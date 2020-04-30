@@ -32,4 +32,53 @@ If you want to use special keys like Enter, Space or the arrow keys, you have to
 
 Here are some examples for that:
 
-`ctrl+kc32` would be Ctrl+Space, `shift+kc10` is Shift+Enter, and `kc127` is the Del key
+`ctrl+kc32` would be Ctrl+Space, `shift+kc10` is Shift+Enter, and `kc127` is 
+the Del key.
+
+Default keybinds
+--
+Basics:
+
+|Action|Shortcut|
+|------|---|
+|Open|  Ctrl+O |
+|Save| Ctrl+S|
+|Help| H|
+|Undo| Ctrl+Z|
+|Redo| Ctrl+Shift+Z|
+
+Folds:
+
+|Action|Shortcut|
+|------|---|
+|Mountain Fold|  M |
+|Valley Fold| V|
+|Line| L|
+|Extend Line | E |
+|Angle Bisector| B|
+|Rabbit Ear |Ctrl+B|
+|Perpendicular Line| P|
+|Reflection| R|
+|Multiple Reflections|Ctrl+R|
+|Flatfold Vertex|N|
+|Grid fill| G|
+|Mirror along a Line| Ctrl+G|
+|Mirror| Ctrl+M|
+|Change Linetype|C|
+|Delete unused Vertices| Ctrl+V
+
+Base Folding
+
+|Action|Shortcut|
+|------|---|
+|Fold Base| F |
+|Flip folded Base| Ctrl+Shift+F|
+|Discard folded Base| Ctrl+F|
+
+Miscellaneous
+
+|Action|Shortcut|
+|------|---|
+|Selection Tool| S |
+|Delete selected Lines| Del|
+|Delete Lines| Ctrl+D|
