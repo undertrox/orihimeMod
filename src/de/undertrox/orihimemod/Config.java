@@ -1,6 +1,9 @@
 package de.undertrox.orihimemod;
 
+import de.undertrox.orihimemod.keybind.Keybind;
 import javafx.util.Pair;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -17,41 +20,30 @@ public class Config {
     private Config() {
     }
 
+    private static Config getInstance() {
+        if (instance == null) {
+            throw new RuntimeException("Tried to access Config before loading Config file.");
+        }
+        return instance;
+    }
+
     public static boolean showNumberTooltips() {
-        return instance.SHOW_NUMBER_TOOLTIPS;
+        return getInstance().SHOW_NUMBER_TOOLTIPS;
     }
 
     public static String generatedVersion() {
-        return instance.GENERATED_VERSION;
+        return getInstance().GENERATED_VERSION;
     }
 
     public static List<Keybind> keybinds() {
-        return instance.keybinds;
+        return getInstance().keybinds;
     }
 
-    public static void load(String config_filename) {
+    public static void load(String configFileName) {
         instance = new Config();
-        File file = new File(config_filename);
+        File file = new File(configFileName);
         if (!file.exists()) {
-            System.out.println("No config file found, generating default config file.");
-            InputStream reader = instance.getClass().getResourceAsStream("orihimeKeybinds.cfg");
-            OutputStream writer = null;
-            try {
-                writer = new FileOutputStream(new File(config_filename));
-
-                byte[] buffer = new byte[1024];
-                int length;
-                while (true) {
-                    try {
-                        if (!((length = reader.read(buffer)) > 0)) break;
-                        writer.write(buffer, 0, length);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+            createConfigFile(configFileName);
         }
         String line;
         try {
@@ -68,15 +60,41 @@ public class Config {
         }
     }
 
+    private static void createConfigFile(String configFileName) {
+        System.out.println("No config file found, generating default config file.");
+        InputStream reader = instance.getClass().getResourceAsStream("orihimeKeybinds.cfg");
+        OutputStream writer;
+        try {
+            writer = new FileOutputStream(new File(configFileName));
+            copy(reader, writer);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void copy(InputStream from, OutputStream to) {
+        byte[] buffer = new byte[1024];
+        int length;
+        while (true) {
+            try {
+                if (!((length = from.read(buffer)) > 0)) break;
+                to.write(buffer, 0, length);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Nullable
     private static Pair<String, String> parseLine(String line) {
-        Pair<String, String> result = null;
         line = line.trim();
-        if (line.length() == 0 || line.charAt(0) == '#') {
+        if (line.length() == 0 || line.charAt(0) == '#') { // Comments and empty lines
             return null;
         }
         StringBuilder configName = new StringBuilder();
         StringBuilder configValue = new StringBuilder();
         boolean foundEquals = false;
+
         for (int i = 0; i < line.length(); i++) {
             char c = line.charAt(i);
             if (!foundEquals) {
@@ -91,40 +109,53 @@ public class Config {
                 }
             }
         }
-        result = new Pair<>(configName.toString(), configValue.toString());
-        return result;
+        return new Pair<>(configName.toString(), configValue.toString());
     }
 
-    private static void parsePair(Pair<String, String> pair) {
-        if (pair.getKey().equals("orihimekeybinds.generatedversion")) {
-            instance.GENERATED_VERSION = pair.getValue();
-        } else if (pair.getKey().equals("orihimekeybinds.showkeybindidtooltips")) {
-            instance.SHOW_NUMBER_TOOLTIPS = Boolean.parseBoolean(pair.getValue());
-        } else if ((pair.getKey().matches("orihimekeybinds.button.[0-9]+"))) {
-            if (pair.getValue().equals("")) {
-                return;
-            }
-            boolean ctrl = false;
-            boolean alt = false;
-            boolean shift = false;
-            if (pair.getValue().contains("ctrl+")) ctrl = true;
-            if (pair.getValue().contains("alt+")) alt = true;
-            if (pair.getValue().contains("shift+")) shift = true;
-            int button = Integer.parseInt(pair.getKey().substring(pair.getKey().lastIndexOf('.') + 1));
-            String key = pair.getValue().substring(pair.getValue().lastIndexOf('+') + 1);
-            Keybind bind = null;
-            if (key.startsWith("kc")) {
-                bind = new Keybind(button, Integer.parseInt(key.substring(2)), shift, ctrl, alt);
-            } else {
-                if (key.length() != 1) {
-                    System.err.println("Keybind Syntax Error! '" + key + "' is not 1 character long.");
-                } else {
-                    bind = new Keybind(button, key.charAt(0), shift, ctrl, alt);
-                }
-            }
-            if (bind != null) {
-                instance.keybinds.add(bind);
+    private static void parsePair(@NotNull Pair<String, String> pair) {
+        String key = pair.getKey();
+        String value = pair.getValue();
+        if (key.equals("orihimekeybinds.generatedversion")) {
+            instance.GENERATED_VERSION = value;
+        } else if (key.equals("orihimekeybinds.showkeybindidtooltips")) {
+            instance.SHOW_NUMBER_TOOLTIPS = Boolean.parseBoolean(value);
+        }else if ((key.matches("orihimekeybinds.button.[0-9]+"))) {
+            Keybind keybind = parseKeybind(pair);
+            if (keybind != null) {
+                instance.keybinds.add(keybind);
             }
         }
     }
+
+    @Nullable
+    private static Keybind parseKeybind(Pair<String, String> pair) {
+        String key = pair.getKey();
+        String value = pair.getValue();
+        if (value.equals("")) {
+            return null;
+        }
+
+        boolean ctrl = false;
+        boolean alt = false;
+        boolean shift = false;
+        if (value.contains("ctrl+")) ctrl = true;
+        if (value.contains("alt+")) alt = true;
+        if (value.contains("shift+")) shift = true;
+        int button = Integer.parseInt(key.substring(key.lastIndexOf('.') + 1));
+
+        String keyChar = value.substring(value.lastIndexOf('+') + 1);
+        if (keyChar.startsWith("kc")) {
+            return new Keybind(button, Integer.parseInt(keyChar.substring(2)), shift, ctrl, alt);
+        } else {
+            if (keyChar.length() != 1) {
+                System.err.println("Keybind Syntax Error! '" + keyChar + "' is not 1 character long.");
+            } else {
+                return new Keybind(button, keyChar.charAt(0), shift, ctrl, alt);
+            }
+        }
+
+        return null;
+    }
+
+
 }

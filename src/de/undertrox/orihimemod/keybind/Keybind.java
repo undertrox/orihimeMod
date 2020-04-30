@@ -1,4 +1,4 @@
-package de.undertrox.orihimemod;
+package de.undertrox.orihimemod.keybind;
 
 import java.awt.event.KeyEvent;
 

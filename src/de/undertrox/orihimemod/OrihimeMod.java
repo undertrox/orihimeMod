@@ -4,7 +4,6 @@ import jp.gr.java_conf.mt777.origami.orihime.ap;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,40 +15,24 @@ public class OrihimeMod {
 
     public static void main(String[] args) {
         System.out.println("OrihimeMod version " + version + " is Starting...");
-        ap frame = new ap();
+        System.out.println("Loading config...");
+        Config.load("orihimeKeybinds.cfg");
+        System.out.println("Loaded "+Config.keybinds().size()+" Keybinds.");
 
+        System.out.println("Starting Orihime...");
+        ap frame = new ap();
         frame.setSize(1200, 700);
         frame.setLocationRelativeTo(null);
         System.out.println("Indexing Buttons...");
         indexButtons(frame);
         System.out.println("Found " + buttons.size() + " Buttons for keybinds");
-        System.out.println("Loading config...");
-        Config.load("orihimeKeybinds.cfg");
-        List<Keybind> keybinds=Config.keybinds();
+
         if (Config.showNumberTooltips()) {
             for (int i = 0; i < buttons.size(); i++) {
                 buttons.get(i).setToolTipText("Keybind ID: "+ i);
             }
         }
-        System.out.println("Loaded "+keybinds.size()+" Keybinds.");
-        KeyListener listener = new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                for (Keybind keybind : keybinds) {
-                    if (keybind.matches(e)) {
-                        buttons.get(keybind.getButtonNumber()).doClick();
-                    }
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-            }
-        };
+        KeyListener listener = new KeybindListener();
         frame.addKeyListener(listener);
         addKeyListenerToChildren(listener, frame);
         frame.setTitle(frame.getTitle()+" - OrihimeMod version " + version);
