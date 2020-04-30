@@ -60,10 +60,18 @@ public class Keybind {
         return alt;
     }
 
+    /**
+     *
+     * @param event KeyEvent to test
+     * @return true, if the event matches the parameters of the keybind
+     */
     public boolean matches(KeyEvent event) {
         return this.getKeyCode() == event.getExtendedKeyCode() && modifiersMatch(event.getModifiersEx());
     }
 
+    /**
+     * returns true if the modifier mask in the argument matches the modifiers of this keybind
+     */
     public boolean modifiersMatch(int modifiers) {
         int onmask = 0;
         int offmask = 0;
