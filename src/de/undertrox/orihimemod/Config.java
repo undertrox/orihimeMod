@@ -6,12 +6,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Config {
     private static Config instance;
 
+    private static final String[] prevVersions = {"0.1.0", "0.1.1", "0.1.2"};
     public boolean SHOW_NUMBER_TOOLTIPS = false;
     public String GENERATED_VERSION = "error loading version";
     public boolean SHOW_KEYBIND_TOOLTIPS = true;
@@ -61,7 +65,26 @@ public class Config {
                 }
             }
         } catch (IOException e) {
-            System.err.println(e);
+            e.printStackTrace();
+        }
+
+        if (!Config.generatedVersion().equals(OrihimeMod.version)) {
+            updateConfigFrom(Config.generatedVersion(), configFileName);
+            System.out.println("Reloading Config file...");
+            load(configFileName);
+        }
+    }
+
+    private static void updateConfigFrom(String version, String configFileName) {
+        System.out.println("Updating Config file from version " + version + " to " + OrihimeMod.version);
+        try {
+            String content = new String(Files.readAllBytes(Paths.get(configFileName)));
+            content = content.replace("orihimeKeybinds.generatedVersion="+version,
+                    "orihimeKeybinds.generatedVersion="+OrihimeMod.version);
+            content += getAddedConfigSince(Config.generatedVersion());
+            Files.write(Paths.get(configFileName), content.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -164,5 +187,35 @@ public class Config {
         return null;
     }
 
+    private static String[] getVersionsBetween(String ver1, String ver2) {
+        int index1 = Arrays.asList(prevVersions).indexOf(ver1)+1;
+        int index2 = Arrays.asList(prevVersions).indexOf(ver2)+1;
 
+        return Arrays.copyOfRange(prevVersions, index1, index2);
+    }
+
+    private static String getAddedConfig(String version) {
+        StringBuilder res = new StringBuilder("\n");
+        InputStream input = instance.getClass().getResourceAsStream("configFiles/" + version + ".cfg");
+        Reader reader = new BufferedReader(new InputStreamReader(input));
+        int c = 0;
+        while (true) {
+            try {
+                if ((c = reader.read()) == -1) break;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            res.append((char) c);
+        }
+        System.out.println(version + res.toString());
+        return res.toString();
+    }
+
+    private static String getAddedConfigSince(String version) {
+        StringBuilder res = new StringBuilder("\n");
+        for (String v : getVersionsBetween(version, OrihimeMod.version)) {
+            res.append(getAddedConfig(v));
+        }
+        return res.toString();
+    }
 }
