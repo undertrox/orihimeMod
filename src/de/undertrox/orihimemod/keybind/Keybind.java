@@ -23,12 +23,11 @@ public class Keybind {
 
     @Override
     public String toString() {
-        StringBuilder b = new StringBuilder("Keybind(");
-        if (ctrl) b.append("ctrl+");
-        if(alt) b.append("alt+");
-        if(shift) b.append("shift+");
-        b.append(keyCode);
-        b.append(")");
+        StringBuilder b = new StringBuilder();
+        if (ctrl) b.append("CTRL+");
+        if(alt) b.append("ALT+");
+        if(shift) b.append("SHIFT+");
+        b.append(KeyEvent.getKeyText(keyCode));
         return b.toString();
     }
 

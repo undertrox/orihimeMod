@@ -14,6 +14,7 @@ public class Config {
 
     public boolean SHOW_NUMBER_TOOLTIPS = false;
     public String GENERATED_VERSION = "error loading version";
+    public boolean SHOW_KEYBIND_TOOLTIPS = true;
     private List<Pair<String, String>> parsed = new ArrayList<>();
     private List<Keybind> keybinds = new ArrayList<>();
 
@@ -29,6 +30,10 @@ public class Config {
 
     public static boolean showNumberTooltips() {
         return getInstance().SHOW_NUMBER_TOOLTIPS;
+    }
+
+    public static boolean showKeybindTooltips() {
+        return getInstance().SHOW_KEYBIND_TOOLTIPS;
     }
 
     public static String generatedVersion() {
@@ -119,7 +124,9 @@ public class Config {
             instance.GENERATED_VERSION = value;
         } else if (key.equals("orihimekeybinds.showkeybindidtooltips")) {
             instance.SHOW_NUMBER_TOOLTIPS = Boolean.parseBoolean(value);
-        }else if ((key.matches("orihimekeybinds.button.[0-9]+"))) {
+        } else if (key.equals("orihimekeybinds.showkeybindtooltips")) {
+            instance.SHOW_KEYBIND_TOOLTIPS = Boolean.parseBoolean(value);
+        } else if ((key.matches("orihimekeybinds.button.[0-9]+"))) {
             Keybind keybind = parseKeybind(pair);
             if (keybind != null) {
                 instance.keybinds.add(keybind);
