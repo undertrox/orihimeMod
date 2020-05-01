@@ -15,10 +15,12 @@ import java.util.List;
 public class Config {
     private static Config instance;
 
-    private static final String[] prevVersions = {"0.1.0", "0.1.1", "0.1.2"};
+    private static final String[] versions = {"0.1.0", "0.1.1", "0.1.2", "0.1.3"};
     public boolean SHOW_NUMBER_TOOLTIPS = false;
     public String GENERATED_VERSION = "error loading version";
     public boolean SHOW_KEYBIND_TOOLTIPS = true;
+    public boolean DARK_MODE = false;
+    public boolean EXPERT_MODE=false;
     private List<Pair<String, String>> parsed = new ArrayList<>();
     private List<Keybind> keybinds = new ArrayList<>();
 
@@ -42,6 +44,14 @@ public class Config {
 
     public static String generatedVersion() {
         return getInstance().GENERATED_VERSION;
+    }
+
+    public static boolean useDarkMode() {
+        return getInstance().DARK_MODE;
+    }
+
+    public static boolean useExpertMode() {
+        return getInstance().EXPERT_MODE;
     }
 
     public static List<Keybind> keybinds() {
@@ -149,6 +159,10 @@ public class Config {
             instance.SHOW_NUMBER_TOOLTIPS = Boolean.parseBoolean(value);
         } else if (key.equals("orihimekeybinds.showkeybindtooltips")) {
             instance.SHOW_KEYBIND_TOOLTIPS = Boolean.parseBoolean(value);
+        } else if (key.equals("orihimedarkmode.enable")) {
+            instance.DARK_MODE = Boolean.parseBoolean(value);
+        } else if (key.equals("orihimeexpertmode.enable")) {
+            instance.EXPERT_MODE = Boolean.parseBoolean(value);
         } else if ((key.matches("orihimekeybinds.button.[0-9]+"))) {
             Keybind keybind = parseKeybind(pair);
             if (keybind != null) {
@@ -188,10 +202,10 @@ public class Config {
     }
 
     private static String[] getVersionsBetween(String ver1, String ver2) {
-        int index1 = Arrays.asList(prevVersions).indexOf(ver1)+1;
-        int index2 = Arrays.asList(prevVersions).indexOf(ver2)+1;
+        int index1 = Arrays.asList(versions).indexOf(ver1)+1;
+        int index2 = Arrays.asList(versions).indexOf(ver2)+1;
 
-        return Arrays.copyOfRange(prevVersions, index1, index2);
+        return Arrays.copyOfRange(versions, index1, index2);
     }
 
     private static String getAddedConfig(String version) {
@@ -207,7 +221,6 @@ public class Config {
             }
             res.append((char) c);
         }
-        System.out.println(version + res.toString());
         return res.toString();
     }
 
