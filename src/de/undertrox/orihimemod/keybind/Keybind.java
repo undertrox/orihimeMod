@@ -27,10 +27,6 @@ public class Keybind {
         this(type, componentID, keyCode, false, false, false);
     }
 
-    public Keybind(int componentID, int keyCode, boolean shift, boolean ctrl, boolean alt) {
-        this(BUTTON, componentID, keyCode, shift, ctrl, alt);
-    }
-
     @Override
     public String toString() {
         StringBuilder b = new StringBuilder();
@@ -41,12 +37,8 @@ public class Keybind {
         return b.toString();
     }
 
-    public Keybind(int componentID, char key, boolean shift, boolean ctrl, boolean alt){
-        this(componentID, KeyEvent.getExtendedKeyCodeForChar(key), shift, ctrl, alt);
-    }
-
-    public Keybind(int componentID, char key) {
-        this(componentID, key, false, false, false);
+    public Keybind(int type, int componentID, char key, boolean shift, boolean ctrl, boolean alt){
+        this(type, componentID, KeyEvent.getExtendedKeyCodeForChar(key), shift, ctrl, alt);
     }
 
     public int getComponentID() {
