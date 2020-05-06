@@ -2,15 +2,11 @@ package de.undertrox.orihimemod;
 
 import de.undertrox.orihimemod.keybind.Keybind;
 import de.undertrox.orihimemod.keybind.KeybindListener;
-import jp.gr.java_conf.mt777.kiroku.memo.Memo;
 import jp.gr.java_conf.mt777.origami.orihime.ExposeClasses;
 import jp.gr.java_conf.mt777.origami.orihime.ap;
-import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -20,7 +16,8 @@ import java.util.List;
 public class OrihimeMod {
 
     public static final String version = "0.1.4";
-    public static List<JButton> buttons = new ArrayList<JButton>();
+    public static List<JButton> buttons = new ArrayList<>();
+    public static List<JCheckBox> checkboxes = new ArrayList<>();
     public static JButtonSaveAsCp btnSaveAsCp;
 
     public static void main(String[] args) {
@@ -36,18 +33,22 @@ public class OrihimeMod {
         frame.setLocationRelativeTo(null);
         btnSaveAsCp = new JButtonSaveAsCp(frame);
         btnSaveAsCp.setText("Save as CP");
-        System.out.println("Indexing Buttons...");
+
+        System.out.println("Indexing Buttons and Checkboxes...");
         indexButtons(frame);
+        indexCheckboxes(frame);
+        System.out.println("Found " + buttons.size() + " Buttons and "+ checkboxes.size() +" checkboxes for keybinds");
+
         btnSaveAsCp.setMargin(new Insets(0,0,0,0));
         buttons.get(1).getParent().add(btnSaveAsCp);
+        buttons.add(btnSaveAsCp);
+        btnSaveAsCp.addActionListener(btnSaveAsCp::saveAsCp);
+
         ExposeClasses.setFrame(frame);
         String title = ExposeClasses.getFrameTitle()+" - OrihimeMod version " + version;
         ExposeClasses.setFrameTitle0(title);
         frame.setTitle(title);
-        btnSaveAsCp.addActionListener(btnSaveAsCp::saveAsCp);
-        buttons.add(btnSaveAsCp);
 
-        System.out.println("Found " + buttons.size() + " Buttons for keybinds");
         addTooltips(Config.showNumberTooltips(), Config.showKeybindTooltips());
         KeyListener listener = new KeybindListener();
         frame.addKeyListener(listener);
@@ -70,7 +71,6 @@ public class OrihimeMod {
                 for (KeyListener keyListener : child.getKeyListeners()) {
                     child.removeKeyListener(keyListener);
                 }
-                System.out.println(Arrays.toString(child.getKeyListeners()));
             }
             if (child instanceof JButton || child instanceof JCheckBox) {
                 JComponent c = (JComponent) child;
@@ -95,6 +95,18 @@ public class OrihimeMod {
             }
             if (child instanceof Container) {
                 indexButtons((Container) child);
+            }
+        }
+    }
+
+    static void indexCheckboxes(Container container) {
+        Component[] children = container.getComponents();
+        for (Component child : children) {
+            if (child instanceof JCheckBox) {
+                checkboxes.add((JCheckBox) child);
+            }
+            if (child instanceof Container) {
+                indexCheckboxes((Container) child);
             }
         }
     }
@@ -137,29 +149,41 @@ public class OrihimeMod {
         }
     }
 
-    static void addTooltips(boolean numberTooltips, boolean keybindTooltips) {
-
+    static void addTooltips(boolean showNumberTooltips, boolean showKeybindTooltips) {
         for (int i = 0; i < buttons.size(); i++) {
             JButton btn = buttons.get(i);
-            if (numberTooltips) {
-                btn.setToolTipText("Keybind ID: " + i);
+            if (showNumberTooltips) {
+                btn.setToolTipText("Keybind ID: orihimeKeybinds.button." + i);
             }
-            if (keybindTooltips) {
+            if (showKeybindTooltips) {
                 StringBuilder b = new StringBuilder();
-                for (Keybind keybind : getKeybindsForButton(i)) {
+                for (Keybind keybind : getKeybindsFor(i, Keybind.BUTTON)) {
                     b.append("<br>"+keybind.toString());
                 }
                 btn.setToolTipText(btn.getToolTipText()+b.toString());
             }
             btn.setToolTipText("<html>"+btn.getToolTipText()+"</html>");
         }
-
+        for (int i = 0; i < checkboxes.size(); i++) {
+            JCheckBox checkBox = checkboxes.get(i);
+            if (showNumberTooltips) {
+                checkBox.setToolTipText("Keybind ID: orihimeKeybinds.checkbox." + i);
+            }
+            if (showKeybindTooltips) {
+                StringBuilder b = new StringBuilder();
+                for (Keybind keybind : getKeybindsFor(i, Keybind.CHECKBOX)) {
+                    b.append("<br>"+keybind.toString());
+                }
+                checkBox.setToolTipText(checkBox.getToolTipText()+b.toString());
+            }
+            checkBox.setToolTipText("<html>"+checkBox.getToolTipText()+"</html>");
+        }
     }
 
-    static List<Keybind> getKeybindsForButton(int buttonId) {
+    static List<Keybind> getKeybindsFor(int buttonId, int type) {
         List<Keybind> result = new ArrayList<>();
         for (Keybind keybind : Config.keybinds()) {
-            if (keybind.getButtonNumber()==buttonId){
+            if (keybind.getComponentID()==buttonId&&keybind.getType()==type){
                 result.add(keybind);
             }
         }

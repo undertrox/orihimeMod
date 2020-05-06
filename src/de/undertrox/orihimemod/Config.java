@@ -164,7 +164,12 @@ public class Config {
         } else if (key.equals("orihimeexpertmode.enable")) {
             instance.EXPERT_MODE = Boolean.parseBoolean(value);
         } else if ((key.matches("orihimekeybinds.button.[0-9]+"))) {
-            Keybind keybind = parseKeybind(pair);
+            Keybind keybind = parseKeybind(pair, Keybind.BUTTON);
+            if (keybind != null) {
+                instance.keybinds.add(keybind);
+            }
+        } else if (key.matches("orihimekeybinds.checkbox.[0-9]+")){
+            Keybind keybind = parseKeybind(pair, Keybind.CHECKBOX);
             if (keybind != null) {
                 instance.keybinds.add(keybind);
             }
@@ -172,7 +177,7 @@ public class Config {
     }
 
     @Nullable
-    private static Keybind parseKeybind(Pair<String, String> pair) {
+    private static Keybind parseKeybind(Pair<String, String> pair, int type) {
         String key = pair.getKey();
         String value = pair.getValue();
         if (value.equals("")) {
@@ -189,12 +194,12 @@ public class Config {
 
         String keyChar = value.substring(value.lastIndexOf('+') + 1);
         if (keyChar.startsWith("kc")) {
-            return new Keybind(button, Integer.parseInt(keyChar.substring(2)), shift, ctrl, alt);
+            return new Keybind(type, button, Integer.parseInt(keyChar.substring(2)), shift, ctrl, alt);
         } else {
             if (keyChar.length() != 1) {
                 System.err.println("Keybind Syntax Error! '" + keyChar + "' is not 1 character long.");
             } else {
-                return new Keybind(button, keyChar.charAt(0), shift, ctrl, alt);
+                return new Keybind(type, button, keyChar.charAt(0), shift, ctrl, alt);
             }
         }
 

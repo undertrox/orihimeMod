@@ -3,22 +3,32 @@ package de.undertrox.orihimemod.keybind;
 import java.awt.event.KeyEvent;
 
 public class Keybind {
-    private int buttonNumber;
+
+    public static final int BUTTON = 0;
+    public static final int CHECKBOX = 1;
+
+    private int componentID;
     private int keyCode;
     private boolean shift;
     private boolean ctrl;
     private boolean alt;
+    private int type;
 
-    public Keybind(int buttonNumber, int keyCode, boolean shift, boolean ctrl, boolean alt) {
-        this.buttonNumber = buttonNumber;
+    public Keybind(int type, int componentID, int keyCode, boolean shift, boolean ctrl, boolean alt) {
+        this.type = type;
+        this.componentID = componentID;
         this.keyCode = keyCode;
         this.shift = shift;
         this.ctrl = ctrl;
         this.alt = alt;
     }
 
-    public Keybind(int buttonNumber, int keyCode) {
-        this(buttonNumber, keyCode, false, false, false);
+    public Keybind(int type, int componentID, int keyCode) {
+        this(type, componentID, keyCode, false, false, false);
+    }
+
+    public Keybind(int componentID, int keyCode, boolean shift, boolean ctrl, boolean alt) {
+        this(BUTTON, componentID, keyCode, shift, ctrl, alt);
     }
 
     @Override
@@ -31,20 +41,24 @@ public class Keybind {
         return b.toString();
     }
 
-    public Keybind(int buttonNumber, char key, boolean shift, boolean ctrl, boolean alt){
-        this(buttonNumber, KeyEvent.getExtendedKeyCodeForChar(key), shift, ctrl, alt);
+    public Keybind(int componentID, char key, boolean shift, boolean ctrl, boolean alt){
+        this(componentID, KeyEvent.getExtendedKeyCodeForChar(key), shift, ctrl, alt);
     }
 
-    public Keybind(int buttonNumber, char key) {
-        this(buttonNumber, key, false, false, false);
+    public Keybind(int componentID, char key) {
+        this(componentID, key, false, false, false);
     }
 
-    public int getButtonNumber() {
-        return buttonNumber;
+    public int getComponentID() {
+        return componentID;
     }
 
     public int getKeyCode() {
         return keyCode;
+    }
+
+    public int getType() {
+        return type;
     }
 
     public boolean hasShift() {

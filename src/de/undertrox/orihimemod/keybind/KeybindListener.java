@@ -2,7 +2,6 @@ package de.undertrox.orihimemod.keybind;
 
 import de.undertrox.orihimemod.Config;
 import de.undertrox.orihimemod.OrihimeMod;
-import de.undertrox.orihimemod.keybind.Keybind;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -17,7 +16,11 @@ public class KeybindListener implements KeyListener {
     public void keyPressed(KeyEvent e) {
         for (Keybind keybind : Config.keybinds()) {
             if (keybind.matches(e)) {
-                OrihimeMod.buttons.get(keybind.getButtonNumber()).doClick();
+                if (keybind.getType() == Keybind.BUTTON) {
+                    OrihimeMod.buttons.get(keybind.getComponentID()).doClick();
+                } else if (keybind.getType() == Keybind.CHECKBOX) {
+                    OrihimeMod.checkboxes.get(keybind.getComponentID()).doClick();
+                }
             }
         }
 
