@@ -1,5 +1,7 @@
-package de.undertrox.orihimemod;
+package de.undertrox.orihimemod.keybind;
 
+import de.undertrox.orihimemod.Config;
+import de.undertrox.orihimemod.OrihimeMod;
 import de.undertrox.orihimemod.keybind.Keybind;
 
 import java.awt.event.KeyEvent;

@@ -1,28 +1,23 @@
 package de.undertrox.orihimemod;
 
 import de.undertrox.orihimemod.keybind.Keybind;
+import de.undertrox.orihimemod.keybind.KeybindListener;
 import jp.gr.java_conf.mt777.kiroku.memo.Memo;
 import jp.gr.java_conf.mt777.origami.orihime.ExposeClasses;
-import jp.gr.java_conf.mt777.origami.orihime.File_keisiki_henkan;
 import jp.gr.java_conf.mt777.origami.orihime.ap;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
-import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class OrihimeMod {
 
     public static final String version = "0.1.3";
-    static List<JButton> buttons = new ArrayList<JButton>();
-    static JButton btnSaveAsCp = new JButton();
+    public static List<JButton> buttons = new ArrayList<JButton>();
+    public static JButton btnSaveAsCp = new JButton();
 
     public static void main(String[] args) {
         System.out.println("OrihimeMod version " + version + " is Starting...");
@@ -59,17 +54,15 @@ public class OrihimeMod {
             String fname = fd.getDirectory() + fd.getFile();
             Memo memo1;
             memo1 = es1.getMemo_for_kakidasi();
-            if (fname.endsWith(".svg")) {
-                //ExposeClasses.memoAndName2File(ExposeClasses.orihime2svg(memo1), fname);
-            } else {
-                if (!fname.endsWith(".cp")) {
-                    fname = fname + ".cp";
-                }
-                ExposeClasses.memoAndName2File(ExposeClasses.orihime2cp(memo1), fname);
-                ExposeClasses.setFrameTitle(ExposeClasses.getFrameTitle0() + "        " + fd.getFile());
-                frame.setTitle(ExposeClasses.getFrameTitle());
-                es1.set_title(ExposeClasses.getFrameTitle());
+
+            if (!fname.endsWith(".cp")) {
+                fname = fname + ".cp";
             }
+            ExposeClasses.memoAndName2File(ExposeClasses.orihime2cp(memo1), fname);
+            ExposeClasses.setFrameTitle(ExposeClasses.getFrameTitle0() + "        " + fd.getFile());
+            frame.setTitle(ExposeClasses.getFrameTitle());
+            es1.set_title(ExposeClasses.getFrameTitle());
+
         });
         buttons.add(btnSaveAsCp);
 
