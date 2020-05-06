@@ -2,8 +2,8 @@ Orihime-Mod
 ===
 
 This is a little mod/addon for the software Orihime by @MT777. It adds the possibility 
-to use keyboard shortcuts. Download the jar file [here](https://github.com/undertrox/orihimeMod/releases/download/v0.1.3/orihimeMod-0.1.3.jar)
-(version 0.1.3)
+to use keyboard shortcuts. Download the jar file [here](https://github.com/undertrox/orihimeMod/releases/download/v0.1.4/orihimeMod-0.1.4.jar)
+(version 0.1.4)
 
 How to add a keybind
 --
@@ -14,16 +14,16 @@ the same folder the jar file is in.
 and make sure `orihimeKeybinds.showKeybindIdTooltips` is set to `true` (If you're using 
 the latest version, it should be located at the very end of the file).
 3. Start the software and put your mouse on top of the button that you want to create a 
-keybind for. A Tooltip with the text `Keybind ID: <some number>` will appear.
+keybind for. A Tooltip with the text `Keybind ID: <some text>` will appear.
 4. In `orihimeKeybinds.cfg`, add a new line: 
 ```
-orihimeKeybinds.button.<keybind id>=<key combination>
+<keybind id>=<key combination>
 ```
 Here are some examples: 
 ```
 orihimeKeybinds.button.46=ctrl+S
 orihimeKeybinds.button.100=K
-orihimeKeybinds.button.42=ctrl+alt+A
+orihimeKeybinds.checkbox.42=ctrl+alt+A
 orihimeKeybinds.button.10=shift+L
 ```
 If you want to use special keys like Enter, Space or the arrow keys, you have to use 
