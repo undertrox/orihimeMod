@@ -17,7 +17,7 @@ import java.util.List;
 
 public class OrihimeMod {
 
-    public static final String version = "0.1.3";
+    public static final String version = "0.1.4";
     public static List<JButton> buttons = new ArrayList<JButton>();
     public static JButtonSaveAsCp btnSaveAsCp;
 
