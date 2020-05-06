@@ -9,6 +9,8 @@ import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +19,7 @@ public class OrihimeMod {
 
     public static final String version = "0.1.3";
     public static List<JButton> buttons = new ArrayList<JButton>();
-    public static JButton btnSaveAsCp = new JButton();
+    public static JButtonSaveAsCp btnSaveAsCp;
 
     public static void main(String[] args) {
         System.out.println("OrihimeMod version " + version + " is Starting...");
@@ -25,12 +27,13 @@ public class OrihimeMod {
         Config.load("orihimeKeybinds.cfg");
         System.out.println("Loaded "+Config.keybinds().size()+" Keybinds.");
 
-        btnSaveAsCp.setText("Save as CP");
-
         System.out.println("Starting Orihime...");
+
         ap frame = new ap();
         frame.setSize(1200, 700);
         frame.setLocationRelativeTo(null);
+        btnSaveAsCp = new JButtonSaveAsCp(frame);
+        btnSaveAsCp.setText("Save as CP");
         System.out.println("Indexing Buttons...");
         indexButtons(frame);
         btnSaveAsCp.setMargin(new Insets(0,0,0,0));
@@ -39,31 +42,7 @@ public class OrihimeMod {
         String title = ExposeClasses.getFrameTitle()+" - OrihimeMod version " + version;
         ExposeClasses.setFrameTitle0(title);
         frame.setTitle(title);
-
-        btnSaveAsCp.addActionListener(e -> {
-            Egaki_Syokunin es1 = ExposeClasses.getEs1();
-            ExposeClasses.setExplanationFileName("qqq/kaki.png");
-            ExposeClasses.readImageFromFile3();
-            ExposeClasses.Button_kyoutuu_sagyou();
-            ExposeClasses.setI_mouseDragged_yuukou(0);
-            ExposeClasses.setI_mouseReleased_yuukou(1);
-            es1.kiroku();
-            FileDialog fd = new FileDialog(frame);
-            fd.setTitle("Save file as .cp");
-            fd.setVisible(true);
-            String fname = fd.getDirectory() + fd.getFile();
-            Memo memo1;
-            memo1 = es1.getMemo_for_kakidasi();
-
-            if (!fname.endsWith(".cp")) {
-                fname = fname + ".cp";
-            }
-            ExposeClasses.memoAndName2File(ExposeClasses.orihime2cp(memo1), fname);
-            ExposeClasses.setFrameTitle(ExposeClasses.getFrameTitle0() + "        " + fd.getFile());
-            frame.setTitle(ExposeClasses.getFrameTitle());
-            es1.set_title(ExposeClasses.getFrameTitle());
-
-        });
+        btnSaveAsCp.addActionListener(btnSaveAsCp::saveAsCp);
         buttons.add(btnSaveAsCp);
 
         System.out.println("Found " + buttons.size() + " Buttons for keybinds");
@@ -110,7 +89,6 @@ public class OrihimeMod {
 
     static void enableDarkModeOn(Container container) {
         Component[] children = container.getComponents();
-        // OZ seems to be the Drawing class for the folded Shape
         for (Component child : children) {
 
             if (child instanceof Panel || child instanceof JPanel) {
