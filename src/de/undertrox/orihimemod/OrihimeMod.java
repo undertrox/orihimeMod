@@ -11,8 +11,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class OrihimeMod {
@@ -64,7 +66,22 @@ public class OrihimeMod {
     static void addKeyListenerToChildren(KeyListener listener, Container container) {
         Component[] children = container.getComponents();
         for (Component child : children) {
-            child.addKeyListener(listener);
+            if (child.getKeyListeners().length>0) {
+                for (KeyListener keyListener : child.getKeyListeners()) {
+                    child.removeKeyListener(keyListener);
+                }
+                System.out.println(Arrays.toString(child.getKeyListeners()));
+            }
+            if (child instanceof JButton || child instanceof JCheckBox) {
+                JComponent c = (JComponent) child;
+                c.getInputMap(JComponent.WHEN_FOCUSED)
+                        .put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,0,false), "none");
+                c.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                        .put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,0,false), "none");
+            }
+            if (!(child instanceof JTextField)) {
+                child.addKeyListener(listener);
+            }
             if (child instanceof Container) {
                 addKeyListenerToChildren(listener, (Container) child);
             }

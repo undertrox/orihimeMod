@@ -20,6 +20,7 @@ public class KeybindListener implements KeyListener {
                 OrihimeMod.buttons.get(keybind.getButtonNumber()).doClick();
             }
         }
+
     }
 
     @Override
