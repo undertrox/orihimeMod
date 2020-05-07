@@ -233,8 +233,10 @@ public class OrihimeMod {
             }
             ExposeClasses.memoAndName2File(memo1, fname);
         }
-        ExposeClasses.setFrameTitle(ExposeClasses.getFrameTitle0() + "        " + fd.getFile());
-        frame.setTitle(ExposeClasses.getFrameTitle());
-        es1.set_title(ExposeClasses.getFrameTitle());
+        if (fd.getFile()!= null) {
+            ExposeClasses.setFrameTitle(ExposeClasses.getFrameTitle0() + "        " + fd.getFile());
+            frame.setTitle(ExposeClasses.getFrameTitle());
+            es1.set_title(ExposeClasses.getFrameTitle());
+        }
     }
 }

@@ -39,8 +39,10 @@ public class JButtonSaveAsCp extends JButton {
             }
             ExposeClasses.memoAndName2File(ExposeClasses.orihime2cp(memo1), fname);
         }
-        ExposeClasses.setFrameTitle(ExposeClasses.getFrameTitle0() + "        " + fd.getFile());
-        frame.setTitle(ExposeClasses.getFrameTitle());
-        es1.set_title(ExposeClasses.getFrameTitle());
+        if (fd.getFile()!= null) {
+            ExposeClasses.setFrameTitle(ExposeClasses.getFrameTitle0() + "        " + fd.getFile());
+            frame.setTitle(ExposeClasses.getFrameTitle());
+            es1.set_title(ExposeClasses.getFrameTitle());
+        }
     }
 }
