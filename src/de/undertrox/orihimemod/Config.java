@@ -59,6 +59,7 @@ public class Config {
     }
 
     public static void load(String configFileName) {
+        System.out.println("Loading Config file");
         instance = new Config();
         File file = new File(configFileName);
         if (!file.exists()) {
@@ -84,6 +85,29 @@ public class Config {
             load(configFileName);
         }
     }
+
+    public static void updateConfigFile(String configFileName) {
+        Config changed = instance;
+        load(configFileName);
+        List<Keybind> newKeybinds = new ArrayList<>();
+        for (Keybind keybind : changed.keybinds) {
+            if (!instance.keybinds.contains(keybind)) {
+                System.out.println(keybind);
+                newKeybinds.add(keybind);
+            }
+        }
+        try {
+            String content = new String(Files.readAllBytes(Paths.get(configFileName)));
+            for (Keybind newKeybind : newKeybinds) {
+                content += "\n" + newKeybind.toConfigEntry();
+            }
+            Files.write(Paths.get(configFileName), content.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        load(configFileName);
+    }
+
 
     private static void updateConfigFrom(String version, String configFileName) {
         System.out.println("Updating Config file from version " + version + " to " + OrihimeMod.version);

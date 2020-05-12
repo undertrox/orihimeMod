@@ -1,6 +1,7 @@
 package de.undertrox.orihimemod.keybind;
 
 import java.awt.event.KeyEvent;
+import java.util.Objects;
 
 public class Keybind {
 
@@ -29,10 +30,7 @@ public class Keybind {
 
     @Override
     public String toString() {
-        StringBuilder b = new StringBuilder();
-        if (ctrl) b.append("CTRL+");
-        if(alt) b.append("ALT+");
-        if(shift) b.append("SHIFT+");
+        StringBuilder b = new StringBuilder(getModifiers());
         b.append(KeyEvent.getKeyText(keyCode));
         return b.toString();
     }
@@ -74,6 +72,14 @@ public class Keybind {
         return this.getKeyCode() == event.getExtendedKeyCode() && modifiersMatch(event.getModifiersEx());
     }
 
+    public String getModifiers() {
+        String s = "";
+        if (ctrl) s += "CTRL+";
+        if(alt) s += "ALT+";
+        if(shift) s += "SHIFT+";
+        return s;
+    }
+
     /**
      * returns true if the modifier mask in the argument matches the modifiers of this keybind
      */
@@ -98,4 +104,30 @@ public class Keybind {
         return (modifiers & (onmask|offmask)) == onmask;
     }
 
+    public String toConfigEntry() {
+        String s = "orihimeKeybinds.";
+        if (type == BUTTON) {
+            s += "button.";
+        } else if(type == CHECKBOX) {
+            s += "checkbox.";
+        }
+        s += componentID;
+        s += "=";
+        s += getModifiers();
+        s += "kc" + getKeyCode();
+        return s;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Keybind keybind = (Keybind) o;
+        return componentID == keybind.componentID &&
+                keyCode == keybind.keyCode &&
+                shift == keybind.shift &&
+                ctrl == keybind.ctrl &&
+                alt == keybind.alt &&
+                type == keybind.type;
+    }
 }

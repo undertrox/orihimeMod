@@ -33,7 +33,6 @@ public class OrihimeMod {
 
     public static void main(String[] args) {
         System.out.println("OrihimeMod version " + version + " is Starting...");
-        System.out.println("Loading config...");
         Config.load("orihimeKeybinds.cfg");
         System.out.println("Loaded "+Config.keybinds().size()+" Keybinds.");
 
@@ -289,6 +288,7 @@ public class OrihimeMod {
                 Config.keybinds().add(new Keybind(Keybind.BUTTON, id, lastKeyEvent.getExtendedKeyCode(),
                         lastKeyEvent.isShiftDown(), lastKeyEvent.isControlDown(), lastKeyEvent.isAltDown()));
                 addTooltips(Config.showNumberTooltips(), Config.showKeybindTooltips());
+                Config.updateConfigFile("orihimeKeybinds.cfg");
             }
         }
     }
