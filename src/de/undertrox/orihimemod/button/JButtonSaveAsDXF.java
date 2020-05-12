@@ -2,7 +2,7 @@ package de.undertrox.orihimemod.button;
 
 import de.undertrox.orihimemod.ExportDXF;
 import jp.gr.java_conf.mt777.kiroku.memo.Memo;
-import jp.gr.java_conf.mt777.origami.orihime.ExposeClasses;
+import jp.gr.java_conf.mt777.origami.orihime.Expose;
 import jp.gr.java_conf.mt777.origami.orihime.ap;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 
@@ -18,12 +18,12 @@ public class JButtonSaveAsDXF extends JButton {
     }
 
     public void saveAsDXF(ActionEvent e) {
-        Egaki_Syokunin es1 = ExposeClasses.getEs1();
-        ExposeClasses.setExplanationFileName("qqq/kaki.png");
-        ExposeClasses.readImageFromFile3();
-        ExposeClasses.Button_kyoutuu_sagyou();
-        ExposeClasses.setI_mouseDragged_yuukou(0);
-        ExposeClasses.setI_mouseReleased_yuukou(1);
+        Egaki_Syokunin es1 = Expose.getEs1();
+        Expose.setExplanationFileName("qqq/kaki.png");
+        Expose.readImageFromFile3();
+        Expose.Button_kyoutuu_sagyou();
+        Expose.setI_mouseDragged_yuukou(0);
+        Expose.setI_mouseReleased_yuukou(1);
         es1.kiroku();
         FileDialog fd = new FileDialog(frame);
         fd.setTitle("Save file as .dxf");
@@ -34,11 +34,11 @@ public class JButtonSaveAsDXF extends JButton {
         if (!fname.endsWith(".dxf")) {
             fname = fname + ".dxf";
         }
-        ExposeClasses.memoAndName2File(ExportDXF.cpToDxf(ExposeClasses.orihime2cp(memo1)), fname);
+        Expose.memoAndName2File(ExportDXF.cpToDxf(Expose.orihime2cp(memo1)), fname);
         if (fd.getFile()!= null) {
-            ExposeClasses.setFrameTitle(ExposeClasses.getFrameTitle0() + "        " + fd.getFile());
-            frame.setTitle(ExposeClasses.getFrameTitle());
-            es1.set_title(ExposeClasses.getFrameTitle());
+            Expose.setFrameTitle(Expose.getFrameTitle0() + "        " + fd.getFile());
+            frame.setTitle(Expose.getFrameTitle());
+            es1.set_title(Expose.getFrameTitle());
         }
     }
 }

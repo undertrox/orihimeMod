@@ -3,15 +3,13 @@ package jp.gr.java_conf.mt777.origami.orihime;
 import jp.gr.java_conf.mt777.kiroku.memo.Memo;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 
-import javax.swing.*;
-
 // this class is used to expose Package-private Fields and Methods, mainly from the class ap
-public class ExposeClasses {
+public class Expose {
 
     private static ap frame;
 
     public static void setFrame(ap frame) {
-        ExposeClasses.frame = frame;
+        Expose.frame = frame;
     }
 
     public static String getExplanationFileName() {

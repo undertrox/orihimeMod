@@ -89,6 +89,12 @@ public class ExportDXF {
         return dxf;
     }
 
+    public static Memo foldedToDXF(Memo folded) {
+        Memo dxf = new Memo();
+
+        return dxf;
+    }
+
     private static double scale(double d, double scale, double center) {
         return d*scale+center;
     }

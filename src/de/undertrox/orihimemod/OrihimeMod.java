@@ -5,7 +5,7 @@ import de.undertrox.orihimemod.button.JButtonSaveAsDXF;
 import de.undertrox.orihimemod.keybind.Keybind;
 import de.undertrox.orihimemod.keybind.KeybindListener;
 import jp.gr.java_conf.mt777.kiroku.memo.Memo;
-import jp.gr.java_conf.mt777.origami.orihime.ExposeClasses;
+import jp.gr.java_conf.mt777.origami.orihime.Expose;
 import jp.gr.java_conf.mt777.origami.orihime.ap;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 
@@ -63,9 +63,9 @@ public class OrihimeMod {
         }
         buttons.get(1).addActionListener(OrihimeMod::saveBtnNew);
 
-        ExposeClasses.setFrame(frame);
-        String title = ExposeClasses.getFrameTitle()+" - OrihimeMod version " + version;
-        ExposeClasses.setFrameTitle0(title);
+        Expose.setFrame(frame);
+        String title = Expose.getFrameTitle()+" - OrihimeMod version " + version;
+        Expose.setFrameTitle0(title);
         frame.setTitle(title);
 
         addTooltips(Config.showNumberTooltips(), Config.showKeybindTooltips());
@@ -210,12 +210,12 @@ public class OrihimeMod {
     }
 
     static void saveBtnNew(ActionEvent e) {
-        Egaki_Syokunin es1 = ExposeClasses.getEs1();
-        ExposeClasses.setExplanationFileName("qqq/kaki.png");
-        ExposeClasses.readImageFromFile3();
-        ExposeClasses.Button_kyoutuu_sagyou();
-        ExposeClasses.setI_mouseDragged_yuukou(0);
-        ExposeClasses.setI_mouseReleased_yuukou(1);
+        Egaki_Syokunin es1 = Expose.getEs1();
+        Expose.setExplanationFileName("qqq/kaki.png");
+        Expose.readImageFromFile3();
+        Expose.Button_kyoutuu_sagyou();
+        Expose.setI_mouseDragged_yuukou(0);
+        Expose.setI_mouseReleased_yuukou(1);
         es1.kiroku();
         FileDialog fd = new FileDialog(frame);
         fd.setTitle("Save file");
@@ -224,19 +224,19 @@ public class OrihimeMod {
         Memo memo1;
         memo1 = es1.getMemo_for_kakidasi();
         if (fname.endsWith(".dxf")) {
-            ExposeClasses.memoAndName2File(ExportDXF.cpToDxf(ExposeClasses.orihime2cp(memo1)), fname);
+            Expose.memoAndName2File(ExportDXF.cpToDxf(Expose.orihime2cp(memo1)), fname);
         } else if (fname.endsWith(".cp")) {
-            ExposeClasses.memoAndName2File(ExposeClasses.orihime2cp(memo1), fname);
+            Expose.memoAndName2File(Expose.orihime2cp(memo1), fname);
         } else {
             if (!(fname.endsWith(".orh"))) {
                 fname += ".orh";
             }
-            ExposeClasses.memoAndName2File(memo1, fname);
+            Expose.memoAndName2File(memo1, fname);
         }
         if (fd.getFile()!= null) {
-            ExposeClasses.setFrameTitle(ExposeClasses.getFrameTitle0() + "        " + fd.getFile());
-            frame.setTitle(ExposeClasses.getFrameTitle());
-            es1.set_title(ExposeClasses.getFrameTitle());
+            Expose.setFrameTitle(Expose.getFrameTitle0() + "        " + fd.getFile());
+            frame.setTitle(Expose.getFrameTitle());
+            es1.set_title(Expose.getFrameTitle());
         }
     }
 }
