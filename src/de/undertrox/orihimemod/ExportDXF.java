@@ -1,7 +1,11 @@
 package de.undertrox.orihimemod;
 
 import jp.gr.java_conf.mt777.kiroku.memo.Memo;
+import jp.gr.java_conf.mt777.origami.orihime.Expose;
+import jp.gr.java_conf.mt777.origami.orihime.oriagari_zu.Oriagari_Zu;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public class ExportDXF {
@@ -85,13 +89,22 @@ public class ExportDXF {
         dxf.addGyou("ENDSEC");
         dxf.addGyou("  0");
         dxf.addGyou("EOF");
-
         return dxf;
     }
 
-    public static Memo foldedToDXF(Memo folded) {
+    public static Memo foldedToDXF() {
+        // TODO: complete this
         Memo dxf = new Memo();
-
+        Memo svg = new Memo();
+        ArrayList<Oriagari_Zu> l = Expose.getOaz();
+        for (int i = 1; i < l.size(); i++) {
+            svg.addMemo(l.get(i).getMemo_for_svg_kakidasi());
+        }
+        System.out.println("test");
+        for (int i = 1; i <= svg.getGyousuu(); i++) {
+            System.out.println(svg.getGyou(i));
+        }
+        System.out.println("test2");
         return dxf;
     }
 

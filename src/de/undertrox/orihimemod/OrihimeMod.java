@@ -2,8 +2,11 @@ package de.undertrox.orihimemod;
 
 import de.undertrox.orihimemod.button.JButtonSaveAsCp;
 import de.undertrox.orihimemod.button.JButtonSaveAsDXF;
+import de.undertrox.orihimemod.keybind.JInputKeybindDialog;
 import de.undertrox.orihimemod.keybind.Keybind;
 import de.undertrox.orihimemod.keybind.KeybindListener;
+import javafx.scene.input.MouseButton;
+import jdk.nashorn.internal.scripts.JD;
 import jp.gr.java_conf.mt777.kiroku.memo.Memo;
 import jp.gr.java_conf.mt777.origami.orihime.Expose;
 import jp.gr.java_conf.mt777.origami.orihime.ap;
@@ -11,10 +14,7 @@ import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +25,10 @@ public class OrihimeMod {
     public static List<JCheckBox> checkboxes = new ArrayList<>();
     public static JButtonSaveAsCp btnSaveAsCp;
     public static JButtonSaveAsDXF btnSaveAsDXF;
+    public static JPopupMenu rightClickMenu;
+    public static JMenuItem addKeybind;
+    public static String currentKeybindID;
+    public static JInputKeybindDialog inputKeybind;
     public static ap frame;
 
     public static void main(String[] args) {
@@ -42,6 +46,18 @@ public class OrihimeMod {
         btnSaveAsCp.setText("Save as CP");
         btnSaveAsDXF = new JButtonSaveAsDXF(frame);
         btnSaveAsDXF.setText("Save as DXF");
+        inputKeybind = new JInputKeybindDialog();
+        addKeybind = new JMenuItem("Add Keybind");
+        addKeybind.addActionListener((e) -> {
+            inputKeybind.setTitle("Input Keybind for " + currentKeybindID);
+            inputKeybind.setSize(350, 100);
+            inputKeybind.setModal(true);
+            inputKeybind.reset();
+            inputKeybind.setLocationRelativeTo(frame);
+            inputKeybind.setVisible(true);
+        });
+        rightClickMenu = new JPopupMenu();
+        rightClickMenu.add(addKeybind);
 
         System.out.println("Indexing Buttons and Checkboxes...");
         indexButtons(frame);
@@ -54,9 +70,11 @@ public class OrihimeMod {
         btnSaveAsCp.addActionListener(btnSaveAsCp::saveAsCp);
 
         btnSaveAsDXF.setMargin(new Insets(0,0,0,0));
-        buttons.get(0).getParent().add(btnSaveAsDXF);
-        buttons.add(btnSaveAsDXF);
+        //buttons.get(0).getParent().add(btnSaveAsDXF);
+        //buttons.add(btnSaveAsDXF);
         btnSaveAsDXF.addActionListener(btnSaveAsDXF::saveAsDXF);
+
+        addMouseListenerToChildren(frame);
 
         for (ActionListener actionListener : buttons.get(1).getActionListeners()) { // Save button
             buttons.get(1).removeActionListener(actionListener);
@@ -81,6 +99,29 @@ public class OrihimeMod {
             }
         }
         frame.setVisible(true);
+    }
+
+    static void addMouseListenerToChildren(Container container) {
+        Component[] children = container.getComponents();
+        for (Component child : children) {
+            if (child instanceof Container) {
+                addMouseListenerToChildren((Container) child);
+            }
+            if (child instanceof JButton) {
+                JButton b = (JButton) child;
+
+                b.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        if (e.isPopupTrigger()) {
+                            int index = buttons.indexOf(e.getComponent());
+                            currentKeybindID = "orihimeKeybinds.button."+index;
+                            rightClickMenu.show(e.getComponent(), e.getX(), e.getY());
+                        }
+                    }
+                });
+            }
+        }
     }
 
     static void addKeyListenerToChildren(KeyListener listener, Container container) {
@@ -237,6 +278,18 @@ public class OrihimeMod {
             Expose.setFrameTitle(Expose.getFrameTitle0() + "        " + fd.getFile());
             frame.setTitle(Expose.getFrameTitle());
             es1.set_title(Expose.getFrameTitle());
+        }
+    }
+
+    public static void keybindDialogClose(KeyEvent lastKeyEvent) {
+        inputKeybind.reset();
+        if (lastKeyEvent != null) {
+            if (currentKeybindID.contains("button")) {
+                int id = Integer.parseInt(currentKeybindID.substring(23));
+                Config.keybinds().add(new Keybind(Keybind.BUTTON, id, lastKeyEvent.getExtendedKeyCode(),
+                        lastKeyEvent.isShiftDown(), lastKeyEvent.isControlDown(), lastKeyEvent.isAltDown()));
+                addTooltips(Config.showNumberTooltips(), Config.showKeybindTooltips());
+            }
         }
     }
 }
