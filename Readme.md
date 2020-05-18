@@ -7,6 +7,12 @@ to use keyboard shortcuts. Download the jar file [here](https://github.com/under
 
 How to add a keybind
 --
+1. Right click on any button or checkbox
+2. Click add Keybind
+3. Input the Keybind and click save
+
+How to add a keybind (before version 0.1.5)
+--
 1. If you just downloaded this software, start it once and close it again, so the config
 file will be generated. After that, you will find a file called `orihimeKeybinds.cfg` in 
 the same folder the jar file is in.
