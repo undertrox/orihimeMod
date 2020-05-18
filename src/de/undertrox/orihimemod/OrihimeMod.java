@@ -5,8 +5,6 @@ import de.undertrox.orihimemod.button.JButtonSaveAsDXF;
 import de.undertrox.orihimemod.keybind.JInputKeybindDialog;
 import de.undertrox.orihimemod.keybind.Keybind;
 import de.undertrox.orihimemod.keybind.KeybindListener;
-import javafx.scene.input.MouseButton;
-import jdk.nashorn.internal.scripts.JD;
 import jp.gr.java_conf.mt777.kiroku.memo.Memo;
 import jp.gr.java_conf.mt777.origami.orihime.Expose;
 import jp.gr.java_conf.mt777.origami.orihime.ap;
@@ -16,6 +14,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class OrihimeMod {
@@ -27,6 +26,7 @@ public class OrihimeMod {
     public static JButtonSaveAsDXF btnSaveAsDXF;
     public static JPopupMenu rightClickMenu;
     public static JMenuItem addKeybind;
+    public static JMenu removeKeybind;
     public static String currentKeybindID;
     public static JInputKeybindDialog inputKeybind;
     public static ap frame;
@@ -47,6 +47,7 @@ public class OrihimeMod {
         btnSaveAsDXF.setText("Save as DXF");
         inputKeybind = new JInputKeybindDialog();
         addKeybind = new JMenuItem("Add Keybind");
+        removeKeybind = new JMenu("Remove Keybind");
         addKeybind.addActionListener((e) -> {
             inputKeybind.setTitle("Input Keybind for " + currentKeybindID);
             inputKeybind.setSize(350, 100);
@@ -57,6 +58,7 @@ public class OrihimeMod {
         });
         rightClickMenu = new JPopupMenu();
         rightClickMenu.add(addKeybind);
+        rightClickMenu.add(removeKeybind);
 
         System.out.println("Indexing Buttons and Checkboxes...");
         indexButtons(frame);
@@ -113,9 +115,56 @@ public class OrihimeMod {
                     @Override
                     public void mouseReleased(MouseEvent e) {
                         if (e.isPopupTrigger()) {
-                            int index = buttons.indexOf(e.getComponent());
+                            int index = buttons.indexOf(b);
                             currentKeybindID = "orihimeKeybinds.button."+index;
-                            rightClickMenu.show(e.getComponent(), e.getX(), e.getY());
+                            removeKeybind.removeAll();
+                            for (Keybind keybind : Config.keybinds()) {
+                                if (keybind.getConfigID().equals(currentKeybindID)) {
+                                    JMenuItem rk = new JMenuItem(keybind.toString());
+                                    removeKeybind.add(rk);
+                                    rk.addActionListener((ev) -> {
+                                        Config.keybinds().remove(keybind);
+                                        Config.updateConfigFile("orihimeKeybinds.cfg");
+                                        addTooltips(Config.showNumberTooltips(), Config.showKeybindTooltips());
+                                    });
+                                }
+                            }
+                            if (removeKeybind.getSubElements().length == 0) {
+                                removeKeybind.setVisible(false);
+                            } else {
+                                removeKeybind.setVisible(true);
+                            }
+                            rightClickMenu.show(b, e.getX(), e.getY());
+                        }
+                    }
+                });
+            } else if (child instanceof JCheckBox) {
+                JCheckBox c = (JCheckBox) child;
+
+                c.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        if (e.isPopupTrigger()) {
+                            int index = checkboxes.indexOf(c);
+                            currentKeybindID = "orihimeKeybinds.checkbox."+index;
+                            removeKeybind.removeAll();
+                            for (Keybind keybind : Config.keybinds()) {
+                                if (keybind.getConfigID().equals(currentKeybindID)) {
+                                    JMenuItem rk = new JMenuItem(keybind.toString());
+                                    removeKeybind.add(rk);
+                                    rk.addActionListener((ev) -> {
+                                        Config.keybinds().remove(keybind);
+                                        Config.updateConfigFile("orihimeKeybinds.cfg");
+                                        addTooltips(Config.showNumberTooltips(), Config.showKeybindTooltips());
+                                    });
+                                }
+                            }
+                            if (removeKeybind.getSubElements().length == 0) {
+                                removeKeybind.setVisible(false);
+                            } else {
+                                removeKeybind.setVisible(true);
+                            }
+                            rightClickMenu.show(c, e.getX(), e.getY());
                         }
                     }
                 });
@@ -287,9 +336,13 @@ public class OrihimeMod {
                 int id = Integer.parseInt(currentKeybindID.substring(23));
                 Config.keybinds().add(new Keybind(Keybind.BUTTON, id, lastKeyEvent.getExtendedKeyCode(),
                         lastKeyEvent.isShiftDown(), lastKeyEvent.isControlDown(), lastKeyEvent.isAltDown()));
-                addTooltips(Config.showNumberTooltips(), Config.showKeybindTooltips());
-                Config.updateConfigFile("orihimeKeybinds.cfg");
+            } else if (currentKeybindID.contains("checkbox")) {
+                int id = Integer.parseInt(currentKeybindID.substring(25));
+                Config.keybinds().add(new Keybind(Keybind.CHECKBOX, id, lastKeyEvent.getExtendedKeyCode(),
+                        lastKeyEvent.isShiftDown(), lastKeyEvent.isControlDown(), lastKeyEvent.isAltDown()));
             }
+            addTooltips(Config.showNumberTooltips(), Config.showKeybindTooltips());
+            Config.updateConfigFile("orihimeKeybinds.cfg");
         }
     }
 }

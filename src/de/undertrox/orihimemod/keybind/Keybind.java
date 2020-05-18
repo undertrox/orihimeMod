@@ -105,6 +105,14 @@ public class Keybind {
     }
 
     public String toConfigEntry() {
+        String s = getConfigID();
+        s += "=";
+        s += getModifiers();
+        s += "kc" + getKeyCode();
+        return s;
+    }
+
+    public String getConfigID() {
         String s = "orihimeKeybinds.";
         if (type == BUTTON) {
             s += "button.";
@@ -112,9 +120,6 @@ public class Keybind {
             s += "checkbox.";
         }
         s += componentID;
-        s += "=";
-        s += getModifiers();
-        s += "kc" + getKeyCode();
         return s;
     }
 

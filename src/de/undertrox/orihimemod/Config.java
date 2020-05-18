@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class Config {
     private static Config instance;
@@ -90,14 +91,23 @@ public class Config {
         Config changed = instance;
         load(configFileName);
         List<Keybind> newKeybinds = new ArrayList<>();
+        List<Keybind> removedKeybinds = new ArrayList<>();
         for (Keybind keybind : changed.keybinds) {
             if (!instance.keybinds.contains(keybind)) {
                 System.out.println(keybind);
                 newKeybinds.add(keybind);
             }
         }
+        for (Keybind keybind : Config.keybinds()) {
+            if (!changed.keybinds.contains(keybind)) {
+                removedKeybinds.add(keybind);
+            }
+        }
         try {
             String content = new String(Files.readAllBytes(Paths.get(configFileName)));
+            for (Keybind kb : removedKeybinds) {
+                content = content.replaceAll("(?i)" + Pattern.quote(kb.toConfigEntry()), "");
+            }
             for (Keybind newKeybind : newKeybinds) {
                 content += "\n" + newKeybind.toConfigEntry();
             }
