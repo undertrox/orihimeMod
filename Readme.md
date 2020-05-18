@@ -5,14 +5,16 @@ This is a little mod/addon for the software Orihime by @MT777. It adds the possi
 to use keyboard shortcuts. Download the jar file [here](https://github.com/undertrox/orihimeMod/releases/download/v0.1.5/orihimeMod-0.1.5.jar)
 (version 0.1.5)
 
-How to add a keybind
+How to add a keybind 
 --
+
+### Version 0.1.5 and newer
+
 1. Right click on any button or checkbox
 2. Click add Keybind
 3. Input the Keybind and click save
 
-How to add a keybind (before version 0.1.5)
---
+### Version 0.1.4 and older
 1. If you just downloaded this software, start it once and close it again, so the config
 file will be generated. After that, you will find a file called `orihimeKeybinds.cfg` in 
 the same folder the jar file is in.
