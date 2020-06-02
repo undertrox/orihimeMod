@@ -71,8 +71,8 @@ public class OrihimeMod {
         btnSaveAsCp.addActionListener(btnSaveAsCp::saveAsCp);
 
         btnSaveAsDXF.setMargin(new Insets(0,0,0,0));
-        //buttons.get(0).getParent().add(btnSaveAsDXF);
-        //buttons.add(btnSaveAsDXF);
+        buttons.get(0).getParent().add(btnSaveAsDXF);
+        buttons.add(btnSaveAsDXF);
         btnSaveAsDXF.addActionListener(btnSaveAsDXF::saveAsDXF);
 
         addMouseListenerToChildren(frame);
