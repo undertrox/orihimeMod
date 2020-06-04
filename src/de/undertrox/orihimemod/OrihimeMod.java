@@ -2,6 +2,7 @@ package de.undertrox.orihimemod;
 
 import de.undertrox.orihimemod.button.JButtonSaveAsCp;
 import de.undertrox.orihimemod.button.JButtonSaveAsDXF;
+import de.undertrox.orihimemod.button.JButtonSaveAsSVG;
 import de.undertrox.orihimemod.keybind.JInputKeybindDialog;
 import de.undertrox.orihimemod.keybind.Keybind;
 import de.undertrox.orihimemod.keybind.KeybindListener;
@@ -14,7 +15,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class OrihimeMod {
@@ -24,11 +24,14 @@ public class OrihimeMod {
     public static List<JCheckBox> checkboxes = new ArrayList<>();
     public static JButtonSaveAsCp btnSaveAsCp;
     public static JButtonSaveAsDXF btnSaveAsDXF;
+    public static JButtonSaveAsSVG btnSaveAsSVG;
     public static JPopupMenu rightClickMenu;
     public static JMenuItem addKeybind;
     public static JMenu removeKeybind;
     public static String currentKeybindID;
     public static JInputKeybindDialog inputKeybind;
+
+    public static JPopupMenu exportMenu;
     public static ap frame;
 
     public static void main(String[] args) {
@@ -41,6 +44,8 @@ public class OrihimeMod {
         frame = new ap();
         frame.setSize(1200, 700);
         frame.setLocationRelativeTo(null);
+        btnSaveAsSVG = new JButtonSaveAsSVG(frame);
+        btnSaveAsSVG.setText("Save as SVG");
         btnSaveAsCp = new JButtonSaveAsCp(frame);
         btnSaveAsCp.setText("Save as CP");
         btnSaveAsDXF = new JButtonSaveAsDXF(frame);
@@ -66,14 +71,39 @@ public class OrihimeMod {
         System.out.println("Found " + buttons.size() + " Buttons and "+ checkboxes.size() +" checkboxes for keybinds");
 
         btnSaveAsCp.setMargin(new Insets(0,0,0,0));
-        buttons.get(0).getParent().add(btnSaveAsCp);
+        //buttons.get(0).getParent().add(btnSaveAsCp);
         buttons.add(btnSaveAsCp);
         btnSaveAsCp.addActionListener(btnSaveAsCp::saveAsCp);
 
         btnSaveAsDXF.setMargin(new Insets(0,0,0,0));
-        buttons.get(0).getParent().add(btnSaveAsDXF);
+        //buttons.get(0).getParent().add(btnSaveAsDXF);
         buttons.add(btnSaveAsDXF);
         btnSaveAsDXF.addActionListener(btnSaveAsDXF::saveAsDXF);
+
+
+        btnSaveAsSVG.setMargin(new Insets(0,0,0,0));
+        //buttons.get(0).getParent().add(btnSaveAsSVG);
+        buttons.add(btnSaveAsSVG);
+        btnSaveAsSVG.addActionListener(btnSaveAsSVG::saveAsSVG);
+
+        exportMenu = new JPopupMenu();
+        JMenuItem exportDXF = new JMenuItem("dxf");
+        exportDXF.addActionListener( e -> btnSaveAsDXF.doClick());
+        JMenuItem exportSVG = new JMenuItem("svg");
+        exportSVG.addActionListener( e -> btnSaveAsSVG.doClick());
+        JMenuItem exportCP = new JMenuItem("cp");
+        exportCP.addActionListener( e -> btnSaveAsCp.doClick());
+
+        exportMenu.add(exportCP);
+        exportMenu.add(exportSVG);
+        exportMenu.add(exportDXF);
+
+        JButton btnExport = new JButton("Export");
+        btnExport.addActionListener(e -> exportMenu.show(btnExport, 0, btnExport.getHeight()));
+        btnExport.setMargin(new Insets(0,0,0,0));
+
+        buttons.get(0).getParent().add(btnExport);
+        buttons.add(btnExport);
 
         addMouseListenerToChildren(frame);
 

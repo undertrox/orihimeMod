@@ -108,6 +108,52 @@ public class ExportDXF {
         return dxf;
     }
 
+    public static Memo cpToSvg(Memo cp) {
+        Memo svg = new Memo();
+        svg.addGyou("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>\n" +
+                "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\"\n" +
+                "\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\n" +
+                "<svg xmlns=\"http://www.w3.org/2000/svg\"\n" +
+                " xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\"\n" +
+                " width=\"1000px\" height=\"1000px\"\n" +
+                " viewBox=\"0 0 1000 1000\" >");
+        double scale = 1000/400.0;
+        double center = 200*scale;
+        for (int lineNum = 1; lineNum <= cp.getGyousuu() ; lineNum++) {
+            if (cp.getGyou(lineNum).length()>0) {
+                StringTokenizer tk = new StringTokenizer(cp.getGyou(lineNum));
+                String str = tk.nextToken();
+                try {
+                    int lineType = Integer.parseInt(str);
+                    String style = "stroke:gray;stroke-width:2;";
+                    int colorNumber = 0;
+                    switch(lineType) {
+                        case 1:
+                            style = "stroke:black;stroke-width:4;";
+                            break;
+                        case 2:
+                            style = "stroke:red;stroke-width:2;";
+                            break;
+                        case 3:
+                            style = "stroke:blue;stroke-width:2;";
+                            break;
+                    }
+                    double x1 = Double.parseDouble(tk.nextToken());
+                    double y1 = Double.parseDouble(tk.nextToken());
+                    double x2 = Double.parseDouble(tk.nextToken());
+                    double y2 = Double.parseDouble(tk.nextToken());
+
+                    svg.addGyou(String.format("<line style=\"%s\" x1=\"%s\" y1=\"%s\" x2=\"%s\" y2=\"%s\"/>", style,
+                            scale(x1, scale, center), scale(y1, scale, center), scale(x2, scale, center), scale(y2, scale, center)));
+                } catch (NumberFormatException e) {
+                    System.err.println("Warning: CP to DXF conversion failed on line "+ lineNum + ". this shouldnt happen.");
+                }
+            }
+        }
+        svg.addGyou("</svg>");
+        return svg;
+    }
+
     private static double scale(double d, double scale, double center) {
         return d*scale+center;
     }
