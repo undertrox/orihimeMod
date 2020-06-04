@@ -19,7 +19,7 @@ import java.util.List;
 
 public class OrihimeMod {
 
-    public static final String version = "0.1.5";
+    public static final String version = "0.1.6";
     public static List<JButton> buttons = new ArrayList<>();
     public static List<JCheckBox> checkboxes = new ArrayList<>();
     public static JButtonSaveAsCp btnSaveAsCp;
@@ -71,18 +71,15 @@ public class OrihimeMod {
         System.out.println("Found " + buttons.size() + " Buttons and "+ checkboxes.size() +" checkboxes for keybinds");
 
         btnSaveAsCp.setMargin(new Insets(0,0,0,0));
-        //buttons.get(0).getParent().add(btnSaveAsCp);
         buttons.add(btnSaveAsCp);
         btnSaveAsCp.addActionListener(btnSaveAsCp::saveAsCp);
 
         btnSaveAsDXF.setMargin(new Insets(0,0,0,0));
-        //buttons.get(0).getParent().add(btnSaveAsDXF);
         buttons.add(btnSaveAsDXF);
         btnSaveAsDXF.addActionListener(btnSaveAsDXF::saveAsDXF);
 
 
         btnSaveAsSVG.setMargin(new Insets(0,0,0,0));
-        //buttons.get(0).getParent().add(btnSaveAsSVG);
         buttons.add(btnSaveAsSVG);
         btnSaveAsSVG.addActionListener(btnSaveAsSVG::saveAsSVG);
 
@@ -346,6 +343,8 @@ public class OrihimeMod {
             Expose.memoAndName2File(ExportDXF.cpToDxf(Expose.orihime2cp(memo1)), fname);
         } else if (fname.endsWith(".cp")) {
             Expose.memoAndName2File(Expose.orihime2cp(memo1), fname);
+        } else if (fname.endsWith(".svg")) {
+            Expose.memoAndName2File(ExportDXF.cpToSvg(Expose.orihime2cp(memo1)), fname);
         } else {
             if (!(fname.endsWith(".orh"))) {
                 fname += ".orh";
