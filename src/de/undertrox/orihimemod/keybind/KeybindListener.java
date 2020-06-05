@@ -5,11 +5,9 @@ import de.undertrox.orihimemod.OrihimeMod;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.time.Instant;
-import java.util.Date;
 
 public class KeybindListener implements KeyListener {
-    static long cooldown = 0;
+    static boolean ctrlDown = false;
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -17,11 +15,15 @@ public class KeybindListener implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getExtendedKeyCode() == KeyEvent.VK_ALT) {
-            if (Instant.now().getEpochSecond()-cooldown > 1) {
-                OrihimeMod.buttons.get(31).doClick();
+        if (e.getExtendedKeyCode() == KeyEvent.VK_CONTROL) {
+            if (!ctrlDown) {
+                ctrlDown = true;
+                if (OrihimeMod.buttons.get(30).getBackground().getRed() > 200) {
+                    OrihimeMod.buttons.get(31).doClick();
+                } else if (OrihimeMod.buttons.get(31).getBackground().getBlue() > 200) {
+                    OrihimeMod.buttons.get(30).doClick();
+                }
             }
-            cooldown = Instant.now().getEpochSecond();
         }
         for (Keybind keybind : Config.keybinds()) {
             if (keybind.matches(e)) {
@@ -37,9 +39,13 @@ public class KeybindListener implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-        if (e.getExtendedKeyCode() == KeyEvent.VK_ALT) {
-            OrihimeMod.buttons.get(30).doClick();
-            cooldown = 0;
+        if (e.getExtendedKeyCode() == KeyEvent.VK_CONTROL) {
+            if (OrihimeMod.buttons.get(30).getBackground().getRed() > 200) {
+                OrihimeMod.buttons.get(31).doClick();
+            } else if (OrihimeMod.buttons.get(31).getBackground().getBlue() > 200) {
+                OrihimeMod.buttons.get(30).doClick();
+            }
+            ctrlDown = false;
         }
     }
 }

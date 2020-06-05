@@ -15,6 +15,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class OrihimeMod {
@@ -30,6 +31,7 @@ public class OrihimeMod {
     public static JMenu removeKeybind;
     public static String currentKeybindID;
     public static JInputKeybindDialog inputKeybind;
+    public static boolean changed = false;
 
     public static JPopupMenu exportMenu;
     public static ap frame;
@@ -42,6 +44,12 @@ public class OrihimeMod {
         System.out.println("Starting Orihime...");
 
         frame = new ap();
+        frame.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                changed = true;
+            }
+        });
         frame.setSize(1200, 700);
         frame.setLocationRelativeTo(null);
         btnSaveAsSVG = new JButtonSaveAsSVG(frame);
@@ -90,10 +98,13 @@ public class OrihimeMod {
         exportSVG.addActionListener( e -> btnSaveAsSVG.doClick());
         JMenuItem exportCP = new JMenuItem("cp");
         exportCP.addActionListener( e -> btnSaveAsCp.doClick());
+        JMenuItem exportPng = new JMenuItem("png");
+        exportPng.addActionListener( e -> buttons.get(3).doClick());
 
         exportMenu.add(exportCP);
         exportMenu.add(exportSVG);
         exportMenu.add(exportDXF);
+        exportMenu.add(exportPng);
 
         JButton btnExport = new JButton("Export");
         btnExport.addActionListener(e -> exportMenu.show(btnExport, 0, btnExport.getHeight()));
@@ -126,6 +137,31 @@ public class OrihimeMod {
                 frame.remove(child);
             }
         }
+        frame.removeWindowListener(frame.getWindowListeners()[0]);
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (changed) {
+                    int n = JOptionPane.showOptionDialog(frame,"Would you like to save before closing?","Save",
+                            JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"Yes", "No", "Cancel"}, "Yes");
+                    switch (n) {
+                        case 0:
+                            buttons.get(1).doClick();
+                            if (!changed) {
+                                e.getWindow().dispose();
+                            }
+                            break;
+                        case 1:
+                            e.getWindow().dispose();
+                            break;
+                        default:
+                            break;
+                    }
+                } else {
+                    e.getWindow().dispose();
+                }
+            }
+        });
         frame.setVisible(true);
     }
 
@@ -164,6 +200,11 @@ public class OrihimeMod {
                             rightClickMenu.show(b, e.getX(), e.getY());
                         }
                     }
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        changed = true;
+                    }
                 });
             } else if (child instanceof JCheckBox) {
                 JCheckBox c = (JCheckBox) child;
@@ -193,6 +234,11 @@ public class OrihimeMod {
                             }
                             rightClickMenu.show(c, e.getX(), e.getY());
                         }
+
+                    }
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        changed = true;
                     }
                 });
             }
@@ -355,6 +401,9 @@ public class OrihimeMod {
             Expose.setFrameTitle(Expose.getFrameTitle0() + "        " + fd.getFile());
             frame.setTitle(Expose.getFrameTitle());
             es1.set_title(Expose.getFrameTitle());
+            changed = false;
+        } else {
+            changed = true;
         }
     }
 
