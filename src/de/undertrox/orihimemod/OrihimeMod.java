@@ -380,6 +380,7 @@ public class OrihimeMod {
         es1.kiroku();
         FileDialog fd = new FileDialog(frame);
         fd.setTitle("Save file");
+        fd.setMode(FileDialog.SAVE);
         fd.setVisible(true);
         String fname = fd.getDirectory() + fd.getFile();
         Memo memo1;
