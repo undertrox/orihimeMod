@@ -1,12 +1,12 @@
 package de.undertrox.orihimemod.keybind;
 
 import java.awt.event.KeyEvent;
-import java.util.Objects;
 
 public class Keybind {
 
     public static final int BUTTON = 0;
     public static final int CHECKBOX = 1;
+    public static final int TOGGLE_TYPE = 2;
 
     private int componentID;
     private int keyCode;
@@ -14,14 +14,19 @@ public class Keybind {
     private boolean ctrl;
     private boolean alt;
     private int type;
+    private boolean ignoreModifiers;
 
-    public Keybind(int type, int componentID, int keyCode, boolean shift, boolean ctrl, boolean alt) {
+    public Keybind(int type, int componentID, int keyCode, boolean shift, boolean ctrl, boolean alt, boolean ignoreModifiers) {
         this.type = type;
         this.componentID = componentID;
         this.keyCode = keyCode;
         this.shift = shift;
         this.ctrl = ctrl;
         this.alt = alt;
+        this.ignoreModifiers = ignoreModifiers;
+    }
+    public Keybind(int type, int componentID, int keyCode, boolean shift, boolean ctrl, boolean alt) {
+        this(type, componentID, keyCode, shift, ctrl, alt, false);
     }
 
     public Keybind(int type, int componentID, int keyCode) {
@@ -80,10 +85,15 @@ public class Keybind {
         return s;
     }
 
+    public void setIgnoreModifiers(boolean ignoreModifiers) {
+        this.ignoreModifiers = ignoreModifiers;
+    }
+
     /**
      * returns true if the modifier mask in the argument matches the modifiers of this keybind
      */
     public boolean modifiersMatch(int modifiers) {
+        if (ignoreModifiers) return true;
         int onmask = 0;
         int offmask = 0;
         if (hasAlt()) {

@@ -5,6 +5,7 @@ import javafx.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.event.KeyEvent;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -16,7 +17,7 @@ import java.util.regex.Pattern;
 public class Config {
     private static Config instance;
 
-    private static final String[] versions = {"0.1.0", "0.1.1", "0.1.2", "0.1.3", "0.1.4", "0.1.5", "0.1.6"};
+    private static final String[] versions = {"0.1.0", "0.1.1", "0.1.2", "0.1.3", "0.1.4", "0.1.5", "0.1.6", "0.1.7"};
     public boolean SHOW_NUMBER_TOOLTIPS = false;
     public String GENERATED_VERSION = "error loading version";
     public boolean SHOW_KEYBIND_TOOLTIPS = true;
@@ -207,6 +208,11 @@ public class Config {
             if (keybind != null) {
                 instance.keybinds.add(keybind);
             }
+        } else if (key.equals("orihimekeybinds.toggletype")) {
+            Keybind keybind = parseKeybind(pair, Keybind.TOGGLE_TYPE);
+            if (keybind != null) {
+                instance.keybinds.add(keybind);
+            }
         }
     }
 
@@ -221,19 +227,26 @@ public class Config {
         boolean ctrl = false;
         boolean alt = false;
         boolean shift = false;
+        boolean ignoreMods = false;
         if (value.contains("ctrl+")) ctrl = true;
         if (value.contains("alt+")) alt = true;
         if (value.contains("shift+")) shift = true;
-        int button = Integer.parseInt(key.substring(key.lastIndexOf('.') + 1));
+        int button = 0;
+        if (type == Keybind.CHECKBOX || type == Keybind.BUTTON) {
+            button = Integer.parseInt(key.substring(key.lastIndexOf('.') + 1));
+        }
+        if (type == Keybind.TOGGLE_TYPE) {
+            ignoreMods = true;
+        }
 
         String keyChar = value.substring(value.lastIndexOf('+') + 1);
         if (keyChar.startsWith("kc")) {
-            return new Keybind(type, button, Integer.parseInt(keyChar.substring(2)), shift, ctrl, alt);
+            return new Keybind(type, button, Integer.parseInt(keyChar.substring(2)), shift, ctrl, alt, ignoreMods);
         } else {
             if (keyChar.length() != 1) {
                 System.err.println("Keybind Syntax Error! '" + keyChar + "' is not 1 character long.");
             } else {
-                return new Keybind(type, button, keyChar.charAt(0), shift, ctrl, alt);
+                return new Keybind(type, button, keyChar.charAt(0), shift, ctrl, alt, ignoreMods);
             }
         }
 

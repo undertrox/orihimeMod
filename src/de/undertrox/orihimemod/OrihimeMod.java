@@ -19,7 +19,7 @@ import java.util.List;
 
 public class OrihimeMod {
 
-    public static final String version = "0.1.6";
+    public static final String version = "0.1.7";
     public static List<JButton> buttons = new ArrayList<>();
     public static List<JCheckBox> checkboxes = new ArrayList<>();
     public static JButtonSaveAsCp btnSaveAsCp;
@@ -140,28 +140,35 @@ public class OrihimeMod {
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (changed) {
-                    int n = JOptionPane.showOptionDialog(frame,"Would you like to save before closing?","Save",
-                            JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"Yes", "No", "Cancel"}, "Yes");
-                    switch (n) {
-                        case 0:
-                            buttons.get(1).doClick();
-                            if (!changed) {
-                                e.getWindow().dispose();
-                            }
-                            break;
-                        case 1:
-                            e.getWindow().dispose();
-                            break;
-                        default:
-                            break;
-                    }
-                } else {
-                    e.getWindow().dispose();
-                }
+                saveBeforeAction(() -> e.getWindow().dispose());
             }
         });
+        ActionListener removeEverything = buttons.get(169).getActionListeners()[0];
+        buttons.get(169).removeActionListener(removeEverything);
+        buttons.get(169).addActionListener(e -> saveBeforeAction(() -> removeEverything.actionPerformed(e)));
         frame.setVisible(true);
+    }
+
+    static void saveBeforeAction(Runnable action) {
+        if (changed) {
+            int n = JOptionPane.showOptionDialog(frame,"Would you like to save?","Save",
+                    JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"Yes", "No", "Cancel"}, "Yes");
+            switch (n) {
+                case 0:
+                    buttons.get(1).doClick();
+                    if (!changed) {
+                        action.run();
+                    }
+                    break;
+                case 1:
+                    action.run();
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            action.run();
+        }
     }
 
     static void addMouseListenerToChildren(Container container) {
