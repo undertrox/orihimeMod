@@ -3,7 +3,8 @@ package jp.gr.java_conf.mt777.origami.orihime;
 import jp.gr.java_conf.mt777.kiroku.memo.Memo;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 
-import java.util.ArrayList;
+import java.awt.*;
+import java.util.List;
 
 // this class is used to expose Package-private Fields and Methods, mainly from the class ap
 public class Expose {
@@ -73,7 +74,12 @@ public class Expose {
         return frame.file_henkan.orihime2svg(memo);
     }
 
-    public static ArrayList getOaz() {
+    public static List<?> getOaz() {
         return frame.OAZ;
+    }
+
+    public static void draw(Graphics g) {
+        frame.es1.oekaki_with_camera(g, frame.i_bun_hyouji,frame.i_cp_hyouji,frame.i_a0_hyouji,frame.i_a1_hyouji,
+                frame.fTenkaizuSenhaba,frame.i_orisen_hyougen,frame.f_h_TenkaizuSenhaba,frame.dim.width,frame.dim.height,frame.i_mejirusi_hyouji);
     }
 }

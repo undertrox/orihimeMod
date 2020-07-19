@@ -15,6 +15,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class OrihimeMod {
@@ -60,7 +61,7 @@ public class OrihimeMod {
         inputKeybind = new JInputKeybindDialog();
         addKeybind = new JMenuItem("Add Keybind");
         removeKeybind = new JMenu("Remove Keybind");
-        addKeybind.addActionListener((e) -> {
+        addKeybind.addActionListener(e -> {
             inputKeybind.setTitle("Input Keybind for " + currentKeybindID);
             inputKeybind.setSize(350, 100);
             inputKeybind.setModal(true);
@@ -191,18 +192,14 @@ public class OrihimeMod {
                                 if (keybind.getConfigID().equals(currentKeybindID)) {
                                     JMenuItem rk = new JMenuItem(keybind.toString());
                                     removeKeybind.add(rk);
-                                    rk.addActionListener((ev) -> {
+                                    rk.addActionListener(ev -> {
                                         Config.keybinds().remove(keybind);
                                         Config.updateConfigFile("orihimeKeybinds.cfg");
                                         addTooltips(Config.showNumberTooltips(), Config.showKeybindTooltips());
                                     });
                                 }
                             }
-                            if (removeKeybind.getSubElements().length == 0) {
-                                removeKeybind.setVisible(false);
-                            } else {
-                                removeKeybind.setVisible(true);
-                            }
+                            removeKeybind.setVisible(removeKeybind.getSubElements().length != 0);
                             rightClickMenu.show(b, e.getX(), e.getY());
                         }
                     }
@@ -226,18 +223,14 @@ public class OrihimeMod {
                                 if (keybind.getConfigID().equals(currentKeybindID)) {
                                     JMenuItem rk = new JMenuItem(keybind.toString());
                                     removeKeybind.add(rk);
-                                    rk.addActionListener((ev) -> {
+                                    rk.addActionListener(ev -> {
                                         Config.keybinds().remove(keybind);
                                         Config.updateConfigFile("orihimeKeybinds.cfg");
                                         addTooltips(Config.showNumberTooltips(), Config.showKeybindTooltips());
                                     });
                                 }
                             }
-                            if (removeKeybind.getSubElements().length == 0) {
-                                removeKeybind.setVisible(false);
-                            } else {
-                                removeKeybind.setVisible(true);
-                            }
+                            removeKeybind.setVisible(removeKeybind.getSubElements().length != 0);
                             rightClickMenu.show(c, e.getX(), e.getY());
                         }
 
@@ -378,13 +371,25 @@ public class OrihimeMod {
     }
 
     static void saveBtnNew(ActionEvent e) {
-        Egaki_Syokunin es1 = Expose.getEs1();
-        Expose.setExplanationFileName("qqq/kaki.png");
-        Expose.readImageFromFile3();
-        Expose.Button_kyoutuu_sagyou();
-        Expose.setI_mouseDragged_yuukou(0);
-        Expose.setI_mouseReleased_yuukou(1);
-        es1.kiroku();
+        Egaki_Syokunin es1;
+        try {
+            es1 = Expose.getEs1();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage() + "\n" + Arrays.toString(ex.getStackTrace()),
+                    "Error, please open an issue with a screenshot of this message on github.com/undertrox/orihimeMod", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try {
+            Expose.setExplanationFileName("qqq/kaki.png");
+            Expose.readImageFromFile3();
+            Expose.Button_kyoutuu_sagyou();
+            Expose.setI_mouseDragged_yuukou(0);
+            Expose.setI_mouseReleased_yuukou(1);
+            es1.kiroku();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage() + "\n" + Arrays.toString(ex.getStackTrace()),
+                    "Warning (saving will still be possible), please open an issue with a screenshot of this message on github.com/undertrox/orihimeMod", JOptionPane.WARNING_MESSAGE);
+        }
         FileDialog fd = new FileDialog(frame);
         fd.setTitle("Save file");
         fd.setMode(FileDialog.SAVE);

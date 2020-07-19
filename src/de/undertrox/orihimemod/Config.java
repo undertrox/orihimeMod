@@ -1,11 +1,7 @@
 package de.undertrox.orihimemod;
 
 import de.undertrox.orihimemod.keybind.Keybind;
-import javafx.util.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.awt.event.KeyEvent;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -158,7 +154,6 @@ public class Config {
         }
     }
 
-    @Nullable
     private static Pair<String, String> parseLine(String line) {
         line = line.trim();
         if (line.length() == 0 || line.charAt(0) == '#') { // Comments and empty lines
@@ -185,7 +180,7 @@ public class Config {
         return new Pair<>(configName.toString(), configValue.toString());
     }
 
-    private static void parsePair(@NotNull Pair<String, String> pair) {
+    private static void parsePair(Pair<String, String> pair) {
         String key = pair.getKey();
         String value = pair.getValue();
         if (key.equals("orihimekeybinds.generatedversion")) {
@@ -216,7 +211,6 @@ public class Config {
         }
     }
 
-    @Nullable
     private static Keybind parseKeybind(Pair<String, String> pair, int type) {
         String key = pair.getKey();
         String value = pair.getValue();
