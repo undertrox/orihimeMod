@@ -13,7 +13,8 @@ import java.util.regex.Pattern;
 public class Config {
     private static Config instance;
 
-    private static final String[] versions = {"0.1.0", "0.1.1", "0.1.2", "0.1.3", "0.1.4", "0.1.5", "0.1.6", "0.1.7"};
+    private static final String[] versions = {"0.1.0", "0.1.1", "0.1.2", "0.1.3", "0.1.4", "0.1.5", "0.1.6", "0.1.7",
+        "0.2.0"};
     public boolean SHOW_NUMBER_TOOLTIPS = false;
     public String GENERATED_VERSION = "error loading version";
     public boolean SHOW_KEYBIND_TOOLTIPS = true;
@@ -21,6 +22,7 @@ public class Config {
     public boolean EXPERT_MODE=false;
     private List<Pair<String, String>> parsed = new ArrayList<>();
     private List<Keybind> keybinds = new ArrayList<>();
+
 
     private Config() {
     }
@@ -91,7 +93,6 @@ public class Config {
         List<Keybind> removedKeybinds = new ArrayList<>();
         for (Keybind keybind : changed.keybinds) {
             if (!instance.keybinds.contains(keybind)) {
-                System.out.println(keybind);
                 newKeybinds.add(keybind);
             }
         }
@@ -240,7 +241,7 @@ public class Config {
             if (keyChar.length() != 1) {
                 System.err.println("Keybind Syntax Error! '" + keyChar + "' is not 1 character long.");
             } else {
-                return new Keybind(type, button, keyChar.charAt(0), shift, ctrl, alt, ignoreMods);
+                return new Keybind(type, button, keyChar, shift, ctrl, alt, ignoreMods);
             }
         }
 

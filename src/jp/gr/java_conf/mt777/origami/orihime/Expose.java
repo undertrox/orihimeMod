@@ -4,6 +4,7 @@ import jp.gr.java_conf.mt777.kiroku.memo.Memo;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 
 import java.awt.*;
+import java.io.*;
 import java.util.List;
 
 // this class is used to expose Package-private Fields and Methods, mainly from the class ap
@@ -43,8 +44,41 @@ public class Expose {
         frame.readImageFromFile3();
     }
 
-    public static void memoAndName2File(Memo memo, String fname) {
+    public static boolean memoAndName2File(Memo memo, String fname) {
+        if (fname == null){ return true;}
         frame.memoAndName2File(memo, fname);
+        Memo memo1 = new Memo();
+        try {
+
+                BufferedReader br = new BufferedReader(new FileReader(fname));
+
+                String rdata;
+
+                memo1.reset();
+                while((rdata = br.readLine()) != null) {
+                    memo1.addGyou(rdata);
+                }
+                br.close();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        boolean eq = memo.getGyousuu()==memo1.getGyousuu();
+        if (!eq) {
+            System.out.println("Error while writing the file.");
+            System.out.println(memo.getGyousuu());
+            System.out.println(memo1.getGyousuu());
+            return eq;
+        }
+        for (int i = 1; i < memo.getGyousuu(); i++) {
+            if (!memo.getGyou(i).equals(memo1.getGyou(i))){
+                eq = false;
+                System.out.println(memo.getGyou(i));
+                System.out.println(memo1.getGyou(i));
+                System.out.println(i);
+            }
+        }
+        System.out.println(eq);
+        return eq;
     }
 
     public static File_keisiki_henkan fileConversion() {
@@ -56,6 +90,7 @@ public class Expose {
     }
     public static void setFrameTitle0(String title) {
         frame.frame_title_0 = title;
+        frame.frame_title = title;
     }
 
     public static void setFrameTitle(String title) {

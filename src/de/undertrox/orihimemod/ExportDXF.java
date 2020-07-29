@@ -96,7 +96,7 @@ public class ExportDXF {
         // TODO: complete this
         Memo dxf = new Memo();
         Memo svg = new Memo();
-        ArrayList<Oriagari_Zu> l = Expose.getOaz();
+        List<Oriagari_Zu> l = (List<Oriagari_Zu>) Expose.getOaz();
         for (int i = 1; i < l.size(); i++) {
             svg.addMemo(l.get(i).getMemo_for_svg_kakidasi());
         }

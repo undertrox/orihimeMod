@@ -14,14 +14,14 @@ import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
 
 public class OrihimeMod {
 
-    public static final String version = "0.1.7";
+    public static final String version = "0.2.0";
     public static List<JButton> buttons = new ArrayList<>();
+    public static Map<String, AbstractButton> controls = new HashMap<>();
     public static List<JCheckBox> checkboxes = new ArrayList<>();
     public static JButtonSaveAsCp btnSaveAsCp;
     public static JButtonSaveAsDXF btnSaveAsDXF;
@@ -36,11 +36,13 @@ public class OrihimeMod {
     public static JPopupMenu exportMenu;
     public static ap frame;
 
+    public static String filename = "";
+
     public static void main(String[] args) {
         System.out.println("OrihimeMod version " + version + " is Starting...");
         Config.load("orihimeKeybinds.cfg");
         System.out.println("Loaded "+Config.keybinds().size()+" Keybinds.");
-
+        System.out.println(" ".substring(1).length());
         System.out.println("Starting Orihime...");
 
         frame = new ap();
@@ -375,7 +377,8 @@ public class OrihimeMod {
         try {
             es1 = Expose.getEs1();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, ex.getMessage() + "\n" + Arrays.toString(ex.getStackTrace()),
+            JOptionPane.showMessageDialog(null,
+                    ex.getMessage() + "\n" + String.join("\n", Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString).toArray(String[]::new)),
                     "Error, please open an issue with a screenshot of this message on github.com/undertrox/orihimeMod", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -387,7 +390,8 @@ public class OrihimeMod {
             Expose.setI_mouseReleased_yuukou(1);
             es1.kiroku();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, ex.getMessage() + "\n" + Arrays.toString(ex.getStackTrace()),
+            JOptionPane.showMessageDialog(null,
+                    ex.getMessage() + "\n" + String.join("\n", Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString).toArray(String[]::new)),
                     "Warning (saving will still be possible), please open an issue with a screenshot of this message on github.com/undertrox/orihimeMod", JOptionPane.WARNING_MESSAGE);
         }
         FileDialog fd = new FileDialog(frame);
@@ -397,17 +401,18 @@ public class OrihimeMod {
         String fname = fd.getDirectory() + fd.getFile();
         Memo memo1;
         memo1 = es1.getMemo_for_kakidasi();
+        boolean success = false;
         if (fname.endsWith(".dxf")) {
-            Expose.memoAndName2File(ExportDXF.cpToDxf(Expose.orihime2cp(memo1)), fname);
+            success = Expose.memoAndName2File(ExportDXF.cpToDxf(Expose.orihime2cp(memo1)), fname);
         } else if (fname.endsWith(".cp")) {
-            Expose.memoAndName2File(Expose.orihime2cp(memo1), fname);
+            success = Expose.memoAndName2File(Expose.orihime2cp(memo1), fname);
         } else if (fname.endsWith(".svg")) {
-            Expose.memoAndName2File(ExportDXF.cpToSvg(Expose.orihime2cp(memo1)), fname);
+            success = Expose.memoAndName2File(ExportDXF.cpToSvg(Expose.orihime2cp(memo1)), fname);
         } else {
             if (!(fname.endsWith(".orh"))) {
                 fname += ".orh";
             }
-            Expose.memoAndName2File(memo1, fname);
+            success = Expose.memoAndName2File(memo1, fname);
         }
         if (fd.getFile()!= null) {
             Expose.setFrameTitle(Expose.getFrameTitle0() + "        " + fd.getFile());
@@ -416,6 +421,10 @@ public class OrihimeMod {
             changed = false;
         } else {
             changed = true;
+        }
+        if (!success) {
+            JOptionPane.showMessageDialog(null, "Error while saving the file, please try again with a different output format.",
+                    "Error while saving", JOptionPane.ERROR_MESSAGE);
         }
     }
 

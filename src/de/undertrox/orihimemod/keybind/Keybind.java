@@ -16,6 +16,10 @@ public class Keybind {
     private int type;
     private boolean ignoreModifiers;
 
+    public Keybind(int type, int componentID, String key, boolean shift, boolean ctrl, boolean alt, boolean ignoreModifiers){
+        this(type, componentID, KeyEvent.getExtendedKeyCodeForChar(key.charAt(0)), shift, ctrl, alt, ignoreModifiers);
+    }
+
     public Keybind(int type, int componentID, int keyCode, boolean shift, boolean ctrl, boolean alt, boolean ignoreModifiers) {
         this.type = type;
         this.componentID = componentID;
@@ -38,10 +42,6 @@ public class Keybind {
         StringBuilder b = new StringBuilder(getModifiers());
         b.append(KeyEvent.getKeyText(keyCode));
         return b.toString();
-    }
-
-    public Keybind(int type, int componentID, char key, boolean shift, boolean ctrl, boolean alt){
-        this(type, componentID, KeyEvent.getExtendedKeyCodeForChar(key), shift, ctrl, alt);
     }
 
     public int getComponentID() {
