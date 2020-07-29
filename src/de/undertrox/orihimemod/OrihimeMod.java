@@ -6,14 +6,18 @@ import de.undertrox.orihimemod.button.JButtonSaveAsSVG;
 import de.undertrox.orihimemod.keybind.JInputKeybindDialog;
 import de.undertrox.orihimemod.keybind.Keybind;
 import de.undertrox.orihimemod.keybind.KeybindListener;
+import de.undertrox.orihimemod.mapping.ButtonMapping;
 import jp.gr.java_conf.mt777.kiroku.memo.Memo;
 import jp.gr.java_conf.mt777.origami.orihime.Expose;
 import jp.gr.java_conf.mt777.origami.orihime.ap;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -21,7 +25,6 @@ public class OrihimeMod {
 
     public static final String version = "0.2.0";
     public static List<JButton> buttons = new ArrayList<>();
-    public static Map<String, AbstractButton> controls = new HashMap<>();
     public static List<JCheckBox> checkboxes = new ArrayList<>();
     public static JButtonSaveAsCp btnSaveAsCp;
     public static JButtonSaveAsDXF btnSaveAsDXF;
@@ -32,15 +35,19 @@ public class OrihimeMod {
     public static String currentKeybindID;
     public static JInputKeybindDialog inputKeybind;
     public static boolean changed = false;
+    public static ButtonMapping mapping;
 
     public static JPopupMenu exportMenu;
     public static ap frame;
 
     public static String filename = "";
+    public static String fullFileName= "";
+    public static final String orihimeVersion = "3.054";
 
     public static void main(String[] args) {
         System.out.println("OrihimeMod version " + version + " is Starting...");
         Config.load("orihimeKeybinds.cfg");
+        mapping = ButtonMapping.load(version, orihimeVersion);
         System.out.println("Loaded "+Config.keybinds().size()+" Keybinds.");
         System.out.println(" ".substring(1).length());
         System.out.println("Starting Orihime...");
@@ -150,6 +157,22 @@ public class OrihimeMod {
         buttons.get(169).removeActionListener(removeEverything);
         buttons.get(169).addActionListener(e -> saveBeforeAction(() -> removeEverything.actionPerformed(e)));
         frame.setVisible(true);
+
+        // Autosave
+
+        if (Config.useAutosave()) {
+            new Timer(Config.autoSaveInterval()*1000, e -> {
+                File file = new File("autosave");
+                file.mkdirs();
+                deleteFilesOlderThan(file, Config.autoSaveMaxAge() * 1000);
+                Date date = new Date() ;
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss") ;
+                System.out.println("AutoSaving " + filename);
+                saveAs("autosave/" + dateFormat.format(date) + filename + ".orh");
+                saveAs("autosave/" + dateFormat.format(date) + filename + ".cp");
+                System.out.println("AutoSaving Done.");
+            }).start();
+        }
     }
 
     static void saveBeforeAction(Runnable action) {
@@ -373,59 +396,58 @@ public class OrihimeMod {
     }
 
     static void saveBtnNew(ActionEvent e) {
-        Egaki_Syokunin es1;
-        try {
-            es1 = Expose.getEs1();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null,
-                    ex.getMessage() + "\n" + String.join("\n", Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString).toArray(String[]::new)),
-                    "Error, please open an issue with a screenshot of this message on github.com/undertrox/orihimeMod", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        try {
-            Expose.setExplanationFileName("qqq/kaki.png");
-            Expose.readImageFromFile3();
-            Expose.Button_kyoutuu_sagyou();
-            Expose.setI_mouseDragged_yuukou(0);
-            Expose.setI_mouseReleased_yuukou(1);
-            es1.kiroku();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null,
-                    ex.getMessage() + "\n" + String.join("\n", Arrays.stream(ex.getStackTrace()).map(StackTraceElement::toString).toArray(String[]::new)),
-                    "Warning (saving will still be possible), please open an issue with a screenshot of this message on github.com/undertrox/orihimeMod", JOptionPane.WARNING_MESSAGE);
-        }
+
+        Expose.setExplanationFileName("qqq/kaki.png");
+        Expose.readImageFromFile3();
+        Expose.Button_kyoutuu_sagyou();
+        Expose.setI_mouseDragged_yuukou(0);
+        Expose.setI_mouseReleased_yuukou(1);
+
         FileDialog fd = new FileDialog(frame);
         fd.setTitle("Save file");
         fd.setMode(FileDialog.SAVE);
         fd.setVisible(true);
         String fname = fd.getDirectory() + fd.getFile();
-        Memo memo1;
-        memo1 = es1.getMemo_for_kakidasi();
-        boolean success = false;
-        if (fname.endsWith(".dxf")) {
-            success = Expose.memoAndName2File(ExportDXF.cpToDxf(Expose.orihime2cp(memo1)), fname);
-        } else if (fname.endsWith(".cp")) {
-            success = Expose.memoAndName2File(Expose.orihime2cp(memo1), fname);
-        } else if (fname.endsWith(".svg")) {
-            success = Expose.memoAndName2File(ExportDXF.cpToSvg(Expose.orihime2cp(memo1)), fname);
-        } else {
-            if (!(fname.endsWith(".orh"))) {
-                fname += ".orh";
-            }
-            success = Expose.memoAndName2File(memo1, fname);
-        }
-        if (fd.getFile()!= null) {
-            Expose.setFrameTitle(Expose.getFrameTitle0() + "        " + fd.getFile());
-            frame.setTitle(Expose.getFrameTitle());
-            es1.set_title(Expose.getFrameTitle());
-            changed = false;
-        } else {
-            changed = true;
-        }
+        boolean success = saveAs(fname);
         if (!success) {
             JOptionPane.showMessageDialog(null, "Error while saving the file, please try again with a different output format.",
                     "Error while saving", JOptionPane.ERROR_MESSAGE);
         }
+        if (fd.getFile()!= null) {
+            Expose.setFrameTitle(Expose.getFrameTitle0() + "        " + fd.getFile());
+            frame.setTitle(Expose.getFrameTitle());
+            Expose.getEs1().set_title(Expose.getFrameTitle());
+            fullFileName = fname;
+            filename = fd.getFile();
+            if (filename.contains(".")) {
+                filename = filename.substring(0, filename.lastIndexOf(".") - 1);
+            }
+            changed = false;
+        } else {
+            changed = true;
+        }
+    }
+
+    static boolean saveAs(String filename) {
+        Egaki_Syokunin es1 = Expose.getEs1();
+        es1.kiroku();
+        Memo memo1;
+        memo1 = es1.getMemo_for_kakidasi();
+        boolean success = false;
+
+        if (filename.endsWith(".dxf")) {
+            success = Expose.memoAndName2File(ExportDXF.cpToDxf(Expose.orihime2cp(memo1)), filename);
+        } else if (filename.endsWith(".cp")) {
+            success = Expose.memoAndName2File(Expose.orihime2cp(memo1), filename);
+        } else if (filename.endsWith(".svg")) {
+            success = Expose.memoAndName2File(ExportDXF.cpToSvg(Expose.orihime2cp(memo1)), filename);
+        } else {
+            if (!(filename.endsWith(".orh"))) {
+                filename += ".orh";
+            }
+            success = Expose.memoAndName2File(memo1, filename);
+        }
+        return success;
     }
 
     public static void keybindDialogClose(KeyEvent lastKeyEvent) {
@@ -442,6 +464,20 @@ public class OrihimeMod {
             }
             addTooltips(Config.showNumberTooltips(), Config.showKeybindTooltips());
             Config.updateConfigFile("orihimeKeybinds.cfg");
+        }
+    }
+
+    public static void deleteFilesOlderThan(File file, int maxDiff) {
+        if (file.isDirectory()) {
+            for (File f : file.listFiles()) {
+                deleteFilesOlderThan(f, maxDiff);
+            }
+        } else {
+            long diff = new Date().getTime() - file.lastModified();
+
+            if (diff > maxDiff) {
+                file.delete();
+            }
         }
     }
 }

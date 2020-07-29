@@ -1,6 +1,8 @@
 package de.undertrox.orihimemod;
 
+import de.undertrox.orihimemod.config.ParsedConfigFile;
 import de.undertrox.orihimemod.keybind.Keybind;
+import de.undertrox.orihimemod.mapping.ButtonMapping;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -20,9 +22,12 @@ public class Config {
     public boolean SHOW_KEYBIND_TOOLTIPS = true;
     public boolean DARK_MODE = false;
     public boolean EXPERT_MODE=false;
+    public boolean AUTOSAVE = true;
+    public int AUTOSAVE_INTERVAL = 300;
+    public int AUTOSAVE_MAX_AGE = 86400;
     private List<Pair<String, String>> parsed = new ArrayList<>();
     private List<Keybind> keybinds = new ArrayList<>();
-
+    private ParsedConfigFile parsedFile;
 
     private Config() {
     }
@@ -58,6 +63,18 @@ public class Config {
         return getInstance().keybinds;
     }
 
+    public static boolean useAutosave() {
+        return getInstance().AUTOSAVE;
+    }
+
+    public static int autoSaveInterval() {
+        return getInstance().AUTOSAVE_INTERVAL;
+    }
+
+    public static int autoSaveMaxAge() {
+        return getInstance().AUTOSAVE_MAX_AGE;
+    }
+
     public static void load(String configFileName) {
         System.out.println("Loading Config file");
         instance = new Config();
@@ -65,18 +82,10 @@ public class Config {
         if (!file.exists()) {
             createConfigFile(configFileName);
         }
-        String line;
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            while ((line = br.readLine()) != null) {
-                Pair<String, String> parsedLine = parseLine(line);
-                if (parsedLine != null) {
-                    instance.parsed.add(parsedLine);
-                    parsePair(parsedLine);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        instance.parsedFile = ParsedConfigFile.fromFile(configFileName);
+        instance.parsed = instance.parsedFile.getAllPairs();
+        for (Pair<String, String> pair : instance.parsed) {
+            parsePair(pair);
         }
 
         if (!Config.generatedVersion().equals(OrihimeMod.version)) {
@@ -101,33 +110,23 @@ public class Config {
                 removedKeybinds.add(keybind);
             }
         }
-        try {
-            String content = new String(Files.readAllBytes(Paths.get(configFileName)));
-            for (Keybind kb : removedKeybinds) {
-                content = content.replaceAll("(?i)" + Pattern.quote(kb.toConfigEntry()), "");
-            }
-            for (Keybind newKeybind : newKeybinds) {
-                content += "\n" + newKeybind.toConfigEntry();
-            }
-            Files.write(Paths.get(configFileName), content.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (Keybind kb : removedKeybinds) {
+            instance.parsedFile.removePair(kb.getConfigID(), kb.getConfigValue());
         }
+        for (Keybind newKeybind : newKeybinds) {
+            instance.parsedFile.addPair(newKeybind.getConfigID(), newKeybind.getConfigValue());
+        }
+        instance.parsedFile.saveTo(configFileName);
         load(configFileName);
     }
 
 
     private static void updateConfigFrom(String version, String configFileName) {
         System.out.println("Updating Config file from version " + version + " to " + OrihimeMod.version);
-        try {
-            String content = new String(Files.readAllBytes(Paths.get(configFileName)));
-            content = content.replace("orihimeKeybinds.generatedVersion="+version,
-                    "orihimeKeybinds.generatedVersion="+OrihimeMod.version);
-            content += getAddedConfigSince(Config.generatedVersion());
-            Files.write(Paths.get(configFileName), content.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ParsedConfigFile file = ParsedConfigFile.fromFile(configFileName);
+        file.append(getAddedConfigSince(version));
+        file.setValue("orihimeKeybinds.generatedVersion", OrihimeMod.version);
+        file.saveTo(configFileName);
     }
 
     private static void createConfigFile(String configFileName) {
@@ -155,35 +154,9 @@ public class Config {
         }
     }
 
-    private static Pair<String, String> parseLine(String line) {
-        line = line.trim();
-        if (line.length() == 0 || line.charAt(0) == '#') { // Comments and empty lines
-            return null;
-        }
-        StringBuilder configName = new StringBuilder();
-        StringBuilder configValue = new StringBuilder();
-        boolean foundEquals = false;
-
-        for (int i = 0; i < line.length(); i++) {
-            char c = line.charAt(i);
-            if (!foundEquals) {
-                if (c == '=') {
-                    foundEquals = true;
-                } else {
-                    configName.append(Character.toLowerCase(c));
-                }
-            } else {
-                if (!Character.isWhitespace(c)) {
-                    configValue.append(Character.toLowerCase(c));
-                }
-            }
-        }
-        return new Pair<>(configName.toString(), configValue.toString());
-    }
-
     private static void parsePair(Pair<String, String> pair) {
-        String key = pair.getKey();
-        String value = pair.getValue();
+        String key = pair.getKey().toLowerCase();
+        String value = pair.getValue().toLowerCase();
         if (key.equals("orihimekeybinds.generatedversion")) {
             instance.GENERATED_VERSION = value;
         } else if (key.equals("orihimekeybinds.showkeybindidtooltips")) {
@@ -209,6 +182,10 @@ public class Config {
             if (keybind != null) {
                 instance.keybinds.add(keybind);
             }
+        } else if (key.equals("orihimemod.autosave.enable")) {
+            instance.AUTOSAVE = Boolean.parseBoolean(value);
+        } else if (key.equals("orihimemod.autosave.interval")) {
+            instance.AUTOSAVE_INTERVAL = Integer.parseInt(value);
         }
     }
 
@@ -255,27 +232,15 @@ public class Config {
         return Arrays.copyOfRange(versions, index1, index2);
     }
 
-    private static String getAddedConfig(String version) {
-        StringBuilder res = new StringBuilder("\n");
-        InputStream input = instance.getClass().getResourceAsStream("configFiles/" + version + ".cfg");
-        Reader reader = new BufferedReader(new InputStreamReader(input));
-        int c = 0;
-        while (true) {
-            try {
-                if ((c = reader.read()) == -1) break;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            res.append((char) c);
-        }
-        return res.toString();
+    private static ParsedConfigFile getAddedConfig(String version) {
+        return ParsedConfigFile.fromStream(instance.getClass().getResourceAsStream("configFiles/" + version + ".cfg"));
     }
 
-    private static String getAddedConfigSince(String version) {
-        StringBuilder res = new StringBuilder("\n");
+    private static ParsedConfigFile getAddedConfigSince(String version) {
+        ParsedConfigFile res = new ParsedConfigFile();
         for (String v : getVersionsBetween(version, OrihimeMod.version)) {
             res.append(getAddedConfig(v));
         }
-        return res.toString();
+        return res;
     }
 }

@@ -7,6 +7,7 @@ public class Keybind {
     public static final int BUTTON = 0;
     public static final int CHECKBOX = 1;
     public static final int TOGGLE_TYPE = 2;
+    public static final int ABSTRACT_BUTTON = 3;
 
     private int componentID;
     private int keyCode;
@@ -14,6 +15,7 @@ public class Keybind {
     private boolean ctrl;
     private boolean alt;
     private int type;
+    private String mappingID;
     private boolean ignoreModifiers;
 
     public Keybind(int type, int componentID, String key, boolean shift, boolean ctrl, boolean alt, boolean ignoreModifiers){
@@ -117,7 +119,13 @@ public class Keybind {
     public String toConfigEntry() {
         String s = getConfigID();
         s += "=";
-        s += getModifiers();
+        s += getConfigValue();
+        return s;
+    }
+
+    public String getConfigValue() {
+
+        String s = getModifiers();
         s += "kc" + getKeyCode();
         return s;
     }
@@ -128,6 +136,8 @@ public class Keybind {
             s += "button.";
         } else if(type == CHECKBOX) {
             s += "checkbox.";
+        } else if (type == ABSTRACT_BUTTON) {
+            return s + mappingID;
         }
         s += componentID;
         return s;

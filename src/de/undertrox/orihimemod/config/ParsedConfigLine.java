@@ -9,10 +9,10 @@ public abstract class ParsedConfigLine {
     }
 
     public String getValue() {
-        return value;
+        return value.toLowerCase();
     }
     public String getKey() {
-        return key;
+        return key.toLowerCase();
     }
 
     public void setValue(String value) {

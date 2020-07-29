@@ -10,6 +10,6 @@ public class PairConfigLine extends ParsedConfigLine {
 
     @Override
     public String toString() {
-        return getKey() + "=" + getValue();
+        return key + "=" + value;
     }
 }

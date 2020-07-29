@@ -14,6 +14,6 @@ public class CommentConfigLine extends ParsedConfigLine{
 
     @Override
     public String toString() {
-        return "#" + getValue();
+        return "#" + value;
     }
 }
