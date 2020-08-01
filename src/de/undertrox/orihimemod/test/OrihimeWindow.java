@@ -21,7 +21,7 @@ public class OrihimeWindow extends JFrame {
     public void paint(Graphics g) {
         super.paint(g);
         System.out.println("Painting");
-        Expose.setFrame(frame);
-        Expose.draw(g);
+        Expose expose = new Expose(frame);
+        expose.draw(g);
     }
 }

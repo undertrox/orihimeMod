@@ -20,6 +20,7 @@ public class Config {
     public boolean SHOW_NUMBER_TOOLTIPS = false;
     public String GENERATED_VERSION = "error loading version";
     public boolean SHOW_KEYBIND_TOOLTIPS = true;
+    public boolean SHOW_HELP_TOOLTIPS = true;
     public boolean DARK_MODE = false;
     public boolean EXPERT_MODE=false;
     public boolean AUTOSAVE = true;
@@ -32,7 +33,7 @@ public class Config {
     private Config() {
     }
 
-    private static Config getInstance() {
+    public static Config getInstance() {
         if (instance == null) {
             throw new RuntimeException("Tried to access Config before loading Config file.");
         }
@@ -45,6 +46,10 @@ public class Config {
 
     public static boolean showKeybindTooltips() {
         return getInstance().SHOW_KEYBIND_TOOLTIPS;
+    }
+
+    public static boolean showHelpTooltips() {
+        return getInstance().SHOW_HELP_TOOLTIPS;
     }
 
     public static String generatedVersion() {
@@ -186,6 +191,8 @@ public class Config {
             instance.AUTOSAVE = Boolean.parseBoolean(value);
         } else if (key.equals("orihimemod.autosave.interval")) {
             instance.AUTOSAVE_INTERVAL = Integer.parseInt(value);
+        } else if (key.equals("orihimekeybinds.showhelptooltips")){
+            instance.SHOW_HELP_TOOLTIPS = Boolean.parseBoolean(value);
         }
     }
 

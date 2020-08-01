@@ -18,12 +18,13 @@ public class JButtonSaveAsCp extends JButton {
     }
 
     public void saveAsCp(ActionEvent e) {
-        Egaki_Syokunin es1 = Expose.getEs1();
-        Expose.setExplanationFileName("qqq/kaki.png");
-        Expose.readImageFromFile3();
-        Expose.Button_kyoutuu_sagyou();
-        Expose.setI_mouseDragged_yuukou(0);
-        Expose.setI_mouseReleased_yuukou(1);
+        Expose expose = new Expose(frame);
+        Egaki_Syokunin es1 = expose.getEs1();
+        expose.setExplanationFileName("qqq/kaki.png");
+        expose.readImageFromFile3();
+        expose.Button_kyoutuu_sagyou();
+        expose.setI_mouseDragged_yuukou(0);
+        expose.setI_mouseReleased_yuukou(1);
         es1.kiroku();
         FileDialog fd = new FileDialog(frame);
         fd.setTitle("Save file as .cp");
@@ -33,17 +34,17 @@ public class JButtonSaveAsCp extends JButton {
         Memo memo1;
         memo1 = es1.getMemo_for_kakidasi();
         if (fname.endsWith(".dxf")) {
-            Expose.memoAndName2File(ExportDXF.cpToDxf(Expose.orihime2cp(memo1)), fname);
+            expose.memoAndName2File(ExportDXF.cpToDxf(expose.orihime2cp(memo1)), fname);
         } else {
             if (!fname.endsWith(".cp")) {
                 fname = fname + ".cp";
             }
-            Expose.memoAndName2File(Expose.orihime2cp(memo1), fname);
+            expose.memoAndName2File(expose.orihime2cp(memo1), fname);
         }
         if (fd.getFile()!= null) {
-            Expose.setFrameTitle(Expose.getFrameTitle0() + "        " + fd.getFile());
-            frame.setTitle(Expose.getFrameTitle());
-            es1.set_title(Expose.getFrameTitle());
+            expose.setFrameTitle(expose.getFrameTitle0() + "        " + fd.getFile());
+            frame.setTitle(expose.getFrameTitle());
+            es1.set_title(expose.getFrameTitle());
         }
     }
 }

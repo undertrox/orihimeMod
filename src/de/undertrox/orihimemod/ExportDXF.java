@@ -1,11 +1,6 @@
 package de.undertrox.orihimemod;
 
 import jp.gr.java_conf.mt777.kiroku.memo.Memo;
-import jp.gr.java_conf.mt777.origami.orihime.Expose;
-import jp.gr.java_conf.mt777.origami.orihime.oriagari_zu.Oriagari_Zu;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.StringTokenizer;
 
 public class ExportDXF {
@@ -92,22 +87,6 @@ public class ExportDXF {
         return dxf;
     }
 
-    public static Memo foldedToDXF() {
-        // TODO: complete this
-        Memo dxf = new Memo();
-        Memo svg = new Memo();
-        List<Oriagari_Zu> l = (List<Oriagari_Zu>) Expose.getOaz();
-        for (int i = 1; i < l.size(); i++) {
-            svg.addMemo(l.get(i).getMemo_for_svg_kakidasi());
-        }
-        System.out.println("test");
-        for (int i = 1; i <= svg.getGyousuu(); i++) {
-            System.out.println(svg.getGyou(i));
-        }
-        System.out.println("test2");
-        return dxf;
-    }
-
     public static Memo cpToSvg(Memo cp) {
         Memo svg = new Memo();
         svg.addGyou("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>\n" +
@@ -125,17 +104,19 @@ public class ExportDXF {
                 String str = tk.nextToken();
                 try {
                     int lineType = Integer.parseInt(str);
-                    String style = "stroke:gray;stroke-width:2;";
-                    int colorNumber = 0;
-                    switch(lineType) {
-                        case 1:
+                    String style;
+                    switch (lineType) {
+                        case 1 :
                             style = "stroke:black;stroke-width:4;";
                             break;
-                        case 2:
-                            style = "stroke:red;stroke-width:2;";
+                        case 2 :
+                            style =  "stroke:red;stroke-width:2;";
                             break;
-                        case 3:
-                            style = "stroke:blue;stroke-width:2;";
+                        case 3 :
+                            style =  "stroke:blue;stroke-width:2;";
+                            break;
+                        default :
+                            style =  "stroke:gray;stroke-width:2;";
                             break;
                     }
                     double x1 = Double.parseDouble(tk.nextToken());

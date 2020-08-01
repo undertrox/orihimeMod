@@ -7,6 +7,7 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.function.Consumer;
 
 public class JInputKeybindDialog extends JDialog {
     public JButton btnOk;
@@ -15,7 +16,7 @@ public class JInputKeybindDialog extends JDialog {
 
     public KeyEvent lastKeyEvent;
 
-    public JInputKeybindDialog() {
+    public JInputKeybindDialog(Consumer<KeyEvent> onClose) {
         btnOk = new JButton("Save");
         btnCancel = new JButton("Cancel");
         keyText = new JLabel("<Press any Key>");
@@ -64,13 +65,13 @@ public class JInputKeybindDialog extends JDialog {
 
         btnCancel.addActionListener((e) -> {
             lastKeyEvent = null;
-            OrihimeMod.keybindDialogClose(null);
+            onClose.accept(null);
             this.setVisible(false);
 
         });
 
         btnOk.addActionListener((e -> {
-            OrihimeMod.keybindDialogClose(lastKeyEvent);
+            onClose.accept(lastKeyEvent);
             this.setVisible(false);
         }));
     }
