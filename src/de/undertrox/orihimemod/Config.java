@@ -24,7 +24,10 @@ public class Config {
     public boolean DARK_MODE = false;
     public boolean EXPERT_MODE=false;
     public boolean AUTOSAVE = true;
+    public boolean USE_NEW_SAVE_BEHAVIOR = false;
+    public static boolean justUpdated = false;
     public int AUTOSAVE_INTERVAL = 300;
+    protected String filename;
     public int AUTOSAVE_MAX_AGE = 86400;
     private List<Pair<String, String>> parsed = new ArrayList<>();
     private List<Keybind> keybinds = new ArrayList<>();
@@ -64,6 +67,16 @@ public class Config {
         return getInstance().EXPERT_MODE;
     }
 
+    public static boolean useNewSave() {
+        return getInstance().USE_NEW_SAVE_BEHAVIOR;
+    }
+
+    public static void setUseNewSave(boolean val) {
+        getInstance().USE_NEW_SAVE_BEHAVIOR = val;
+        getInstance().parsedFile.setValue("orihimemod.save.newbehavior", Boolean.toString(val));
+        getInstance().parsedFile.saveTo(getInstance().filename);
+    }
+
     public static List<Keybind> keybinds() {
         return getInstance().keybinds;
     }
@@ -83,6 +96,7 @@ public class Config {
     public static void load(String configFileName) {
         System.out.println("Loading Config file");
         instance = new Config();
+        instance.filename = configFileName;
         File file = new File(configFileName);
         if (!file.exists()) {
             createConfigFile(configFileName);
@@ -94,9 +108,16 @@ public class Config {
         }
 
         if (!Config.generatedVersion().equals(OrihimeMod.version)) {
+            justUpdated = true;
             updateConfigFrom(Config.generatedVersion(), configFileName);
             System.out.println("Reloading Config file...");
             load(configFileName);
+        }
+
+        if (!instance.parsedFile.contains("orihimemod.save.newbehavior")) {
+            justUpdated = true;
+            instance.parsedFile.addPair("orihimeMod.save.newBehavior", "false");
+            instance.parsedFile.saveTo(configFileName);
         }
     }
 
@@ -138,6 +159,7 @@ public class Config {
         System.out.println("No config file found, generating default config file.");
         InputStream reader = instance.getClass().getResourceAsStream("orihimeKeybinds.cfg");
         OutputStream writer;
+        justUpdated = true;
         try {
             writer = new FileOutputStream(new File(configFileName));
             copy(reader, writer);
@@ -193,6 +215,8 @@ public class Config {
             instance.AUTOSAVE_INTERVAL = Integer.parseInt(value);
         } else if (key.equals("orihimekeybinds.showhelptooltips")){
             instance.SHOW_HELP_TOOLTIPS = Boolean.parseBoolean(value);
+        } else if (key.equals("orihimemod.save.newbehavior")) {
+            instance.USE_NEW_SAVE_BEHAVIOR = Boolean.parseBoolean(value);
         }
     }
 

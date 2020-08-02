@@ -49,14 +49,14 @@ public class AutosaveHandler {
     }
 
     public void autosave() {
-        File file = new File("autosave");
+        File file = new File("orihimeMod-Autosave");
         file.mkdirs();
         deleteFilesOlderThan(file, maxAge * 1000);
         Date date = new Date() ;
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss") ;
         System.out.println("AutoSaving " + baseFileName);
-        SaveHelper.saveTo(frame, "autosave/" + dateFormat.format(date) + baseFileName + ".orh");
-        SaveHelper.saveTo(frame, "autosave/" + dateFormat.format(date) + baseFileName + ".cp");
+        SaveHelper.saveTo(frame, "orihimeMod-Autosave/" + dateFormat.format(date) + baseFileName + ".orh");
+        SaveHelper.saveTo(frame, "orihimeMod-Autosave/" + dateFormat.format(date) + baseFileName + ".cp");
         System.out.println("AutoSaving Done.");
     }
 

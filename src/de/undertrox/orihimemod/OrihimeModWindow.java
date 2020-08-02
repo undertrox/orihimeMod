@@ -13,6 +13,10 @@ import jp.gr.java_conf.mt777.origami.orihime.OrihimeFrame;
 import jp.gr.java_conf.mt777.origami.orihime.ap;
 
 import javax.swing.*;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.StringContent;
+import javax.swing.text.StyleContext;
+import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -116,6 +120,36 @@ public class OrihimeModWindow {
         buttons.get(169).removeActionListener(removeEverything);
         buttons.get(169).addActionListener(e -> saveBeforeAction(() -> removeEverything.actionPerformed(e)));
 
+        if (Config.justUpdated) {
+            String[] options = {"Old", "New"};
+            int result = JOptionPane.showOptionDialog(
+                    frame,
+                    "Important Change:\n\n This version changes how the save button works.\n " +
+                            "After the initial save, it will no longer ask where to save, but automatically \n" +
+                            "save to the last location. If you want to save to a new location, you have to use \n" +
+                            "Export -> Save as. This also means that when you press the Save button after\n" +
+                            "pressing the Save As button, the file will be saved in the location you selected \n" +
+                            "using the Save As button.\n\n" +
+                            "All Other export options will NOT affect where the Save button saves data.\n\n" +
+                            "Do you want to use the new saving behavior, or do you want to keep the old one?\n" +
+                            "This can always be changed by editing the config file (orihimeKeybinds.cfg), but\n" +
+                            "this dialog will not be shown again.",
+                    "Important Change notes",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,     //no custom icon
+                    options,  //button titles
+                    options[0] //default button
+            );
+            // use old behavior
+            if (result == JOptionPane.YES_OPTION) {
+                Config.setUseNewSave(false);
+            } else { // use new behavior
+                System.out.println("use new behavior");
+                Config.setUseNewSave(true);
+            }
+        }
+
         System.out.println("Configuring autosaver");
         autosaver = new AutosaveHandler(frame, Config.useAutosave(), Config.autoSaveInterval(), Config.autoSaveMaxAge(), filename);
     }
@@ -184,14 +218,16 @@ public class OrihimeModWindow {
         exportCP.addActionListener( e -> btnSaveAsCp.doClick());
         JMenuItem exportPng = new JMenuItem("png");
         exportPng.addActionListener( e -> buttons.get(3).doClick());
-        JMenuItem exportOrh = new JMenuItem("Save as");
-        exportOrh.addActionListener(e -> saveBtnNew(e, true));
+        JMenuItem saveAs = new JMenuItem("Save as");
+        saveAs.addActionListener(e -> saveBtnNew(e, true));
 
         exportMenu.add(exportCP);
         exportMenu.add(exportSVG);
         exportMenu.add(exportDXF);
         exportMenu.add(exportPng);
-        exportMenu.add(exportOrh);
+        if (Config.useNewSave() || Config.justUpdated) {
+            exportMenu.add(saveAs);
+        }
 
         JButton btnExport = new JButton("Export");
         btnExport.addActionListener(e -> {
@@ -413,6 +449,9 @@ public class OrihimeModWindow {
     }
 
     void saveBtnNew(ActionEvent e, boolean saveAs) {
+        if (!Config.useNewSave()) {
+            saveAs = true;
+        }
 
         expose.setExplanationFileName("qqq/kaki.png");
         expose.readImageFromFile3();
