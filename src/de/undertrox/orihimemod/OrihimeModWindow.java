@@ -209,6 +209,7 @@ public class OrihimeModWindow {
         buttons.add(btnSaveAsSVG);
         btnSaveAsSVG.addActionListener(btnSaveAsSVG::saveAsSVG);
 
+
         exportMenu = new JPopupMenu();
         JMenuItem exportDXF = new JMenuItem("dxf");
         exportDXF.addActionListener( e -> btnSaveAsDXF.doClick());
@@ -220,6 +221,10 @@ public class OrihimeModWindow {
         exportPng.addActionListener( e -> buttons.get(3).doClick());
         JMenuItem saveAs = new JMenuItem("Save as");
         saveAs.addActionListener(e -> saveBtnNew(e, true));
+        JButton btnSaveAs=new JButton();
+        btnSaveAs.addActionListener(e -> saveAs.doClick());
+
+        buttons.add(btnSaveAs);
 
         exportMenu.add(exportCP);
         exportMenu.add(exportSVG);
