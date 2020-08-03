@@ -2,15 +2,11 @@ package de.undertrox.orihimemod;
 
 import de.undertrox.orihimemod.config.ParsedConfigFile;
 import de.undertrox.orihimemod.keybind.Keybind;
-import de.undertrox.orihimemod.mapping.ButtonMapping;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class Config {
     private static Config instance;
@@ -25,7 +21,7 @@ public class Config {
     public boolean EXPERT_MODE=false;
     public boolean AUTOSAVE = true;
     public boolean USE_NEW_SAVE_BEHAVIOR = false;
-    public static boolean justUpdated = false;
+    public static boolean justUpdatedTo0d2d0 = false;
     public int AUTOSAVE_INTERVAL = 300;
     protected String filename;
     public int AUTOSAVE_MAX_AGE = 86400;
@@ -108,14 +104,13 @@ public class Config {
         }
 
         if (!Config.generatedVersion().equals(OrihimeMod.version)) {
-            justUpdated = true;
             updateConfigFrom(Config.generatedVersion(), configFileName);
             System.out.println("Reloading Config file...");
             load(configFileName);
         }
 
         if (!instance.parsedFile.contains("orihimemod.save.newbehavior")) {
-            justUpdated = true;
+            justUpdatedTo0d2d0 = true;
             instance.parsedFile.addPair("orihimeMod.save.newBehavior", "false");
             instance.parsedFile.saveTo(configFileName);
         }
@@ -150,6 +145,9 @@ public class Config {
     private static void updateConfigFrom(String version, String configFileName) {
         System.out.println("Updating Config file from version " + version + " to " + OrihimeMod.version);
         ParsedConfigFile file = ParsedConfigFile.fromFile(configFileName);
+        if (Arrays.asList(getVersionsBetween(version, OrihimeMod.version)).contains("0.2.0")) {
+            justUpdatedTo0d2d0 = true;
+        }
         file.append(getAddedConfigSince(version));
         file.setValue("orihimeKeybinds.generatedVersion", OrihimeMod.version);
         file.saveTo(configFileName);
@@ -159,7 +157,7 @@ public class Config {
         System.out.println("No config file found, generating default config file.");
         InputStream reader = instance.getClass().getResourceAsStream("orihimeKeybinds.cfg");
         OutputStream writer;
-        justUpdated = true;
+        justUpdatedTo0d2d0 = true;
         try {
             writer = new FileOutputStream(new File(configFileName));
             copy(reader, writer);
@@ -173,7 +171,7 @@ public class Config {
         int length;
         while (true) {
             try {
-                if (!((length = from.read(buffer)) > 0)) break;
+                if ((length = from.read(buffer)) <= 0) break;
                 to.write(buffer, 0, length);
             } catch (IOException e) {
                 e.printStackTrace();

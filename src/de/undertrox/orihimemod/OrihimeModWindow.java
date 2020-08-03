@@ -13,10 +13,6 @@ import jp.gr.java_conf.mt777.origami.orihime.OrihimeFrame;
 import jp.gr.java_conf.mt777.origami.orihime.ap;
 
 import javax.swing.*;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StringContent;
-import javax.swing.text.StyleContext;
-import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -106,7 +102,9 @@ public class OrihimeModWindow {
                 frame.remove(child);
             }
         }
+        // Remove force close on exit
         frame.removeWindowListener(frame.getWindowListeners()[0]);
+        // Add own window closing listener
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -116,16 +114,16 @@ public class OrihimeModWindow {
                 });
             }
         });
-        ActionListener removeEverything = buttons.get(169).getActionListeners()[0];
-        buttons.get(169).removeActionListener(removeEverything);
-        buttons.get(169).addActionListener(e -> saveBeforeAction(() -> removeEverything.actionPerformed(e)));
+        ActionListener removeEverything = mapping.get("remove_everything").getActionListeners()[0];
+        mapping.get("remove_everything").removeActionListener(removeEverything);
+        mapping.get("remove_everything").addActionListener(e -> saveBeforeAction(() -> removeEverything.actionPerformed(e)));
 
-        if (Config.justUpdated) {
+        if (Config.justUpdatedTo0d2d0) {
             String[] options = {"Old", "New"};
             int result = JOptionPane.showOptionDialog(
                     frame,
                     "Important Change:\n\n This version changes how the save button works.\n " +
-                            "After the initial save, it will no longer ask where to save, but automatically \n" +
+                            "After the initial save/open, it will no longer ask where to save, but automatically \n" +
                             "save to the last location. If you want to save to a new location, you have to use \n" +
                             "Export -> Save as. This also means that when you press the Save button after\n" +
                             "pressing the Save As button, the file will be saved in the location you selected \n" +
@@ -218,9 +216,15 @@ public class OrihimeModWindow {
         JMenuItem exportCP = new JMenuItem("cp");
         exportCP.addActionListener( e -> btnSaveAsCp.doClick());
         JMenuItem exportPng = new JMenuItem("png");
-        exportPng.addActionListener( e -> buttons.get(3).doClick());
+        exportPng.addActionListener( e -> mapping.get("export_image").doClick());
         JMenuItem saveAs = new JMenuItem("Save as");
         saveAs.addActionListener(e -> saveBtnNew(e, true));
+        JMenuItem exportORH = new JMenuItem("orh");
+        exportORH.addActionListener(e -> {
+            for (ActionListener actionListener : oldSaveButton) {
+                actionListener.actionPerformed(e);
+            }
+        });
         JButton btnSaveAs=new JButton();
         btnSaveAs.addActionListener(e -> saveAs.doClick());
 
@@ -230,7 +234,8 @@ public class OrihimeModWindow {
         exportMenu.add(exportSVG);
         exportMenu.add(exportDXF);
         exportMenu.add(exportPng);
-        if (Config.useNewSave() || Config.justUpdated) {
+        exportMenu.add(exportORH);
+        if (Config.useNewSave() || Config.justUpdatedTo0d2d0) {
             exportMenu.add(saveAs);
         }
 
@@ -243,7 +248,7 @@ public class OrihimeModWindow {
         });
         btnExport.setMargin(new Insets(0,0,0,0));
 
-        buttons.get(0).getParent().add(btnExport);
+        mapping.get("save").getParent().add(btnExport);
         buttons.add(btnExport);
     }
 
@@ -269,7 +274,7 @@ public class OrihimeModWindow {
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"Yes", "No", "Cancel"}, "Yes");
             switch (n) {
                 case 0:
-                    buttons.get(1).doClick();
+                    mapping.get("save").doClick();
                     if (!changed) {
                         action.run();
                     }
@@ -520,9 +525,5 @@ public class OrihimeModWindow {
             addTooltips(Config.showNumberTooltips(), Config.showKeybindTooltips(), Config.showHelpTooltips());
             Config.updateConfigFile("orihimeKeybinds.cfg");
         }
-    }
-
-    void openBtnNew(ActionEvent e) {
-
     }
 }
