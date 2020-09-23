@@ -1,5 +1,6 @@
 package de.undertrox.orihimemod;
 
+import jp.gr.java_conf.mt777.origami.orihime.OrihimeFrame;
 import jp.gr.java_conf.mt777.origami.orihime.ap;
 
 import javax.swing.*;
@@ -10,7 +11,7 @@ import java.util.Date;
 
 
 public class AutosaveHandler {
-    private ap frame;
+    private OrihimeFrame frame;
     private boolean enable;
     private int interval;
     private int maxAge;
@@ -25,7 +26,7 @@ public class AutosaveHandler {
         this.baseFileName = baseFileName;
     }
 
-    public AutosaveHandler(ap frame, boolean enable, int interval, int maxAge, String baseFileName) {
+    public AutosaveHandler(OrihimeFrame frame, boolean enable, int interval, int maxAge, String baseFileName) {
         this.frame = frame;
         this.enable = enable;
         this.interval = interval;

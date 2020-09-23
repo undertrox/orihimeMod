@@ -12,7 +12,7 @@ public class Config {
     private static Config instance;
 
     private static final String[] versions = {"0.1.0", "0.1.1", "0.1.2", "0.1.3", "0.1.4", "0.1.5", "0.1.6", "0.1.7",
-        "0.2.0"};
+        "0.2.0", "0.3.0", "0.3.1"};
     public boolean SHOW_NUMBER_TOOLTIPS = false;
     public String GENERATED_VERSION = "error loading version";
     public boolean SHOW_KEYBIND_TOOLTIPS = true;
@@ -21,7 +21,7 @@ public class Config {
     public boolean EXPERT_MODE=false;
     public boolean AUTOSAVE = true;
     public boolean USE_NEW_SAVE_BEHAVIOR = false;
-    public static boolean justUpdatedTo0d2d0 = false;
+    public static boolean justUpdatedTo0_2_0 = false;
     public int AUTOSAVE_INTERVAL = 300;
     protected String filename;
     public int AUTOSAVE_MAX_AGE = 86400;
@@ -110,7 +110,7 @@ public class Config {
         }
 
         if (!instance.parsedFile.contains("orihimemod.save.newbehavior")) {
-            justUpdatedTo0d2d0 = true;
+            justUpdatedTo0_2_0 = true;
             instance.parsedFile.addPair("orihimeMod.save.newBehavior", "false");
             instance.parsedFile.saveTo(configFileName);
         }
@@ -146,7 +146,7 @@ public class Config {
         System.out.println("Updating Config file from version " + version + " to " + OrihimeMod.version);
         ParsedConfigFile file = ParsedConfigFile.fromFile(configFileName);
         if (Arrays.asList(getVersionsBetween(version, OrihimeMod.version)).contains("0.2.0")) {
-            justUpdatedTo0d2d0 = true;
+            justUpdatedTo0_2_0 = true;
         }
         file.append(getAddedConfigSince(version));
         file.setValue("orihimeKeybinds.generatedVersion", OrihimeMod.version);
@@ -157,7 +157,7 @@ public class Config {
         System.out.println("No config file found, generating default config file.");
         InputStream reader = instance.getClass().getResourceAsStream("orihimeKeybinds.cfg");
         OutputStream writer;
-        justUpdatedTo0d2d0 = true;
+        justUpdatedTo0_2_0 = true;
         try {
             writer = new FileOutputStream(new File(configFileName));
             copy(reader, writer);

@@ -2,11 +2,12 @@ package de.undertrox.orihimemod;
 
 import jp.gr.java_conf.mt777.kiroku.memo.Memo;
 import jp.gr.java_conf.mt777.origami.orihime.Expose;
+import jp.gr.java_conf.mt777.origami.orihime.OrihimeFrame;
 import jp.gr.java_conf.mt777.origami.orihime.ap;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 
 public class SaveHelper {
-    public static boolean saveTo(ap frame, String filename) {
+    public static boolean saveTo(OrihimeFrame frame, String filename) {
         Expose expose = new Expose(frame);
         Egaki_Syokunin es1 = expose.getEs1();
         es1.kiroku();
@@ -26,6 +27,9 @@ public class SaveHelper {
             }
             success = expose.memoAndName2File(memo1, filename);
         }
+        Memo m = new Memo();
+        m.addGyou(frame.textRenderer.serialize());
+        expose.memoAndName2File(m, filename+"text");
         return success;
     }
 }

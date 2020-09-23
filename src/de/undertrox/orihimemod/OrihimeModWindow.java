@@ -3,17 +3,21 @@ package de.undertrox.orihimemod;
 import de.undertrox.orihimemod.button.JButtonSaveAsCp;
 import de.undertrox.orihimemod.button.JButtonSaveAsDXF;
 import de.undertrox.orihimemod.button.JButtonSaveAsSVG;
+import de.undertrox.orihimemod.button.TextButton;
 import de.undertrox.orihimemod.keybind.JInputKeybindDialog;
 import de.undertrox.orihimemod.keybind.Keybind;
 import de.undertrox.orihimemod.keybind.KeybindListener;
 import de.undertrox.orihimemod.mapping.ButtonMapping;
 import de.undertrox.orihimemod.traverse.Darkmode;
+import jp.gr.java_conf.mt777.origami.dougu.keijiban.TextRenderer;
 import jp.gr.java_conf.mt777.origami.orihime.Expose;
 import jp.gr.java_conf.mt777.origami.orihime.OrihimeFrame;
 import jp.gr.java_conf.mt777.origami.orihime.ap;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +81,7 @@ public class OrihimeModWindow {
         initCustomButtons();
         initRightClickMenu();
         fixMVButtons();
+        addContextMenuToLengthsAndAngles();
 
         addMouseListenerToChildren(frame);
 
@@ -115,10 +120,15 @@ public class OrihimeModWindow {
             }
         });
         ActionListener removeEverything = mapping.get("remove_everything").getActionListeners()[0];
+        ActionListener newRemoveEverything = e -> {
+            removeEverything.actionPerformed(e);
+            frame.textRenderer = new TextRenderer(frame);
+            frame.keijiban = frame.textRenderer;
+        };
         mapping.get("remove_everything").removeActionListener(removeEverything);
-        mapping.get("remove_everything").addActionListener(e -> saveBeforeAction(() -> removeEverything.actionPerformed(e)));
+        mapping.get("remove_everything").addActionListener(e -> saveBeforeAction(() -> newRemoveEverything.actionPerformed(e)));
 
-        if (Config.justUpdatedTo0d2d0) {
+        if (Config.justUpdatedTo0_2_0) {
             String[] options = {"Old", "New"};
             int result = JOptionPane.showOptionDialog(
                     frame,
@@ -147,9 +157,55 @@ public class OrihimeModWindow {
                 Config.setUseNewSave(true);
             }
         }
-
         System.out.println("Configuring autosaver");
         autosaver = new AutosaveHandler(frame, Config.useAutosave(), Config.autoSaveInterval(), Config.autoSaveMaxAge(), filename);
+    }
+
+    private void addContextMenuToLengthsAndAngles() {
+        addContextMenuToMeasureField(mapping.get("measure_l1"));
+        addContextMenuToMeasureField(mapping.get("measure_l2"));
+        addContextMenuToMeasureField(mapping.get("measure_a1"));
+        addContextMenuToMeasureField(mapping.get("measure_a2"));
+        addContextMenuToMeasureField(mapping.get("measure_a3"));
+
+    }
+
+    private void addContextMenuToMeasureField(AbstractButton measuringButton) {
+        Container parent = measuringButton.getParent();
+        boolean found = false;
+        for (Component component : parent.getComponents()) {
+            if (found && component instanceof JLabel) {
+                JLabel measuringLabel = (JLabel) component;
+                JPopupMenu popupMenu = new JPopupMenu();
+                JMenuItem copy = new JMenuItem("Copy");
+                copy.addActionListener(e -> {
+                    Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    StringSelection selection;
+
+                    try {
+                        selection = new StringSelection(measuringLabel.getText());
+                        c.setContents(selection, selection);
+                    } catch(Exception ex) {
+                        ex.printStackTrace();
+                    }
+                });
+                popupMenu.add(copy);
+                measuringLabel.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        if (e.getButton() == MouseEvent.BUTTON3) {
+                            popupMenu.setInvoker(e.getComponent());
+                            popupMenu.setLocation(e.getLocationOnScreen());
+                            popupMenu.setVisible(true);
+                        }
+                    }
+                });
+                return;
+            }
+            if (component == measuringButton) {
+                found = true;
+            }
+        }
     }
 
     // Fixes the Colors of M/V/E/A buttons not working on mac
@@ -207,6 +263,10 @@ public class OrihimeModWindow {
         buttons.add(btnSaveAsSVG);
         btnSaveAsSVG.addActionListener(btnSaveAsSVG::saveAsSVG);
 
+        frame.tb = new TextButton(frame, "Text Mode");
+        buttons.add(frame.tb);
+        frame.tb.addActionListener(frame::textButtonClick);
+
 
         exportMenu = new JPopupMenu();
         JMenuItem exportDXF = new JMenuItem("dxf");
@@ -235,7 +295,7 @@ public class OrihimeModWindow {
         exportMenu.add(exportDXF);
         exportMenu.add(exportPng);
         exportMenu.add(exportORH);
-        if (Config.useNewSave() || Config.justUpdatedTo0d2d0) {
+        if (Config.useNewSave() || Config.justUpdatedTo0_2_0) {
             exportMenu.add(saveAs);
         }
 
@@ -249,6 +309,14 @@ public class OrihimeModWindow {
         btnExport.setMargin(new Insets(0,0,0,0));
 
         mapping.get("save").getParent().add(btnExport);
+        JPanel p = new JPanel();
+        p.setLayout(new GridLayout(1, 2));
+        p.setBackground(Color.PINK);
+        //p.setBounds(2, 2, 102, 55);
+        p.add(frame.textField);
+        p.add(frame.tb);
+        mapping.get("change_circle_color").getParent().getParent().setLayout(new GridLayout(29, 1));
+        mapping.get("change_circle_color").getParent().getParent().add(p);
         buttons.add(btnExport);
     }
 
@@ -409,7 +477,7 @@ public class OrihimeModWindow {
             btn.setToolTipText(btn.getToolTipText() == null? "" : btn.getToolTipText() + "<br>");
             if (showHelpTooltips) {
                 String key = mapping.getKey("button." + i);
-                if (tooltips.containsKey(key)) {
+                if ( key != null && tooltips.containsKey(key)) {
                     btn.setToolTipText(btn.getToolTipText() + tooltips.getString(key));
                 }
             }

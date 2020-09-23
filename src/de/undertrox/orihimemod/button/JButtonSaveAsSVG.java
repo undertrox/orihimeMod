@@ -3,6 +3,7 @@ package de.undertrox.orihimemod.button;
 import de.undertrox.orihimemod.ExportDXF;
 import jp.gr.java_conf.mt777.kiroku.memo.Memo;
 import jp.gr.java_conf.mt777.origami.orihime.Expose;
+import jp.gr.java_conf.mt777.origami.orihime.OrihimeFrame;
 import jp.gr.java_conf.mt777.origami.orihime.ap;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 
@@ -11,9 +12,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 
 public class JButtonSaveAsSVG extends JButton {
-    ap frame;
+    OrihimeFrame frame;
 
-    public JButtonSaveAsSVG(ap frame) {
+    public JButtonSaveAsSVG(OrihimeFrame frame) {
         this.frame = frame;
     }
 
@@ -37,7 +38,9 @@ public class JButtonSaveAsSVG extends JButton {
             fname = fname + ".svg";
         }
         expose.memoAndName2File(ExportDXF.cpToSvg(expose.orihime2cp(memo1)), fname);
-
+        Memo m = new Memo();
+        m.addGyou(frame.textRenderer.serialize());
+        expose.memoAndName2File(m, fname+"text");
         if (fd.getFile()!= null) {
             expose.setFrameTitle(expose.getFrameTitle0() + "        " + fd.getFile());
             frame.setTitle(expose.getFrameTitle());
