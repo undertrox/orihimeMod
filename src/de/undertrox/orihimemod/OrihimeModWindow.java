@@ -102,7 +102,7 @@ public class OrihimeModWindow {
         if (Config.useDarkMode()) {
             enableDarkMode(frame);
         }
-        if (Config.useExpertMode()) {
+        if (Config.useExpertMode() || Config.useNewUI()) {
             for (Component child : frame.getComponents()) {
                 frame.remove(child);
             }
@@ -157,8 +157,15 @@ public class OrihimeModWindow {
                 Config.setUseNewSave(true);
             }
         }
+        if (Config.useNewUI()) {
+            initNewUI();
+        }
         System.out.println("Configuring autosaver");
         autosaver = new AutosaveHandler(frame, Config.useAutosave(), Config.autoSaveInterval(), Config.autoSaveMaxAge(), filename);
+    }
+
+    private void initNewUI() {
+
     }
 
     private void addContextMenuToLengthsAndAngles() {

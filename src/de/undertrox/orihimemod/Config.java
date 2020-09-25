@@ -12,7 +12,7 @@ public class Config {
     private static Config instance;
 
     private static final String[] versions = {"0.1.0", "0.1.1", "0.1.2", "0.1.3", "0.1.4", "0.1.5", "0.1.6", "0.1.7",
-        "0.2.0", "0.3.0", "0.3.1"};
+        "0.2.0", "0.3.0", "0.3.1", "1.0.0"};
     public boolean SHOW_NUMBER_TOOLTIPS = false;
     public String GENERATED_VERSION = "error loading version";
     public boolean SHOW_KEYBIND_TOOLTIPS = true;
@@ -20,6 +20,7 @@ public class Config {
     public boolean DARK_MODE = false;
     public boolean EXPERT_MODE=false;
     public boolean AUTOSAVE = true;
+    public boolean USE_NEW_UI = true;
     public boolean USE_NEW_SAVE_BEHAVIOR = false;
     public static boolean justUpdatedTo0_2_0 = false;
     public int AUTOSAVE_INTERVAL = 300;
@@ -87,6 +88,10 @@ public class Config {
 
     public static int autoSaveMaxAge() {
         return getInstance().AUTOSAVE_MAX_AGE;
+    }
+
+    public static boolean useNewUI() {
+        return getInstance().USE_NEW_UI;
     }
 
     public static void load(String configFileName) {
@@ -192,6 +197,8 @@ public class Config {
             instance.DARK_MODE = Boolean.parseBoolean(value);
         } else if (key.equals("orihimeexpertmode.enable")) {
             instance.EXPERT_MODE = Boolean.parseBoolean(value);
+        } else if (key.equals("orihimemod.newui.enable")) {
+            instance.USE_NEW_UI = Boolean.parseBoolean(value);
         } else if ((key.matches("orihimekeybinds.button.[0-9]+"))) {
             Keybind keybind = parseKeybind(pair, Keybind.BUTTON);
             if (keybind != null) {

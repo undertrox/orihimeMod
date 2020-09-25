@@ -77,7 +77,6 @@ public class OrihimeFrame extends ap {
             notifyChange();
         }
 
-
         try {
             if(fd.getFile()!=null) {  //�L�����Z���ł͂Ȃ��ꍇ�B
                 BufferedReader br = new BufferedReader(new FileReader(fname));

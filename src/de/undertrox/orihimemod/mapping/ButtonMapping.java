@@ -42,7 +42,8 @@ public class ButtonMapping {
         InputStream fis = null;
         Properties prop = null;
         try {
-            fis = ButtonMapping.class.getResourceAsStream(version + "-" + orihimeVersion + ".properties");
+            System.out.println(version + "-" + orihimeVersion + ".properties");
+            fis = ButtonMapping.class.getResourceAsStream("0.3.1" + "-" + orihimeVersion + ".properties");
             prop = new Properties();
             prop.load(fis);
         } catch(IOException e) {
