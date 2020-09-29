@@ -8,6 +8,7 @@ import de.undertrox.orihimemod.keybind.JInputKeybindDialog;
 import de.undertrox.orihimemod.keybind.Keybind;
 import de.undertrox.orihimemod.keybind.KeybindListener;
 import de.undertrox.orihimemod.mapping.ButtonMapping;
+import de.undertrox.orihimemod.newui.NewUI;
 import de.undertrox.orihimemod.traverse.Darkmode;
 import jp.gr.java_conf.mt777.origami.dougu.keijiban.TextRenderer;
 import jp.gr.java_conf.mt777.origami.orihime.Expose;
@@ -165,7 +166,9 @@ public class OrihimeModWindow {
     }
 
     private void initNewUI() {
-
+        System.out.println("Initializing UI Wrapper");
+        NewUI ui = new NewUI(frame);
+        ui.init(mapping);
     }
 
     private void addContextMenuToLengthsAndAngles() {
@@ -228,7 +231,9 @@ public class OrihimeModWindow {
     }
 
     public void show() {
-        frame.setVisible(true);
+        if (!Config.useNewUI()) {
+            frame.setVisible(true);
+        }
         System.out.println("Starting autosaver");
         autosaver.start();
     }

@@ -1,6 +1,7 @@
 package de.undertrox.orihimemod.keybind;
 
 import java.awt.event.KeyEvent;
+import java.util.Locale;
 
 public class Keybind {
 
@@ -8,6 +9,14 @@ public class Keybind {
     public static final int CHECKBOX = 1;
     public static final int TOGGLE_TYPE = 2;
     public static final int ABSTRACT_BUTTON = 3;
+
+    static boolean onMac = false;
+    static {
+        String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
+        if ((os.contains("mac")) || (os.contains("darwin"))) {
+            onMac = true;
+        }
+    }
 
     private int componentID;
     private int keyCode;
@@ -108,10 +117,11 @@ public class Keybind {
         } else {
             offmask |= KeyEvent.SHIFT_DOWN_MASK;
         }
+        int ctrl = onMac? KeyEvent.META_DOWN_MASK : KeyEvent.CTRL_DOWN_MASK;
         if (hasCtrl()) {
-            onmask |= KeyEvent.CTRL_DOWN_MASK;
+            onmask |= ctrl;
         } else {
-            offmask |= KeyEvent.CTRL_DOWN_MASK;
+            offmask |= ctrl;
         }
         return (modifiers & (onmask|offmask)) == onmask;
     }
