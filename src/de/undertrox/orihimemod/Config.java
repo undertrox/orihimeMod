@@ -2,11 +2,14 @@ package de.undertrox.orihimemod;
 
 import de.undertrox.orihimemod.config.ParsedConfigFile;
 import de.undertrox.orihimemod.keybind.Keybind;
+import de.undertrox.orihimemod.mapping.ButtonMapping;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static de.undertrox.orihimemod.OrihimeMod.orihimeVersion;
 
 public class Config {
     private static Config instance;
@@ -29,6 +32,8 @@ public class Config {
     private List<Pair<String, String>> parsed = new ArrayList<>();
     private List<Keybind> keybinds = new ArrayList<>();
     private ParsedConfigFile parsedFile;
+    private static ButtonMapping mapping = ButtonMapping.load(OrihimeMod.version, OrihimeMod.orihimeVersion);
+    private static List<Runnable> onReload= new ArrayList<>();
 
     private Config() {
     }
@@ -38,6 +43,10 @@ public class Config {
             throw new RuntimeException("Tried to access Config before loading Config file.");
         }
         return instance;
+    }
+
+    public static void onReload(Runnable runnable) {
+        onReload.add(runnable);
     }
 
     public static boolean showNumberTooltips() {
@@ -119,6 +128,9 @@ public class Config {
             instance.parsedFile.addPair("orihimeMod.save.newBehavior", "false");
             instance.parsedFile.saveTo(configFileName);
         }
+        for (Runnable runnable : onReload) {
+            runnable.run();
+        }
     }
 
     public static void updateConfigFile(String configFileName) {
@@ -137,10 +149,10 @@ public class Config {
             }
         }
         for (Keybind kb : removedKeybinds) {
-            instance.parsedFile.removePair(kb.getConfigID(), kb.getConfigValue());
+            instance.parsedFile.removePair("orihimekeybinds." + mapping.getKey(kb.getConfigID().substring(16)), kb.getConfigValue());
         }
         for (Keybind newKeybind : newKeybinds) {
-            instance.parsedFile.addPair(newKeybind.getConfigID(), newKeybind.getConfigValue());
+            instance.parsedFile.addPair("orihimekeybinds." + mapping.getKey(newKeybind.getConfigID().substring(16)), newKeybind.getConfigValue());
         }
         instance.parsedFile.saveTo(configFileName);
         load(configFileName);
@@ -152,6 +164,14 @@ public class Config {
         ParsedConfigFile file = ParsedConfigFile.fromFile(configFileName);
         if (Arrays.asList(getVersionsBetween(version, OrihimeMod.version)).contains("0.2.0")) {
             justUpdatedTo0_2_0 = true;
+        }
+        if (Arrays.asList(getVersionsBetween(version, OrihimeMod.version)).contains("1.0.0")) {
+            for (Pair<String, String> pair : file.getAllPairs()) {
+                String key = mapping.getKey(pair.getKey().substring(16));
+                if (key != null) {
+                    file.replaceKey(pair.getKey(), "orihimeKeybinds." + key);
+                }
+            }
         }
         file.append(getAddedConfigSince(version));
         file.setValue("orihimeKeybinds.generatedVersion", OrihimeMod.version);
@@ -214,6 +234,11 @@ public class Config {
             if (keybind != null) {
                 instance.keybinds.add(keybind);
             }
+        } else if (key.matches("orihimekeybinds.[a-zA-Z_0-9]+")) {
+            Keybind keybind = parseNewKeybind(pair);
+            if (keybind != null) {
+                instance.keybinds.add(keybind);
+            }
         } else if (key.equals("orihimemod.autosave.enable")) {
             instance.AUTOSAVE = Boolean.parseBoolean(value);
         } else if (key.equals("orihimemod.autosave.interval")) {
@@ -223,6 +248,17 @@ public class Config {
         } else if (key.equals("orihimemod.save.newbehavior")) {
             instance.USE_NEW_SAVE_BEHAVIOR = Boolean.parseBoolean(value);
         }
+    }
+
+    private static Keybind parseNewKeybind(Pair<String, String> pair) {
+        Pair<String, String> newPair = new Pair<>(mapping.getValue(pair.getKey().substring(16)), pair.getValue());
+        if (newPair.getKey().contains("checkbox")) {
+            return parseKeybind(newPair, Keybind.CHECKBOX);
+        } else if (newPair.getKey().contains("button")) {
+            return parseKeybind(newPair, Keybind.BUTTON);
+        }
+        System.out.println("Failed parsing " + pair + " (" + newPair + ")");
+        return null;
     }
 
     private static Keybind parseKeybind(Pair<String, String> pair, int type) {

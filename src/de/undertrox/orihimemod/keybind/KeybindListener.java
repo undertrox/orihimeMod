@@ -10,10 +10,10 @@ import java.util.List;
 
 public class KeybindListener implements KeyListener {
     static boolean toggle = false;
-    List<JButton> buttons;
+    List<AbstractButton> buttons;
     List<JCheckBox> checkBoxes;
 
-    public KeybindListener(List<JButton> buttons, List<JCheckBox> checkBoxes) {
+    public KeybindListener(List<AbstractButton> buttons, List<JCheckBox> checkBoxes) {
         this.buttons = buttons;
         this.checkBoxes = checkBoxes;
     }

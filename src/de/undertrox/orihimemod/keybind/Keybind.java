@@ -1,6 +1,8 @@
 package de.undertrox.orihimemod.keybind;
 
+import javax.swing.*;
 import java.awt.event.KeyEvent;
+import java.security.Key;
 import java.util.Locale;
 
 public class Keybind {
@@ -136,7 +138,11 @@ public class Keybind {
     public String getConfigValue() {
 
         String s = getModifiers();
-        s += "kc" + getKeyCode();
+        if (KeyEvent.getKeyText(getKeyCode()).length() == 1) {
+            s += KeyEvent.getKeyText(getKeyCode());
+        } else {
+            s += "kc" + getKeyCode();
+        }
         return s;
     }
 
@@ -151,6 +157,21 @@ public class Keybind {
         }
         s += componentID;
         return s;
+    }
+
+    public int getModifiersInt() {
+        int mask = 0;
+        if (hasAlt()) {
+            mask |= KeyEvent.ALT_DOWN_MASK;
+        }
+        if (hasShift()) {
+            mask |= KeyEvent.SHIFT_DOWN_MASK;
+        }
+        int ctrl = onMac? KeyEvent.META_DOWN_MASK : KeyEvent.CTRL_DOWN_MASK;
+        if (hasCtrl()) {
+            mask |= ctrl;
+        }
+        return mask;
     }
 
     @Override

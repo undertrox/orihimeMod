@@ -17,4 +17,12 @@ public class Pair<T,U> {
         this.key = key;
         this.value = value;
     }
+
+    public void setKey(T key) {
+        this.key = key;
+    }
+
+    public void setValue(U value) {
+        this.value = value;
+    }
 }

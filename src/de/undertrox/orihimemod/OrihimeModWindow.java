@@ -28,7 +28,7 @@ import static de.undertrox.orihimemod.OrihimeMod.orihimeVersion;
 import static de.undertrox.orihimemod.OrihimeMod.version;
 
 public class OrihimeModWindow {
-    public List<JButton> buttons = new ArrayList<>();
+    public List<AbstractButton> buttons = new ArrayList<>();
     public List<JCheckBox> checkboxes = new ArrayList<>();
     public JButtonSaveAsCp btnSaveAsCp;
     public JButtonSaveAsDXF btnSaveAsDXF;
@@ -65,6 +65,7 @@ public class OrihimeModWindow {
         mapping = ButtonMapping.load(version, orihimeVersion);
         mapping.setButtons(buttons);
         mapping.setCheckboxes(checkboxes);
+
         System.out.println("Loading Tooltips");
         tooltips = ResourceBundle.getBundle("tooltips");
         System.out.println("Starting Orihime...");
@@ -117,6 +118,9 @@ public class OrihimeModWindow {
                 saveBeforeAction(() -> {
                     autosaver.stop();
                     e.getWindow().dispose();
+                    if (Config.useNewUI()) {
+                        newUI.close();
+                    }
                 });
             }
         });
@@ -165,10 +169,11 @@ public class OrihimeModWindow {
         autosaver = new AutosaveHandler(frame, Config.useAutosave(), Config.autoSaveInterval(), Config.autoSaveMaxAge(), filename);
     }
 
+    private NewUI newUI;
     private void initNewUI() {
         System.out.println("Initializing UI Wrapper");
-        NewUI ui = new NewUI(frame);
-        ui.init(mapping);
+        newUI = new NewUI(frame, tooltips);
+        newUI.init(mapping, this);
     }
 
     private void addContextMenuToLengthsAndAngles() {
@@ -224,8 +229,8 @@ public class OrihimeModWindow {
         mapping.get("mountain").setBorderPainted(false);
         mapping.get("valley").setOpaque(true);
         mapping.get("valley").setBorderPainted(false);
-        mapping.get("aux").setOpaque(true);
-        mapping.get("aux").setBorderPainted(false);
+        mapping.get("auxiliary").setOpaque(true);
+        mapping.get("auxiliary").setBorderPainted(false);
         mapping.get("edge").setOpaque(true);
         mapping.get("edge").setBorderPainted(false);
     }
@@ -348,7 +353,7 @@ public class OrihimeModWindow {
         frame.setLocationRelativeTo(null);
     }
 
-    void saveBeforeAction(Runnable action) {
+    public void saveBeforeAction(Runnable action) {
         if (changed) {
             int n = JOptionPane.showOptionDialog(frame,"Would you like to save?","Save",
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"Yes", "No", "Cancel"}, "Yes");
@@ -379,22 +384,25 @@ public class OrihimeModWindow {
             }
             if (child instanceof AbstractButton) {
                 AbstractButton b = (AbstractButton) child;
-                b.addMouseListener(new RightClickListener(b));
+                b.addMouseListener(new RightClickListener(b, mapping));
             }
         }
     }
 
-    class RightClickListener extends MouseAdapter {
+    public MouseListener createRightClickListener(AbstractButton btn, ButtonMapping mapping) {
+        return new RightClickListener(btn, mapping);
+    }
+    public class RightClickListener extends MouseAdapter {
 
         AbstractButton b;
         String keybindId;
 
-        public RightClickListener(AbstractButton button) {
+        public RightClickListener(AbstractButton button, ButtonMapping mapping) {
             b = button;
             int index = buttons.indexOf(b);
             String bOrC = "button";
             if (index < 0) {
-                index = checkboxes.indexOf(b);
+                index = mapping.getCheckboxes().indexOf(b);
                 bOrC = "checkbox";
             }
             if (index < 0) keybindId = "";
@@ -410,6 +418,7 @@ public class OrihimeModWindow {
         @Override
         public void mouseReleased(MouseEvent e) {
             if (e.isPopupTrigger()) {
+                e.consume();
                 currentKeybindID = keybindId;
                 removeKeybind.removeAll();
                 for (Keybind keybind : Config.keybinds()) {
@@ -485,7 +494,7 @@ public class OrihimeModWindow {
 
     void addTooltips(boolean showNumberTooltips, boolean showKeybindTooltips, boolean showHelpTooltips) {
         for (int i = 0; i < buttons.size(); i++) {
-            JButton btn = buttons.get(i);
+            AbstractButton btn = buttons.get(i);
             btn.setToolTipText(btn.getToolTipText() == null? "" : btn.getToolTipText() + "<br>");
             if (showHelpTooltips) {
                 String key = mapping.getKey("button." + i);
@@ -494,7 +503,7 @@ public class OrihimeModWindow {
                 }
             }
             if (showNumberTooltips) {
-                btn.setToolTipText(btn.getToolTipText() + "<br>Keybind ID: orihimeKeybinds.button." + i);
+                btn.setToolTipText(btn.getToolTipText() + "<br>Keybind ID: orihimeKeybinds." + mapping.getKey("button." + i));
             }
             if (showKeybindTooltips) {
                 StringBuilder b = new StringBuilder();

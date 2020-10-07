@@ -10,14 +10,14 @@ public class ButtonMapping {
     private String modVersion;
     private String orihimeVersion;
     private Map<String, String> mappings;
-    private List<JButton> buttons;
+    private List<AbstractButton> buttons;
     private List<JCheckBox> checkboxes;
 
-    public List<JButton> getButtons() {
+    public List<AbstractButton> getButtons() {
         return buttons;
     }
 
-    public void setButtons(List<JButton> buttons) {
+    public void setButtons(List<AbstractButton> buttons) {
         this.buttons = buttons;
     }
 
@@ -43,7 +43,7 @@ public class ButtonMapping {
         Properties prop = null;
         try {
             System.out.println(version + "-" + orihimeVersion + ".properties");
-            fis = ButtonMapping.class.getResourceAsStream("0.3.1" + "-" + orihimeVersion + ".properties");
+            fis = ButtonMapping.class.getResourceAsStream(version + "-" + orihimeVersion + ".properties");
             prop = new Properties();
             prop.load(fis);
         } catch(IOException e) {
@@ -85,6 +85,10 @@ public class ButtonMapping {
             }
         }
         return null;
+    }
+
+    public String getValue(String value) {
+        return mappings.get(value);
     }
 
 

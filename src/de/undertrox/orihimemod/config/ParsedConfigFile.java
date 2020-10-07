@@ -90,7 +90,7 @@ public class ParsedConfigFile {
         List<Pair<String, String>> pairs = new ArrayList<>();
         for (ParsedConfigLine line : lines) {
             if (line instanceof PairConfigLine) {
-                pairs.add(new Pair(line.getKey(), line.getValue()));
+                pairs.add(new Pair<>(line.getKey(), line.getValue()));
             }
         }
         return pairs;
@@ -133,7 +133,7 @@ public class ParsedConfigFile {
         for (Iterator<ParsedConfigLine> iterator = lines.iterator(); iterator.hasNext(); ) {
             ParsedConfigLine line = iterator.next();
             if (line instanceof PairConfigLine) {
-                if (line.getKey().equals(key) && line.getValue().equals(value)) {
+                if (line.getKey().equalsIgnoreCase(key) && line.getValue().equalsIgnoreCase(value)) {
                     iterator.remove();
                 }
             }

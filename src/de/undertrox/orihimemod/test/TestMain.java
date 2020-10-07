@@ -13,10 +13,5 @@ public class TestMain {
         frame.setSize(1200, 700);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-        window = new OrihimeWindow(frame, null);
-        window.setSize(1200, 700);
-        window.setLocationRelativeTo(null);
-        System.out.println("Starting");
-        window.setVisible(true);
     }
 }
