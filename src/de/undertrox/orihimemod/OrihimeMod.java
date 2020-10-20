@@ -4,7 +4,7 @@ import java.awt.event.MouseEvent;
 
 public class OrihimeMod {
 
-    public static final String version = "0.3.1";
+    public static final String version = "0.3.2";
     public static final String orihimeVersion = "3.054";
 
     public static void main(String[] args) {
