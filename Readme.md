@@ -2,8 +2,41 @@ Orihime-Mod
 ===
 
 This is a little mod/addon for the software Orihime by @MT777. It adds the possibility 
-to use keyboard shortcuts. Download the jar file [here](https://github.com/undertrox/orihimeMod/releases/download/v0.3.2/orihimeMod-0.3.2.jar)
+to use keyboard shortcuts and a lot of other features. Download the jar file [here](https://github.com/undertrox/orihimeMod/releases/download/v0.3.2/orihimeMod-0.3.2.jar)
 (version 0.3.2)
+
+Features
+---
+
+### Keybinds
+
+This was the original purpose of this mod, but over time, a lot of other features were added as well.
+
+### Autosave
+
+By default, every 5 minutes, a copy of what you are currently working on will be saved to the `orihimeMod-Autosave` folder in both .orh and .cp format.
+Files in the autosave folder that are older than 1 day are automatically deleted.
+
+The autosave interval and the age at which files get deleted can be configured using `orihimeMod.autoSave.interval` and  `orihimeMod.autoSave.maxAge`
+
+### Tooltips
+
+Every button in the software has a short description that gets shown when hovered over.
+
+### Self intersection Highlighting
+
+If a CP is locally flatfoldable, but still cannot be folded, the sections of the CP that would have to intersect to fold it are highlighted in red
+
+### Various Quality-of-Life Improvements
+
+For example:
+ - Asking whether to save before closing
+ - More intuitive saving behaviour for new users
+ - easier access to exporting in different formats
+ - better behavior when selecting
+ - warning when saving as .orh didn't work
+ - ...
+
 
 How to add a keybind 
 --
