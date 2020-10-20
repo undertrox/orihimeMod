@@ -27,6 +27,10 @@ Every button in the software has a short description that gets shown when hovere
 
 If a CP is locally flatfoldable, but still cannot be folded, the sections of the CP that would have to intersect to fold it are highlighted in red
 
+### Text on Crease Patterns
+
+You can add Text on CPs. it will be saved in a separate file as to not break compatibility with oripa and different versions of orihime(Mod)
+
 ### Various Quality-of-Life Improvements
 
 For example:
