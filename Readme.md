@@ -2,8 +2,8 @@ Orihime-Mod
 ===
 
 This is a little mod/addon for the software Orihime by @MT777. It adds the possibility 
-to use keyboard shortcuts and a lot of other features. Download the jar file [here](https://github.com/undertrox/orihimeMod/releases/download/v0.3.2/orihimeMod-0.3.2.jar)
-(version 0.3.2)
+to use keyboard shortcuts and a lot of other features. Download the jar file [here](https://github.com/undertrox/orihimeMod/releases/download/v0.3.2.1/orihimeMod-0.3.2.1.jar)
+(version 0.3.2.1)
 
 Features
 ---
