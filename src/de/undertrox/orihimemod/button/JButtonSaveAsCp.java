@@ -1,9 +1,9 @@
 package de.undertrox.orihimemod.button;
 
 import de.undertrox.orihimemod.ExportDXF;
+import jp.gr.java_conf.mt777.kiroku.memo.Memo;
 import jp.gr.java_conf.mt777.origami.orihime.Expose;
 import jp.gr.java_conf.mt777.origami.orihime.OrihimeFrame;
-import jp.gr.java_conf.mt777.kiroku.Text;
 import jp.gr.java_conf.mt777.origami.orihime.ap;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 
@@ -32,7 +32,7 @@ public class JButtonSaveAsCp extends JButton {
         fd.setMode(FileDialog.SAVE);
         fd.setVisible(true);
         String fname = fd.getDirectory() + fd.getFile();
-        Text memo1;
+        Memo memo1;
         memo1 = es1.getMemo_for_kakidasi();
         if (fname.endsWith(".dxf")) {
             expose.memoAndName2File(ExportDXF.cpToDxf(expose.orihime2cp(memo1)), fname);
@@ -43,8 +43,8 @@ public class JButtonSaveAsCp extends JButton {
             expose.memoAndName2File(expose.orihime2cp(memo1), fname);
         }
 
-        Text m = new Text();
-        m.addLine(frame.textRenderer.serialize());
+        Memo m = new Memo();
+        m.addGyou(frame.textRenderer.serialize());
         expose.memoAndName2File(m, fname+"text");
         if (fd.getFile()!= null) {
             expose.setFrameTitle(expose.getFrameTitle0() + "        " + fd.getFile());
