@@ -1,7 +1,6 @@
 package de.undertrox.orihimemod;
 
 import jp.gr.java_conf.mt777.origami.orihime.OrihimeFrame;
-import jp.gr.java_conf.mt777.origami.orihime.ap;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

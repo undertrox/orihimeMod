@@ -1,6 +1,6 @@
 package jp.gr.java_conf.mt777.origami.orihime;
 
-import jp.gr.java_conf.mt777.kiroku.memo.Memo;
+import jp.gr.java_conf.mt777.kiroku.Text;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 
 import java.awt.*;
@@ -48,10 +48,10 @@ public class Expose {
         frame.readImageFromFile3();
     }
 
-    public boolean memoAndName2File(Memo memo, String fname) {
+    public boolean memoAndName2File(Text memo, String fname) {
         if (fname == null){ return true;}
         frame.memoAndName2File(memo, fname);
-        Memo memo1 = new Memo();
+        Text memo1 = new Text();
         try {
 
                 BufferedReader br = new BufferedReader(new FileReader(fname));
@@ -60,24 +60,24 @@ public class Expose {
 
                 memo1.reset();
                 while((rdata = br.readLine()) != null) {
-                    memo1.addGyou(rdata);
+                    memo1.addLine(rdata);
                 }
                 br.close();
         } catch(Exception e) {
             e.printStackTrace();
         }
-        boolean eq = memo.getGyousuu()==memo1.getGyousuu();
+        boolean eq = memo.getLineNum()==memo1.getLineNum();
         if (!eq) {
             System.out.println("Error while writing the file.");
-            System.out.println(memo.getGyousuu());
-            System.out.println(memo1.getGyousuu());
+            System.out.println(memo.getLineNum());
+            System.out.println(memo1.getLineNum());
             return eq;
         }
-        for (int i = 1; i < memo.getGyousuu(); i++) {
-            if (!memo.getGyou(i).equals(memo1.getGyou(i))){
+        for (int i = 1; i < memo.getLineNum(); i++) {
+            if (!memo.getLine(i).equals(memo1.getLine(i))){
                 eq = false;
-                System.out.println(memo.getGyou(i));
-                System.out.println(memo1.getGyou(i));
+                System.out.println(memo.getLine(i));
+                System.out.println(memo1.getLine(i));
                 System.out.println(i);
             }
         }
@@ -105,11 +105,11 @@ public class Expose {
         return frame.frame_title;
     }
 
-    public Memo orihime2cp(Memo memo) {
+    public Text orihime2cp(Text memo) {
         return frame.file_henkan.orihime2cp(memo);
     }
 
-    public Memo orihime2svg(Memo memo) {
+    public Text orihime2svg(Text memo) {
         return frame.file_henkan.orihime2svg(memo);
     }
 

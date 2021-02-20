@@ -1,41 +1,41 @@
 package de.undertrox.orihimemod;
 
-import jp.gr.java_conf.mt777.kiroku.memo.Memo;
+import jp.gr.java_conf.mt777.kiroku.Text;
 import java.util.StringTokenizer;
 
 public class ExportDXF {
-    public static Memo cpToDxf(Memo cp) {
+    public static Text cpToDxf(Text cp) {
         double scale = 3.0;
         double center = 4.0;
         double x1, y1, x2, y2;
         String str;
         int lineType;
 
-        Memo dxf = new Memo();
-        dxf.addGyou("  0");
-        dxf.addGyou("SECTION");
-        dxf.addGyou("  2");
-        dxf.addGyou("HEADER");
-        dxf.addGyou("  9");
-        dxf.addGyou("$ACADVER");
-        dxf.addGyou("  1");
-        dxf.addGyou("AC1009");
-        dxf.addGyou("  0");
-        dxf.addGyou("ENDSEC");
-        dxf.addGyou("  0");
-        dxf.addGyou("SECTION");
-        dxf.addGyou("  2");
-        dxf.addGyou("ENTITIES");
+        Text dxf = new Text();
+        dxf.addLine("  0");
+        dxf.addLine("SECTION");
+        dxf.addLine("  2");
+        dxf.addLine("HEADER");
+        dxf.addLine("  9");
+        dxf.addLine("$ACADVER");
+        dxf.addLine("  1");
+        dxf.addLine("AC1009");
+        dxf.addLine("  0");
+        dxf.addLine("ENDSEC");
+        dxf.addLine("  0");
+        dxf.addLine("SECTION");
+        dxf.addLine("  2");
+        dxf.addLine("ENTITIES");
 
 
-        for (int lineNum = 1; lineNum <= cp.getGyousuu() ; lineNum++) {
-            if (cp.getGyou(lineNum).length()>0) {
-                StringTokenizer tk = new StringTokenizer(cp.getGyou(lineNum));
+        for (int lineNum = 1; lineNum <= cp.getLineNum() ; lineNum++) {
+            if (cp.getLine(lineNum).length()>0) {
+                StringTokenizer tk = new StringTokenizer(cp.getLine(lineNum));
                 str = tk.nextToken();
                 try {
-                    dxf.addGyou("  0");
-                    dxf.addGyou("LINE");
-                    dxf.addGyou("  8");
+                    dxf.addLine("  0");
+                    dxf.addLine("LINE");
+                    dxf.addLine("  8");
                     lineType = Integer.parseInt(str);
                     String layerName = "noname";
                     int colorNumber = 0;
@@ -58,21 +58,21 @@ public class ExportDXF {
                     x2 = Double.parseDouble(tk.nextToken());
                     y2 = Double.parseDouble(tk.nextToken());
 
-                    dxf.addGyou(layerName);
-                    dxf.addGyou("  6");
-                    dxf.addGyou("CONTINUOUS");
-                    dxf.addGyou("  62");
-                    dxf.addGyou("" + colorNumber);
+                    dxf.addLine(layerName);
+                    dxf.addLine("  6");
+                    dxf.addLine("CONTINUOUS");
+                    dxf.addLine("  62");
+                    dxf.addLine("" + colorNumber);
 
-                    dxf.addGyou("  10");
-                    dxf.addGyou("" + scale(x1,scale,center));
-                    dxf.addGyou("  20");
-                    dxf.addGyou("" + scale(y1,-scale,center));
+                    dxf.addLine("  10");
+                    dxf.addLine("" + scale(x1,scale,center));
+                    dxf.addLine("  20");
+                    dxf.addLine("" + scale(y1,-scale,center));
 
-                    dxf.addGyou("  11");
-                    dxf.addGyou("" + scale(x2,scale,center));
-                    dxf.addGyou("  21");
-                    dxf.addGyou("" + scale(y2,-scale,center));
+                    dxf.addLine("  11");
+                    dxf.addLine("" + scale(x2,scale,center));
+                    dxf.addLine("  21");
+                    dxf.addLine("" + scale(y2,-scale,center));
 
                 } catch (NumberFormatException e) {
                     System.err.println("Warning: CP to DXF conversion failed on line "+ lineNum + ". this shouldnt happen.");
@@ -80,16 +80,16 @@ public class ExportDXF {
             }
         }
 
-        dxf.addGyou("  0");
-        dxf.addGyou("ENDSEC");
-        dxf.addGyou("  0");
-        dxf.addGyou("EOF");
+        dxf.addLine("  0");
+        dxf.addLine("ENDSEC");
+        dxf.addLine("  0");
+        dxf.addLine("EOF");
         return dxf;
     }
 
-    public static Memo cpToSvg(Memo cp) {
-        Memo svg = new Memo();
-        svg.addGyou("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>\n" +
+    public static Text cpToSvg(Text cp) {
+        Text svg = new Text();
+        svg.addLine("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>\n" +
                 "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\"\n" +
                 "\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\n" +
                 "<svg xmlns=\"http://www.w3.org/2000/svg\"\n" +
@@ -98,9 +98,9 @@ public class ExportDXF {
                 " viewBox=\"0 0 1000 1000\" >");
         double scale = 1000/400.0;
         double center = 200*scale;
-        for (int lineNum = 1; lineNum <= cp.getGyousuu() ; lineNum++) {
-            if (cp.getGyou(lineNum).length()>0) {
-                StringTokenizer tk = new StringTokenizer(cp.getGyou(lineNum));
+        for (int lineNum = 1; lineNum <= cp.getLineNum() ; lineNum++) {
+            if (cp.getLine(lineNum).length()>0) {
+                StringTokenizer tk = new StringTokenizer(cp.getLine(lineNum));
                 String str = tk.nextToken();
                 try {
                     int lineType = Integer.parseInt(str);
@@ -124,14 +124,14 @@ public class ExportDXF {
                     double x2 = Double.parseDouble(tk.nextToken());
                     double y2 = Double.parseDouble(tk.nextToken());
 
-                    svg.addGyou(String.format("<line style=\"%s\" x1=\"%s\" y1=\"%s\" x2=\"%s\" y2=\"%s\"/>", style,
+                    svg.addLine(String.format("<line style=\"%s\" x1=\"%s\" y1=\"%s\" x2=\"%s\" y2=\"%s\"/>", style,
                             scale(x1, scale, center), scale(y1, scale, center), scale(x2, scale, center), scale(y2, scale, center)));
                 } catch (NumberFormatException e) {
                     System.err.println("Warning: CP to DXF conversion failed on line "+ lineNum + ". this shouldnt happen.");
                 }
             }
         }
-        svg.addGyou("</svg>");
+        svg.addLine("</svg>");
         return svg;
     }
 
