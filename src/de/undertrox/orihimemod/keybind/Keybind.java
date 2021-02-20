@@ -9,7 +9,6 @@ public class Keybind {
     public static final int TOGGLE_TYPE = 2;
     public static final int ABSTRACT_BUTTON = 3;
 
-    private int componentID;
     private int keyCode;
     private boolean shift;
     private boolean ctrl;
@@ -18,25 +17,29 @@ public class Keybind {
     private String mappingID;
     private boolean ignoreModifiers;
 
-    public Keybind(int type, int componentID, String key, boolean shift, boolean ctrl, boolean alt, boolean ignoreModifiers){
-        this(type, componentID, KeyEvent.getExtendedKeyCodeForChar(key.charAt(0)), shift, ctrl, alt, ignoreModifiers);
+    public Keybind(int type, String mappingID, String key, boolean shift, boolean ctrl, boolean alt, boolean ignoreModifiers){
+        this(type, mappingID, KeyEvent.getExtendedKeyCodeForChar(key.charAt(0)), shift, ctrl, alt, ignoreModifiers);
     }
 
-    public Keybind(int type, int componentID, int keyCode, boolean shift, boolean ctrl, boolean alt, boolean ignoreModifiers) {
+    public String getMappingID() {
+        return mappingID;
+    }
+
+    public Keybind(int type, String mappingID, int keyCode, boolean shift, boolean ctrl, boolean alt, boolean ignoreModifiers) {
         this.type = type;
-        this.componentID = componentID;
         this.keyCode = keyCode;
         this.shift = shift;
         this.ctrl = ctrl;
         this.alt = alt;
+        this.mappingID = mappingID;
         this.ignoreModifiers = ignoreModifiers;
     }
-    public Keybind(int type, int componentID, int keyCode, boolean shift, boolean ctrl, boolean alt) {
-        this(type, componentID, keyCode, shift, ctrl, alt, false);
+    public Keybind(int type, String mappingID, int keyCode, boolean shift, boolean ctrl, boolean alt) {
+        this(type, mappingID, keyCode, shift, ctrl, alt, false);
     }
 
-    public Keybind(int type, int componentID, int keyCode) {
-        this(type, componentID, keyCode, false, false, false);
+    public Keybind(int type, String mappingId, int keyCode) {
+        this(type, mappingId, keyCode, false, false, false);
     }
 
     @Override
@@ -44,10 +47,6 @@ public class Keybind {
         StringBuilder b = new StringBuilder(getModifiers());
         b.append(KeyEvent.getKeyText(keyCode));
         return b.toString();
-    }
-
-    public int getComponentID() {
-        return componentID;
     }
 
     public int getKeyCode() {
@@ -131,16 +130,7 @@ public class Keybind {
     }
 
     public String getConfigID() {
-        String s = "orihimeKeybinds.";
-        if (type == BUTTON) {
-            s += "button.";
-        } else if(type == CHECKBOX) {
-            s += "checkbox.";
-        } else if (type == ABSTRACT_BUTTON) {
-            return s + mappingID;
-        }
-        s += componentID;
-        return s;
+        return mappingID;
     }
 
     @Override
@@ -148,7 +138,7 @@ public class Keybind {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Keybind keybind = (Keybind) o;
-        return componentID == keybind.componentID &&
+        return mappingID.equals(keybind.mappingID) &&
                 keyCode == keybind.keyCode &&
                 shift == keybind.shift &&
                 ctrl == keybind.ctrl &&

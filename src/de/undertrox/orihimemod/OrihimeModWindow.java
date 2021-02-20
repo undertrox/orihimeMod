@@ -47,7 +47,7 @@ public class OrihimeModWindow {
     public OrihimeFrame frame;
 
     public String filename = "";
-    public String fullFileName= "";
+    public String fullFileName = "";
 
     public Config config;
 
@@ -59,9 +59,9 @@ public class OrihimeModWindow {
         System.out.println("OrihimeMod version " + version + " is Starting...");
         Config.load("orihimeKeybinds.cfg");
         config = Config.getInstance();
-        System.out.println("Loaded "+Config.keybinds().size()+" Keybinds.");
+        System.out.println("Loaded " + Config.keybinds().size() + " Keybinds.");
         System.out.println("Loading Button mapping for Mod version " + version + " and Orihime version " + orihimeVersion);
-        mapping = ButtonMapping.load(version, orihimeVersion);
+        mapping = config.mapping;
         mapping.setButtons(buttons);
         mapping.setCheckboxes(checkboxes);
         System.out.println("Loading Tooltips");
@@ -74,7 +74,7 @@ public class OrihimeModWindow {
         System.out.println("Indexing Buttons and Checkboxes...");
         indexButtons(frame);
         indexCheckboxes(frame);
-        System.out.println("Found " + buttons.size() + " Buttons and "+ checkboxes.size() +" checkboxes for keybinds");
+        System.out.println("Found " + buttons.size() + " Buttons and " + checkboxes.size() + " checkboxes for keybinds");
 
         System.out.println("Initializing own UI elements");
         oldSaveButton = mapping.get("save").getActionListeners();
@@ -91,12 +91,12 @@ public class OrihimeModWindow {
         mapping.get("save").addActionListener(e -> saveBtnNew(e, false));
 
         expose.setFrame(frame);
-        String title = expose.getFrameTitle()+" - OrihimeMod version " + OrihimeMod.version;
+        String title = expose.getFrameTitle() + " - OrihimeMod version " + OrihimeMod.version;
         expose.setFrameTitle0(title);
         frame.setTitle(title);
 
         addTooltips(Config.showNumberTooltips(), Config.showKeybindTooltips(), Config.showHelpTooltips());
-        KeyListener listener = new KeybindListener(buttons, checkboxes);
+        KeyListener listener = new KeybindListener(mapping);
         frame.addKeyListener(listener);
         addKeyListenerToChildren(listener, frame);
         if (Config.useDarkMode()) {
@@ -185,7 +185,7 @@ public class OrihimeModWindow {
                     try {
                         selection = new StringSelection(measuringLabel.getText());
                         c.setContents(selection, selection);
-                    } catch(Exception ex) {
+                    } catch (Exception ex) {
                         ex.printStackTrace();
                     }
                 });
@@ -251,15 +251,15 @@ public class OrihimeModWindow {
         btnSaveAsDXF.setText("Save as DXF");
         inputKeybind = new JInputKeybindDialog(this::keybindDialogClose);
 
-        btnSaveAsCp.setMargin(new Insets(0,0,0,0));
+        btnSaveAsCp.setMargin(new Insets(0, 0, 0, 0));
         buttons.add(btnSaveAsCp);
         btnSaveAsCp.addActionListener(btnSaveAsCp::saveAsCp);
 
-        btnSaveAsDXF.setMargin(new Insets(0,0,0,0));
+        btnSaveAsDXF.setMargin(new Insets(0, 0, 0, 0));
         buttons.add(btnSaveAsDXF);
         btnSaveAsDXF.addActionListener(btnSaveAsDXF::saveAsDXF);
 
-        btnSaveAsSVG.setMargin(new Insets(0,0,0,0));
+        btnSaveAsSVG.setMargin(new Insets(0, 0, 0, 0));
         buttons.add(btnSaveAsSVG);
         btnSaveAsSVG.addActionListener(btnSaveAsSVG::saveAsSVG);
 
@@ -270,13 +270,13 @@ public class OrihimeModWindow {
 
         exportMenu = new JPopupMenu();
         JMenuItem exportDXF = new JMenuItem("dxf");
-        exportDXF.addActionListener( e -> btnSaveAsDXF.doClick());
+        exportDXF.addActionListener(e -> btnSaveAsDXF.doClick());
         JMenuItem exportSVG = new JMenuItem("svg");
-        exportSVG.addActionListener( e -> btnSaveAsSVG.doClick());
+        exportSVG.addActionListener(e -> btnSaveAsSVG.doClick());
         JMenuItem exportCP = new JMenuItem("cp");
-        exportCP.addActionListener( e -> btnSaveAsCp.doClick());
+        exportCP.addActionListener(e -> btnSaveAsCp.doClick());
         JMenuItem exportPng = new JMenuItem("png");
-        exportPng.addActionListener( e -> mapping.get("export_image").doClick());
+        exportPng.addActionListener(e -> mapping.get("export_image").doClick());
         JMenuItem saveAs = new JMenuItem("Save as");
         saveAs.addActionListener(e -> saveBtnNew(e, true));
         JMenuItem exportORH = new JMenuItem("orh");
@@ -285,7 +285,7 @@ public class OrihimeModWindow {
                 actionListener.actionPerformed(e);
             }
         });
-        JButton btnSaveAs=new JButton();
+        JButton btnSaveAs = new JButton();
         btnSaveAs.addActionListener(e -> saveAs.doClick());
 
         buttons.add(btnSaveAs);
@@ -306,7 +306,7 @@ public class OrihimeModWindow {
             expose.setI_mouseDragged_yuukou(0);
             expose.setI_mouseReleased_yuukou(0);
         });
-        btnExport.setMargin(new Insets(0,0,0,0));
+        btnExport.setMargin(new Insets(0, 0, 0, 0));
 
         mapping.get("save").getParent().add(btnExport);
         JPanel p = new JPanel();
@@ -338,7 +338,7 @@ public class OrihimeModWindow {
 
     void saveBeforeAction(Runnable action) {
         if (changed) {
-            int n = JOptionPane.showOptionDialog(frame,"Would you like to save?","Save",
+            int n = JOptionPane.showOptionDialog(frame, "Would you like to save?", "Save",
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"Yes", "No", "Cancel"}, "Yes");
             switch (n) {
                 case 0:
@@ -421,7 +421,7 @@ public class OrihimeModWindow {
     void addKeyListenerToChildren(KeyListener listener, Container container) {
         Component[] children = container.getComponents();
         for (Component child : children) {
-            if (child.getKeyListeners().length>0) {
+            if (child.getKeyListeners().length > 0) {
                 for (KeyListener keyListener : child.getKeyListeners()) {
                     child.removeKeyListener(keyListener);
                 }
@@ -429,9 +429,9 @@ public class OrihimeModWindow {
             if (child instanceof JButton || child instanceof JCheckBox) {
                 JComponent c = (JComponent) child;
                 c.getInputMap(JComponent.WHEN_FOCUSED)
-                        .put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,0,false), "none");
+                        .put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false), "none");
                 c.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-                        .put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,0,false), "none");
+                        .put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false), "none");
             }
             if (!(child instanceof JTextField)) {
                 child.addKeyListener(listener);
@@ -474,28 +474,28 @@ public class OrihimeModWindow {
     void addTooltips(boolean showNumberTooltips, boolean showKeybindTooltips, boolean showHelpTooltips) {
         for (int i = 0; i < buttons.size(); i++) {
             JButton btn = buttons.get(i);
-            btn.setToolTipText(btn.getToolTipText() == null? "" : btn.getToolTipText() + "<br>");
+            btn.setToolTipText(btn.getToolTipText() == null ? "" : btn.getToolTipText() + "<br>");
             if (showHelpTooltips) {
                 String key = mapping.getKey("button." + i);
-                if ( key != null && tooltips.containsKey(key)) {
+                if (key != null && tooltips.containsKey(key)) {
                     btn.setToolTipText(btn.getToolTipText() + tooltips.getString(key));
                 }
             }
             if (showNumberTooltips) {
-                btn.setToolTipText(btn.getToolTipText() + "<br>Keybind ID: orihimeKeybinds.button." + i);
+                btn.setToolTipText(btn.getToolTipText() + "<br>Keybind ID: " + mapping.getKey("button." + i));
             }
             if (showKeybindTooltips) {
                 StringBuilder b = new StringBuilder();
                 for (Keybind keybind : getKeybindsFor(i, Keybind.BUTTON)) {
-                    b.append("<br>"+keybind.toString());
+                    b.append("<br>" + keybind.toString());
                 }
-                btn.setToolTipText(btn.getToolTipText()+b.toString());
+                btn.setToolTipText(btn.getToolTipText() + b.toString());
             }
-            btn.setToolTipText("<html>"+btn.getToolTipText()+"</html>");
+            btn.setToolTipText("<html>" + btn.getToolTipText() + "</html>");
         }
         for (int i = 0; i < checkboxes.size(); i++) {
             JCheckBox checkBox = checkboxes.get(i);
-            checkBox.setToolTipText(checkBox.getToolTipText() == null? "" : checkBox.getToolTipText() + "<br>");
+            checkBox.setToolTipText(checkBox.getToolTipText() == null ? "" : checkBox.getToolTipText() + "<br>");
             if (showHelpTooltips) {
                 String key = mapping.getKey("checkbox." + i);
                 if (tooltips.containsKey(key)) {
@@ -503,23 +503,29 @@ public class OrihimeModWindow {
                 }
             }
             if (showNumberTooltips) {
-                checkBox.setToolTipText(checkBox.getToolTipText() + "<br>Keybind ID: orihimeKeybinds.checkbox." + i);
+                checkBox.setToolTipText(checkBox.getToolTipText() + "<br>Keybind ID: " + mapping.getKey("checkbox." + i));
             }
             if (showKeybindTooltips) {
                 StringBuilder b = new StringBuilder();
                 for (Keybind keybind : getKeybindsFor(i, Keybind.CHECKBOX)) {
-                    b.append("<br>"+keybind.toString());
+                    b.append("<br>" + keybind.toString());
                 }
-                checkBox.setToolTipText(checkBox.getToolTipText()+b.toString());
+                checkBox.setToolTipText(checkBox.getToolTipText() + b.toString());
             }
-            checkBox.setToolTipText("<html>"+checkBox.getToolTipText()+"</html>");
+            checkBox.setToolTipText("<html>" + checkBox.getToolTipText() + "</html>");
         }
     }
 
     List<Keybind> getKeybindsFor(int buttonId, int type) {
         List<Keybind> result = new ArrayList<>();
+        String mappingId;
+        if (type == Keybind.CHECKBOX) {
+            mappingId = mapping.getKey("checkbox." + buttonId);
+        } else {
+            mappingId = mapping.getKey("button."+buttonId);
+        }
         for (Keybind keybind : Config.keybinds()) {
-            if (keybind.getComponentID()==buttonId&&keybind.getType()==type){
+            if (keybind.getMappingID().equals(mappingId)) {
                 result.add(keybind);
             }
         }
@@ -545,7 +551,8 @@ public class OrihimeModWindow {
             fd.setVisible(true);
             fname = fd.getDirectory() + fd.getFile();
             if (fd.getFile() == null) {
-                changed = true; return;
+                changed = true;
+                return;
             }
             success = SaveHelper.saveTo(frame, fname);
         } else {
@@ -581,15 +588,8 @@ public class OrihimeModWindow {
     void keybindDialogClose(KeyEvent lastKeyEvent) {
         inputKeybind.reset();
         if (lastKeyEvent != null) {
-            if (currentKeybindID.contains("button")) {
-                int id = Integer.parseInt(currentKeybindID.substring(23));
-                Config.keybinds().add(new Keybind(Keybind.BUTTON, id, lastKeyEvent.getExtendedKeyCode(),
-                        lastKeyEvent.isShiftDown(), lastKeyEvent.isControlDown(), lastKeyEvent.isAltDown()));
-            } else if (currentKeybindID.contains("checkbox")) {
-                int id = Integer.parseInt(currentKeybindID.substring(25));
-                Config.keybinds().add(new Keybind(Keybind.CHECKBOX, id, lastKeyEvent.getExtendedKeyCode(),
-                        lastKeyEvent.isShiftDown(), lastKeyEvent.isControlDown(), lastKeyEvent.isAltDown()));
-            }
+            Config.keybinds().add(new Keybind(Keybind.BUTTON, currentKeybindID, lastKeyEvent.getExtendedKeyCode(),
+                    lastKeyEvent.isShiftDown(), lastKeyEvent.isControlDown(), lastKeyEvent.isAltDown()));
             addTooltips(Config.showNumberTooltips(), Config.showKeybindTooltips(), Config.showHelpTooltips());
             Config.updateConfigFile("orihimeKeybinds.cfg");
         }

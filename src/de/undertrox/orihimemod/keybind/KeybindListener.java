@@ -2,6 +2,7 @@ package de.undertrox.orihimemod.keybind;
 
 import de.undertrox.orihimemod.Config;
 import de.undertrox.orihimemod.OrihimeMod;
+import de.undertrox.orihimemod.mapping.ButtonMapping;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -10,12 +11,10 @@ import java.util.List;
 
 public class KeybindListener implements KeyListener {
     static boolean toggle = false;
-    List<JButton> buttons;
-    List<JCheckBox> checkBoxes;
+    ButtonMapping mapping;
 
-    public KeybindListener(List<JButton> buttons, List<JCheckBox> checkBoxes) {
-        this.buttons = buttons;
-        this.checkBoxes = checkBoxes;
+    public KeybindListener(ButtonMapping mapping) {
+        this.mapping = mapping;
     }
 
     @Override
@@ -25,20 +24,19 @@ public class KeybindListener implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         for (Keybind keybind : Config.keybinds()) {
+            System.out.println(keybind);
             if (keybind.matches(e)) {
-                if (keybind.getType() == Keybind.BUTTON) {
-                    buttons.get(keybind.getComponentID()).doClick();
-                } else if (keybind.getType() == Keybind.CHECKBOX) {
-                    checkBoxes.get(keybind.getComponentID()).doClick();
-                } else if (keybind.getType() == Keybind.TOGGLE_TYPE) {
+                if (keybind.getType() == Keybind.TOGGLE_TYPE) {
                     if (!toggle) {
                         toggle = true;
-                        if (buttons.get(30).getBackground().getRed() > 200) {
-                            buttons.get(31).doClick();
-                        } else if (buttons.get(31).getBackground().getBlue() > 200) {
-                            buttons.get(30).doClick();
+                        if (mapping.get("mountain").getBackground().getRed() > 200) {
+                            mapping.get("valley").doClick();
+                        } else if (mapping.get("valley").getBackground().getBlue() > 200) {
+                            mapping.get("mountain").doClick();
                         }
                     }
+                } else {
+                    mapping.get(keybind.getMappingID()).doClick();
                 }
             }
         }
@@ -50,10 +48,10 @@ public class KeybindListener implements KeyListener {
         for (Keybind keybind : Config.keybinds()) {
             if (keybind.matches(e) && keybind.getType() == Keybind.TOGGLE_TYPE) {
                 if (toggle) {
-                    if (buttons.get(30).getBackground().getRed() > 200) {
-                        buttons.get(31).doClick();
-                    } else if (buttons.get(31).getBackground().getBlue() > 200) {
-                        buttons.get(30).doClick();
+                    if (mapping.get("mountain").getBackground().getRed() > 200) {
+                        mapping.get("valley").doClick();
+                    } else if (mapping.get("valley").getBackground().getBlue() > 200) {
+                        mapping.get("mountain").doClick();
                     }
                 }
                 toggle = false;

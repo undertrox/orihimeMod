@@ -2,17 +2,21 @@ package de.undertrox.orihimemod;
 
 import de.undertrox.orihimemod.config.ParsedConfigFile;
 import de.undertrox.orihimemod.keybind.Keybind;
+import de.undertrox.orihimemod.mapping.ButtonMapping;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static de.undertrox.orihimemod.OrihimeMod.orihimeVersion;
+import static de.undertrox.orihimemod.OrihimeMod.version;
+
 public class Config {
     private static Config instance;
 
     private static final String[] versions = {"0.1.0", "0.1.1", "0.1.2", "0.1.3", "0.1.4", "0.1.5", "0.1.6", "0.1.7",
-        "0.2.0", "0.3.0", "0.3.1", "0.3.2"};
+        "0.2.0", "0.3.0", "0.3.1", "0.3.2", "1.0.0"};
     public boolean SHOW_NUMBER_TOOLTIPS = false;
     public String GENERATED_VERSION = "error loading version";
     public boolean SHOW_KEYBIND_TOOLTIPS = true;
@@ -24,6 +28,7 @@ public class Config {
     public static boolean justUpdatedTo0_2_0 = false;
     public int AUTOSAVE_INTERVAL = 300;
     protected String filename;
+    public ButtonMapping mapping;
     public int AUTOSAVE_MAX_AGE = 86400;
     private List<Pair<String, String>> parsed = new ArrayList<>();
     private List<Keybind> keybinds = new ArrayList<>();
@@ -93,6 +98,7 @@ public class Config {
         System.out.println("Loading Config file");
         instance = new Config();
         instance.filename = configFileName;
+        instance.mapping = ButtonMapping.load(version, orihimeVersion);
         File file = new File(configFileName);
         if (!file.exists()) {
             createConfigFile(configFileName);
@@ -148,9 +154,23 @@ public class Config {
         if (Arrays.asList(getVersionsBetween(version, OrihimeMod.version)).contains("0.2.0")) {
             justUpdatedTo0_2_0 = true;
         }
+        if (Arrays.asList(getVersionsBetween(version, OrihimeMod.version)).contains("1.0.0")) {
+            updateKeybindNames(file);
+        }
         file.append(getAddedConfigSince(version));
         file.setValue("orihimeKeybinds.generatedVersion", OrihimeMod.version);
         file.saveTo(configFileName);
+    }
+
+    private static void updateKeybindNames(ParsedConfigFile file) {
+        ButtonMapping oldMapping = ButtonMapping.load("0.3.2", "3.054");
+        for (Pair<String, String> configPair : file.getAllPairs()) {
+            System.out.println(configPair.getKey().substring(16));
+            String newName = oldMapping.getKey(configPair.getKey().substring(16));
+            if (newName != null) {
+                file.replaceKey(configPair.getKey(), newName);
+            }
+        }
     }
 
     private static void createConfigFile(String configFileName) {
@@ -215,6 +235,11 @@ public class Config {
             instance.SHOW_HELP_TOOLTIPS = Boolean.parseBoolean(value);
         } else if (key.equals("orihimemod.save.newbehavior")) {
             instance.USE_NEW_SAVE_BEHAVIOR = Boolean.parseBoolean(value);
+        } else {
+            Keybind keybind = parseKeybind(pair, Keybind.ABSTRACT_BUTTON);
+            if (keybind != null) {
+                instance.keybinds.add(keybind);
+            }
         }
     }
 
@@ -232,22 +257,18 @@ public class Config {
         if (value.contains("ctrl+")) ctrl = true;
         if (value.contains("alt+")) alt = true;
         if (value.contains("shift+")) shift = true;
-        int button = 0;
-        if (type == Keybind.CHECKBOX || type == Keybind.BUTTON) {
-            button = Integer.parseInt(key.substring(key.lastIndexOf('.') + 1));
-        }
         if (type == Keybind.TOGGLE_TYPE) {
             ignoreMods = true;
         }
 
         String keyChar = value.substring(value.lastIndexOf('+') + 1);
         if (keyChar.startsWith("kc")) {
-            return new Keybind(type, button, Integer.parseInt(keyChar.substring(2)), shift, ctrl, alt, ignoreMods);
+            return new Keybind(type, key, Integer.parseInt(keyChar.substring(2)), shift, ctrl, alt, ignoreMods);
         } else {
             if (keyChar.length() != 1) {
                 System.err.println("Keybind Syntax Error! '" + keyChar + "' is not 1 character long.");
             } else {
-                return new Keybind(type, button, keyChar, shift, ctrl, alt, ignoreMods);
+                return new Keybind(type, key, keyChar, shift, ctrl, alt, ignoreMods);
             }
         }
 
