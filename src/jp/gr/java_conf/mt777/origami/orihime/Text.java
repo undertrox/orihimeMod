@@ -1,18 +1,18 @@
 package jp.gr.java_conf.mt777.origami.orihime;
 
 import jp.gr.java_conf.mt777.origami.dougu.camera.Camera;
-import jp.gr.java_conf.mt777.zukei2d.ten.Point;
+import jp.gr.java_conf.mt777.zukei2d.ten.Ten;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
 
 public class Text {
-    Point pos;
+    Ten pos;
     Camera c;
     int size;
     String text;
 
-    public Text(Point pos, int size, String text) {
+    public Text(Ten pos, int size, String text) {
         this.pos = pos;
         this.size = size;
         this.text = text;
@@ -22,11 +22,11 @@ public class Text {
         this.c = c;
     }
 
-    public Point getPos() {
+    public Ten getPos() {
         return pos;
     }
 
-    public void setPos(Point pos) {
+    public void setPos(Ten pos) {
         this.pos = pos;
     }
 
@@ -48,10 +48,10 @@ public class Text {
 
     public void paint(Graphics2D g) {
 
-        Point t = new Point(getPos().getX(), getPos().getY());
-        Point transformed = c.object2TV(t);
+        Ten t = new Ten(getPos().getx(), getPos().gety());
+        Ten transformed = c.object2TV(t);
         g.setFont(new Font("sans-serif",Font.PLAIN, size));
         g.setColor(Color.BLACK);
-        g.drawString(text, (int) transformed.getX(), (int) transformed.getY());
+        g.drawString(text, (int) transformed.getx(), (int) transformed.gety());
     }
 }

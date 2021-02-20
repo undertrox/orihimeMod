@@ -4,7 +4,7 @@ import jp.gr.java_conf.mt777.origami.dougu.camera.Camera;
 import jp.gr.java_conf.mt777.origami.orihime.OrihimeFrame;
 import jp.gr.java_conf.mt777.origami.orihime.Text;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.ExposeES;
-import jp.gr.java_conf.mt777.zukei2d.ten.Point;
+import jp.gr.java_conf.mt777.zukei2d.ten.Ten;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -38,12 +38,12 @@ public class TextRenderer extends Keijiban {
         graphics.setFont(f);
     }
 
-    public void removeTextAt(Point transform) {
+    public void removeTextAt(Ten transform) {
         double minDist = Double.POSITIVE_INFINITY;
         Text nearest = null;
         for (Text text : textList) {
             // Distance
-            double d = transform.distance(text.getPos());
+            double d = transform.kyori(text.getPos());
             if (d < minDist) {
                 minDist = d;
                 nearest = text;
@@ -59,7 +59,7 @@ public class TextRenderer extends Keijiban {
         StringBuilder s = new StringBuilder();
 
         for (Text text : textList) {
-            s.append(text.getPos().getX()).append(" ").append(text.getPos().getY()).append(" ").append(text.getSize())
+            s.append(text.getPos().getx()).append(" ").append(text.getPos().gety()).append(" ").append(text.getSize())
              .append(" ").append(text.getText());
             s.append("\n");
         }
@@ -81,7 +81,7 @@ public class TextRenderer extends Keijiban {
                 while (t.hasMoreTokens()) {
                     str.append(t.nextToken());
                 }
-                r.addText(new Text(new Point(posX, posY), size, str.toString()));
+                r.addText(new Text(new Ten(posX, posY), size, str.toString()));
             } catch (Exception e) {
                 System.err.println("Syntax error in Text file");
                 e.printStackTrace();

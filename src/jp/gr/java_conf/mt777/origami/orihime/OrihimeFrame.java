@@ -1,11 +1,11 @@
 package jp.gr.java_conf.mt777.origami.orihime;
 
 import de.undertrox.orihimemod.button.TextButton;
-import jp.gr.java_conf.mt777.kiroku.Text;
+import jp.gr.java_conf.mt777.kiroku.memo.Memo;
 import jp.gr.java_conf.mt777.origami.dougu.keijiban.TextRenderer;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.ExposeES;
-import jp.gr.java_conf.mt777.zukei2d.ten.Point;
+import jp.gr.java_conf.mt777.zukei2d.ten.Ten;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,9 +43,9 @@ public class OrihimeFrame extends ap {
     }
 
     @Override
-    public Text readFile2Memo() {
+    public Memo readFile2Memo() {
         String fname;
-        Text memo_temp = new Text();
+        Memo memo_temp = new Memo();
 
         boolean file_ok=false;
 
@@ -84,7 +84,7 @@ public class OrihimeFrame extends ap {
                 String rdata;
                 memo1.reset();
                 while((rdata = br.readLine()) != null) {
-                    memo_temp.addLine(rdata);
+                    memo_temp.addGyou(rdata);
                 }
                 br.close();
                 // Read text
@@ -154,8 +154,8 @@ public class OrihimeFrame extends ap {
         }
     }
 
-    public Point transformPoint(java.awt.Point p) {
-        return ExposeES.getCamera(es1).TV2object(new Point(p.getX(), p.getY()));
+    public Ten transformPoint(Point p) {
+        return ExposeES.getCamera(es1).TV2object(new Ten(p.getX(), p.getY()));
     }
 
     @Override
@@ -189,7 +189,7 @@ public class OrihimeFrame extends ap {
         if (i_mouse_modeA == MOUSE_MODE_ADD_TEXT) {
             if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
                 if (!textField.getText().isEmpty()) {
-                    textRenderer.addText(new jp.gr.java_conf.mt777.origami.orihime.Text(transformPoint(mouseEvent.getPoint()), 15, textField.getText()));
+                    textRenderer.addText(new Text(transformPoint(mouseEvent.getPoint()), 15, textField.getText()));
                 }
             } else if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
                 hack = true;
@@ -235,11 +235,8 @@ public class OrihimeFrame extends ap {
                                                        mouseWheelEvent.getClickCount(),
                                                        mouseWheelEvent.isPopupTrigger(),
                                                        mouseWheelEvent.getScrollType(), mouseWheelEvent.getScrollAmount(), wheelMoved);
-
-        if (!mouseWheelEvent.isShiftDown() && this.i_mouse_right_button_on != 1) {
-            for (int i = 0; i < amount; i++) {
-                super.mouseWheelMoved(newEvent);
-            }
+        for (int i = 0; i < amount; i++) {
+            super.mouseWheelMoved(newEvent);
         }
     }
 }
