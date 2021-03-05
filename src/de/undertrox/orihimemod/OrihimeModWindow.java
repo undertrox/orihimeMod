@@ -386,7 +386,7 @@ public class OrihimeModWindow {
                 bOrC = "checkbox";
             }
             if (index < 0) keybindId = "";
-            keybindId = "orihimeKeybinds." + bOrC + "." + index;
+            keybindId = mapping.getKey(bOrC + "." + index);
         }
 
         @Override

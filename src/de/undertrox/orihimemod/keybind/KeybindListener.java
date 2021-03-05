@@ -24,7 +24,6 @@ public class KeybindListener implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         for (Keybind keybind : Config.keybinds()) {
-            System.out.println(keybind);
             if (keybind.matches(e)) {
                 if (keybind.getType() == Keybind.TOGGLE_TYPE) {
                     if (!toggle) {

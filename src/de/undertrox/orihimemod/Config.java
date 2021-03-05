@@ -105,8 +105,15 @@ public class Config {
         }
         instance.parsedFile = ParsedConfigFile.fromFile(configFileName);
         instance.parsed = instance.parsedFile.getAllPairs();
-        for (Pair<String, String> pair : instance.parsed) {
-            parsePair(pair);
+        List<Pair<String, String>> pairs = instance.parsed;
+        for (int i = 0; i < pairs.size(); i++) {
+            Pair<String, String> pair = pairs.get(i);
+            try{
+                parsePair(pair);
+            } catch (RuntimeException e) {
+                System.err.println("Config Syntax error: " + pair);
+                e.printStackTrace();
+            }
         }
 
         if (!Config.generatedVersion().equals(OrihimeMod.version)) {
@@ -231,10 +238,16 @@ public class Config {
             instance.AUTOSAVE = Boolean.parseBoolean(value);
         } else if (key.equals("orihimemod.autosave.interval")) {
             instance.AUTOSAVE_INTERVAL = Integer.parseInt(value);
-        } else if (key.equals("orihimekeybinds.showhelptooltips")){
+        } else if (key.equals("orihimemod.autosave.maxage")) {
+            instance.AUTOSAVE_MAX_AGE = Integer.parseInt(value);
+        } else if (key.equals("orihimemod.showhelptooltips")){
             instance.SHOW_HELP_TOOLTIPS = Boolean.parseBoolean(value);
         } else if (key.equals("orihimemod.save.newbehavior")) {
             instance.USE_NEW_SAVE_BEHAVIOR = Boolean.parseBoolean(value);
+        }
+        else //noinspection StatementWithEmptyBody
+            if (key.equals("orihimeadditionalsavebuttons.enable")) {
+            // for compatibility, but ignored
         } else {
             Keybind keybind = parseKeybind(pair, Keybind.ABSTRACT_BUTTON);
             if (keybind != null) {
@@ -266,13 +279,11 @@ public class Config {
             return new Keybind(type, key, Integer.parseInt(keyChar.substring(2)), shift, ctrl, alt, ignoreMods);
         } else {
             if (keyChar.length() != 1) {
-                System.err.println("Keybind Syntax Error! '" + keyChar + "' is not 1 character long.");
+                throw new RuntimeException("Keybind Syntax Error! '" + keyChar + "' is not 1 character long.");
             } else {
                 return new Keybind(type, key, keyChar, shift, ctrl, alt, ignoreMods);
             }
         }
-
-        return null;
     }
 
     private static String[] getVersionsBetween(String ver1, String ver2) {
