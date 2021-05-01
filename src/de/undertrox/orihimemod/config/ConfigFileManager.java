@@ -6,10 +6,7 @@ import de.undertrox.orihimemod.keybind.Keybind;
 import de.undertrox.orihimemod.mapping.ButtonMapping;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static de.undertrox.orihimemod.OrihimeMod.orihimeVersion;
 import static de.undertrox.orihimemod.OrihimeMod.version;
@@ -17,7 +14,7 @@ import static de.undertrox.orihimemod.OrihimeMod.version;
 public class ConfigFileManager {
 
     private Config config;
-    private String fileName;
+    private final String fileName;
 
     public ConfigFileManager(String fileName) {
         this.fileName = fileName;

@@ -1,7 +1,6 @@
 package de.undertrox.orihimemod;
 
 import jp.gr.java_conf.mt777.origami.orihime.OrihimeFrame;
-import jp.gr.java_conf.mt777.origami.orihime.ap;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -11,11 +10,11 @@ import java.util.Date;
 
 
 public class AutosaveHandler {
-    private OrihimeFrame frame;
-    private boolean enable;
-    private int interval;
-    private int maxAge;
-    private Timer timer;
+    private final OrihimeFrame frame;
+    private final boolean enable;
+    private final int interval;
+    private final int maxAge;
+    private final Timer timer;
     private String baseFileName;
 
     public String getBaseFileName() {
@@ -31,7 +30,7 @@ public class AutosaveHandler {
         this.enable = enable;
         this.interval = interval;
         this.maxAge = maxAge;
-        timer = new Timer(this.interval*1000, this::autosave);
+        timer = new Timer(this.interval * 1000, this::autosave);
         this.baseFileName = baseFileName;
     }
 
@@ -53,8 +52,8 @@ public class AutosaveHandler {
         File file = new File("orihimeMod-Autosave");
         file.mkdirs();
         deleteFilesOlderThan(file, maxAge * 1000);
-        Date date = new Date() ;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss") ;
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
         System.out.println("AutoSaving " + baseFileName);
         SaveHelper.saveTo(frame, "orihimeMod-Autosave/" + dateFormat.format(date) + baseFileName + ".orh");
         SaveHelper.saveTo(frame, "orihimeMod-Autosave/" + dateFormat.format(date) + baseFileName + ".cp");

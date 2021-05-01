@@ -528,7 +528,7 @@ public class OrihimeModWindow {
         if (type == Keybind.CHECKBOX) {
             mappingId = mapping.getKey("checkbox." + buttonId);
         } else {
-            mappingId = mapping.getKey("button."+buttonId);
+            mappingId = mapping.getKey("button." + buttonId);
         }
         for (Keybind keybind : configManager.getConfig().keybinds()) {
             if (keybind.getMappingID().equals(mappingId)) {

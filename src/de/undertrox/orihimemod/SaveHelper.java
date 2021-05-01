@@ -3,7 +3,6 @@ package de.undertrox.orihimemod;
 import jp.gr.java_conf.mt777.kiroku.memo.Memo;
 import jp.gr.java_conf.mt777.origami.orihime.Expose;
 import jp.gr.java_conf.mt777.origami.orihime.OrihimeFrame;
-import jp.gr.java_conf.mt777.origami.orihime.ap;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 
 public class SaveHelper {
@@ -29,7 +28,7 @@ public class SaveHelper {
         }
         Memo m = new Memo();
         m.addGyou(frame.textRenderer.serialize());
-        expose.memoAndName2File(m, filename+"text");
+        expose.memoAndName2File(m, filename + "text");
         return success;
     }
 }

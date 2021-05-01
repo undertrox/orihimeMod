@@ -1,15 +1,17 @@
 package de.undertrox.orihimemod.mapping;
 
-import de.undertrox.orihimemod.IOHelper;
-
 import javax.swing.*;
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 public class ButtonMapping {
-    private String modVersion;
-    private String orihimeVersion;
-    private Map<String, String> mappings;
+    private final String modVersion;
+    private final String orihimeVersion;
+    private final Map<String, String> mappings;
     private List<JButton> buttons;
     private List<JCheckBox> checkboxes;
 
@@ -45,7 +47,7 @@ public class ButtonMapping {
             fis = ButtonMapping.class.getResourceAsStream(version + "-" + orihimeVersion + ".properties");
             prop = new Properties();
             prop.load(fis);
-        } catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
             if (fis != null) {
@@ -71,7 +73,7 @@ public class ButtonMapping {
         String mapping = mappings.get(key);
         if (mapping.toLowerCase().startsWith("checkbox.")) {
             return checkboxes.get(Integer.parseInt(mapping.substring(9)));
-        } else if (mapping.toLowerCase().startsWith("button.")){
+        } else if (mapping.toLowerCase().startsWith("button.")) {
             return buttons.get(Integer.parseInt(mapping.substring(7)));
         }
         return null;

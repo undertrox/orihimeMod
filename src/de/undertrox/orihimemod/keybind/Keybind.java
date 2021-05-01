@@ -9,15 +9,15 @@ public class Keybind {
     public static final int TOGGLE_TYPE = 2;
     public static final int ABSTRACT_BUTTON = 3;
 
-    private int keyCode;
-    private boolean shift;
-    private boolean ctrl;
-    private boolean alt;
-    private int type;
-    private String mappingID;
+    private final int keyCode;
+    private final boolean shift;
+    private final boolean ctrl;
+    private final boolean alt;
+    private final int type;
+    private final String mappingID;
     private boolean ignoreModifiers;
 
-    public Keybind(int type, String mappingID, String key, boolean shift, boolean ctrl, boolean alt, boolean ignoreModifiers){
+    public Keybind(int type, String mappingID, String key, boolean shift, boolean ctrl, boolean alt, boolean ignoreModifiers) {
         this(type, mappingID, KeyEvent.getExtendedKeyCodeForChar(key.charAt(0)), shift, ctrl, alt, ignoreModifiers);
     }
 
@@ -34,6 +34,7 @@ public class Keybind {
         this.mappingID = mappingID;
         this.ignoreModifiers = ignoreModifiers;
     }
+
     public Keybind(int type, String mappingID, int keyCode, boolean shift, boolean ctrl, boolean alt) {
         this(type, mappingID, keyCode, shift, ctrl, alt, false);
     }
@@ -70,7 +71,6 @@ public class Keybind {
     }
 
     /**
-     *
      * @param event KeyEvent to test
      * @return true, if the event matches the parameters of the keybind
      */
@@ -81,8 +81,8 @@ public class Keybind {
     public String getModifiers() {
         String s = "";
         if (ctrl) s += "CTRL+";
-        if(alt) s += "ALT+";
-        if(shift) s += "SHIFT+";
+        if (alt) s += "ALT+";
+        if (shift) s += "SHIFT+";
         return s;
     }
 
@@ -112,7 +112,7 @@ public class Keybind {
         } else {
             offmask |= KeyEvent.CTRL_DOWN_MASK;
         }
-        return (modifiers & (onmask|offmask)) == onmask;
+        return (modifiers & (onmask | offmask)) == onmask;
     }
 
     public String toConfigEntry() {

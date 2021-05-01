@@ -7,11 +7,11 @@ import java.awt.*;
 
 public class TextButton extends JButton {
 
-    private OrihimeFrame frame;
+    private final OrihimeFrame frame;
 
     public TextButton(OrihimeFrame parent, String text) {
         super(text);
-        this.setMargin(new Insets(0,0,0,0));
+        this.setMargin(new Insets(0, 0, 0, 0));
         this.frame = parent;
     }
 

@@ -19,25 +19,25 @@ public class Darkmode {
         for (Component child : children) {
 
             if (child instanceof Panel || child instanceof JPanel) {
-                child.setBackground(Color.getHSBColor(0,0, 0.3f));
-                child.setForeground(Color.getHSBColor(0,0,0.9f));
+                child.setBackground(Color.getHSBColor(0, 0, 0.3f));
+                child.setForeground(Color.getHSBColor(0, 0, 0.9f));
             } else if (child instanceof JButton) {
                 ((JButton) child).setBorder(BorderFactory.createLineBorder(Color.black));
-                child.setBackground(Color.getHSBColor(0,0, 0.2f));
-                child.setForeground(Color.getHSBColor(0,0,0.9f));
-            } else if (child instanceof  JTextField) {
+                child.setBackground(Color.getHSBColor(0, 0, 0.2f));
+                child.setForeground(Color.getHSBColor(0, 0, 0.9f));
+            } else if (child instanceof JTextField) {
                 ((JTextField) child).setBorder(BorderFactory.createLineBorder(Color.black));
-                child.setBackground(Color.getHSBColor(0,0, 0.4f));
-                child.setForeground(Color.getHSBColor(0,0,1f));
-            }else if (child instanceof JLabel) {
+                child.setBackground(Color.getHSBColor(0, 0, 0.4f));
+                child.setForeground(Color.getHSBColor(0, 0, 1f));
+            } else if (child instanceof JLabel) {
                 ((JLabel) child).setBorder(BorderFactory.createLineBorder(Color.black));
-                child.setBackground(Color.getHSBColor(0,0, 0.3f));
-                child.setForeground(Color.getHSBColor(0,0,0.9f));
+                child.setBackground(Color.getHSBColor(0, 0, 0.3f));
+                child.setForeground(Color.getHSBColor(0, 0, 0.9f));
             } else if (child instanceof JCheckBox) {
                 JCheckBox checkBox = ((JCheckBox) child);
                 checkBox.setBorder(BorderFactory.createLineBorder(Color.black));
-                child.setBackground(Color.getHSBColor(0,0, 0.3f));
-                child.setForeground(Color.getHSBColor(0,0,0.9f));
+                child.setBackground(Color.getHSBColor(0, 0, 0.3f));
+                child.setForeground(Color.getHSBColor(0, 0, 0.9f));
             } else {
                 System.out.println(child.getClass().getName());
             }

@@ -1,6 +1,6 @@
 package de.undertrox.orihimemod;
 
-public class Pair<T,U> {
+public class Pair<T, U> {
     T key;
 
     public T getKey() {

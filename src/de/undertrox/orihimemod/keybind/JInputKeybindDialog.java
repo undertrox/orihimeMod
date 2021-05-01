@@ -1,9 +1,6 @@
 package de.undertrox.orihimemod.keybind;
 
-import de.undertrox.orihimemod.OrihimeMod;
-
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -23,7 +20,7 @@ public class JInputKeybindDialog extends JDialog {
         keyText.setHorizontalAlignment(SwingConstants.CENTER);
         removeSpaceKeybind(btnCancel);
         removeSpaceKeybind(btnOk);
-        this.setLayout(new GridLayout(3,1));
+        this.setLayout(new GridLayout(3, 1));
         this.add(keyText);
         this.add(btnOk);
         this.add(btnCancel);
@@ -43,10 +40,10 @@ public class JInputKeybindDialog extends JDialog {
                     if (mods.length() > 0) {
                         mods += "+";
                     }
-                    if (!mods.contains(key+"+")) {
-                        text =  mods + KeyEvent.getKeyText(e.getExtendedKeyCode());
+                    if (!mods.contains(key + "+")) {
+                        text = mods + KeyEvent.getKeyText(e.getExtendedKeyCode());
                     } else {
-                        text = mods.substring(0,mods.length()-1);
+                        text = mods.substring(0, mods.length() - 1);
                     }
                     keyText.setText(text);
                     lastKeyEvent = e;
@@ -89,8 +86,8 @@ public class JInputKeybindDialog extends JDialog {
 
     private void removeSpaceKeybind(JButton c) {
         c.getInputMap(JComponent.WHEN_FOCUSED)
-                .put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,0,false), "none");
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false), "none");
         c.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-                .put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,0,false), "none");
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false), "none");
     }
 }

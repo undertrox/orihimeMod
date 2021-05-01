@@ -5,7 +5,7 @@ import java.io.*;
 public class IOHelper {
     public static String readFile(String filename) {
         try {
-            InputStream stream = new FileInputStream(new File(filename));
+            InputStream stream = new FileInputStream(filename);
             return readStream(stream);
         } catch (IOException e) {
             e.printStackTrace();
@@ -24,7 +24,7 @@ public class IOHelper {
                 flag = true;
             }
             return result.toString();
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return "";

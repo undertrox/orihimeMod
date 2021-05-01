@@ -11,6 +11,7 @@ public abstract class ParsedConfigLine {
     public String getValue() {
         return value.toLowerCase();
     }
+
     public String getKey() {
         return key.toLowerCase();
     }

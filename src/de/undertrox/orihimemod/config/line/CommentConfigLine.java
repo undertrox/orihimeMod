@@ -1,6 +1,6 @@
 package de.undertrox.orihimemod.config.line;
 
-public class CommentConfigLine extends ParsedConfigLine{
+public class CommentConfigLine extends ParsedConfigLine {
 
     public CommentConfigLine(String line) {
         super(line);
