@@ -1,4 +1,4 @@
-package de.undertrox.orihimemod.config;
+package de.undertrox.orihimemod.config.line;
 
 public abstract class ParsedConfigLine {
 
@@ -24,19 +24,4 @@ public abstract class ParsedConfigLine {
     }
 
     public abstract String toString();
-
-    public static ParsedConfigLine parse(String line) {
-        line = line.trim();
-        if (line.isEmpty()) {
-            return new EmptyConfigLine();
-        }
-        if (line.startsWith("#")) {
-            return new CommentConfigLine(line);
-        }
-        if (line.contains("=")) {
-            return new PairConfigLine(line);
-        }
-        return new SingleValueConfigLine(line);
-
-    }
 }

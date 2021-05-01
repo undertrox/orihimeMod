@@ -1,39 +1,50 @@
 package de.undertrox.orihimemod.config;
 
 import de.undertrox.orihimemod.Pair;
+import de.undertrox.orihimemod.config.line.ConfigLineParser;
+import de.undertrox.orihimemod.config.line.PairConfigLine;
+import de.undertrox.orihimemod.config.line.ParsedConfigLine;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Scanner;
+import java.util.stream.Collectors;
 
+/**
+ * Represents the config file in an easily accessible way while preserving comments
+ * and whitespace, so the config file can be updated programmatically without losing those
+ */
 public class ParsedConfigFile {
-    List<ParsedConfigLine> lines = new ArrayList<>();
+    List<ParsedConfigLine> lines;
 
     public ParsedConfigFile() {
+        this.lines = new ArrayList<>();
     }
 
-    private ParsedConfigFile(String fileContent) {
-        for (String line : fileContent.split("\n")) {
-            lines.add(ParsedConfigLine.parse(line));
-        }
+    private ParsedConfigFile(List<ParsedConfigLine> lines) {
+        this.lines = lines;
     }
 
     public static ParsedConfigFile fromStream(InputStream stream) {
-        String newLine = System.getProperty("line.separator");
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-        StringBuilder result = new StringBuilder();
-        boolean flag = false;
+        List<ParsedConfigLine> lines = new ArrayList<>();
         try {
             for (String line; (line = reader.readLine()) != null; ) {
-                result.append(flag ? newLine : "").append(line);
-                flag = true;
+                lines.add(ConfigLineParser.parse(line));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new ParsedConfigFile(result.toString());
+        return new ParsedConfigFile(lines);
+    }
+
+    public static ParsedConfigFile fromString(String fileContent) {
+        List<ParsedConfigLine> lines = Arrays.stream(fileContent.split("\n"))
+                .map(ConfigLineParser::parse)
+                .collect(Collectors.toList());
+        return new ParsedConfigFile(lines);
     }
 
     public static ParsedConfigFile fromFile(String fileName) {
@@ -41,7 +52,7 @@ public class ParsedConfigFile {
             return fromStream(new FileInputStream(fileName));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return new ParsedConfigFile("");
+            return new ParsedConfigFile();
         }
     }
 
@@ -60,17 +71,17 @@ public class ParsedConfigFile {
 
     public void saveTo(String fileName) {
         try {
-            File myObj = new File(fileName);
-            if (myObj.createNewFile()) {
-                System.out.println("Config File created: " + myObj.getName());
+            File saveFile = new File(fileName);
+            if (saveFile.createNewFile()) {
+                System.out.println("Config File created: " + saveFile.getName());
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
         try {
-            FileWriter myWriter = new FileWriter(fileName);
-            myWriter.write(toString());
-            myWriter.close();
+            FileWriter writer = new FileWriter(fileName);
+            writer.write(toString());
+            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -90,7 +101,7 @@ public class ParsedConfigFile {
         List<Pair<String, String>> pairs = new ArrayList<>();
         for (ParsedConfigLine line : lines) {
             if (line instanceof PairConfigLine) {
-                pairs.add(new Pair(line.getKey(), line.getValue()));
+                pairs.add(new Pair<>(line.getKey(), line.getValue()));
             }
         }
         return pairs;

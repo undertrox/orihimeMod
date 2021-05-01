@@ -1,4 +1,4 @@
-package de.undertrox.orihimemod.config;
+package de.undertrox.orihimemod.config.line;
 
 
 public class EmptyConfigLine extends ParsedConfigLine {
