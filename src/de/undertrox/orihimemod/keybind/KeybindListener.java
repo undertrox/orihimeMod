@@ -1,10 +1,7 @@
 package de.undertrox.orihimemod.keybind;
 
-import de.undertrox.orihimemod.Config;
-import de.undertrox.orihimemod.OrihimeMod;
 import de.undertrox.orihimemod.mapping.ButtonMapping;
 
-import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.List;

@@ -129,10 +129,15 @@ public class ParsedConfigFile {
 
     public void setValue(String key, String value) {
         key = key.toLowerCase();
+        boolean found = false;
         for (ParsedConfigLine line : lines) {
             if (line.getKey().equals(key)) {
                 line.setValue(value);
+                found = true;
             }
+        }
+        if (!found) {
+            addPair(key, value);
         }
     }
 

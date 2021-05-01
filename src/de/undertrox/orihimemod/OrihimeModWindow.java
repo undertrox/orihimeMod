@@ -4,6 +4,8 @@ import de.undertrox.orihimemod.button.JButtonSaveAsCp;
 import de.undertrox.orihimemod.button.JButtonSaveAsDXF;
 import de.undertrox.orihimemod.button.JButtonSaveAsSVG;
 import de.undertrox.orihimemod.button.TextButton;
+import de.undertrox.orihimemod.config.Config;
+import de.undertrox.orihimemod.config.ConfigFileManager;
 import de.undertrox.orihimemod.keybind.JInputKeybindDialog;
 import de.undertrox.orihimemod.keybind.Keybind;
 import de.undertrox.orihimemod.keybind.KeybindListener;
@@ -49,7 +51,7 @@ public class OrihimeModWindow {
     public String filename = "";
     public String fullFileName = "";
 
-    public Config config;
+    public ConfigFileManager configManager;
 
     public AutosaveHandler autosaver;
 
@@ -57,7 +59,9 @@ public class OrihimeModWindow {
 
     public OrihimeModWindow() {
         System.out.println("OrihimeMod version " + version + " is Starting...");
-        config = Config.load("orihimeKeybinds.cfg");
+        configManager = new ConfigFileManager("orihimeKeybinds.cfg");
+        configManager.load();
+        Config config = configManager.getConfig();
         System.out.println("Loaded " + config.keybinds().size() + " Keybinds.");
         System.out.println("Loading Button mapping for Mod version " + version + " and Orihime version " + orihimeVersion);
         mapping = config.mapping;
@@ -155,6 +159,7 @@ public class OrihimeModWindow {
                 System.out.println("use new behavior");
                 config.setUseNewSave(true);
             }
+            configManager.saveChangesToFile();
         }
         System.out.println("Configuring autosaver");
         autosaver = new AutosaveHandler(frame, config.useAutosave(), config.autoSaveInterval(), config.autoSaveMaxAge(), filename);
@@ -294,7 +299,7 @@ public class OrihimeModWindow {
         exportMenu.add(exportDXF);
         exportMenu.add(exportPng);
         exportMenu.add(exportORH);
-        if (config.useNewSave() || config.justUpdatedTo0_2_0) {
+        if (configManager.getConfig().useNewSave() || configManager.getConfig().justUpdatedTo0_2_0) {
             exportMenu.add(saveAs);
         }
 
@@ -399,13 +404,15 @@ public class OrihimeModWindow {
             if (e.isPopupTrigger()) {
                 currentKeybindID = keybindId;
                 removeKeybind.removeAll();
-                for (Keybind keybind : config.keybinds()) {
+                for (Keybind keybind : configManager.getConfig().keybinds()) {
                     if (keybind.getConfigID().equals(currentKeybindID)) {
                         JMenuItem rk = new JMenuItem(keybind.toString());
                         removeKeybind.add(rk);
                         rk.addActionListener(ev -> {
+                            Config config = configManager.getConfig();
                             config.keybinds().remove(keybind);
-                            config = config.updateAndLoadConfigFile("orihimeKeybinds.cfg");
+                            configManager.saveChangesToFile();
+                            config = configManager.getConfig();
                             addTooltips(config.showNumberTooltips(), config.showKeybindTooltips(), config.showHelpTooltips());
                         });
                     }
@@ -523,7 +530,7 @@ public class OrihimeModWindow {
         } else {
             mappingId = mapping.getKey("button."+buttonId);
         }
-        for (Keybind keybind : config.keybinds()) {
+        for (Keybind keybind : configManager.getConfig().keybinds()) {
             if (keybind.getMappingID().equals(mappingId)) {
                 result.add(keybind);
             }
@@ -532,7 +539,7 @@ public class OrihimeModWindow {
     }
 
     void saveBtnNew(ActionEvent e, boolean saveAs) {
-        if (!config.useNewSave()) {
+        if (!configManager.getConfig().useNewSave()) {
             saveAs = true;
         }
 
@@ -582,11 +589,12 @@ public class OrihimeModWindow {
 
     void keybindDialogClose(KeyEvent lastKeyEvent) {
         inputKeybind.reset();
+        Config config = configManager.getConfig();
         if (lastKeyEvent != null) {
             config.keybinds().add(new Keybind(Keybind.BUTTON, currentKeybindID, lastKeyEvent.getExtendedKeyCode(),
                     lastKeyEvent.isShiftDown(), lastKeyEvent.isControlDown(), lastKeyEvent.isAltDown()));
             addTooltips(config.showNumberTooltips(), config.showKeybindTooltips(), config.showHelpTooltips());
-            config = config.updateAndLoadConfigFile("orihimeKeybinds.cfg");
+            configManager.saveChangesToFile();
         }
     }
 }
