@@ -57,9 +57,8 @@ public class OrihimeModWindow {
 
     public OrihimeModWindow() {
         System.out.println("OrihimeMod version " + version + " is Starting...");
-        Config.load("orihimeKeybinds.cfg");
-        config = Config.getInstance();
-        System.out.println("Loaded " + Config.keybinds().size() + " Keybinds.");
+        config = Config.load("orihimeKeybinds.cfg");
+        System.out.println("Loaded " + config.keybinds().size() + " Keybinds.");
         System.out.println("Loading Button mapping for Mod version " + version + " and Orihime version " + orihimeVersion);
         mapping = config.mapping;
         mapping.setButtons(buttons);
@@ -95,14 +94,14 @@ public class OrihimeModWindow {
         expose.setFrameTitle0(title);
         frame.setTitle(title);
 
-        addTooltips(Config.showNumberTooltips(), Config.showKeybindTooltips(), Config.showHelpTooltips());
-        KeyListener listener = new KeybindListener(mapping);
+        addTooltips(config.showNumberTooltips(), config.showKeybindTooltips(), config.showHelpTooltips());
+        KeyListener listener = new KeybindListener(mapping, config.keybinds());
         frame.addKeyListener(listener);
         addKeyListenerToChildren(listener, frame);
-        if (Config.useDarkMode()) {
+        if (config.useDarkMode()) {
             enableDarkMode(frame);
         }
-        if (Config.useExpertMode()) {
+        if (config.useExpertMode()) {
             for (Component child : frame.getComponents()) {
                 frame.remove(child);
             }
@@ -128,7 +127,7 @@ public class OrihimeModWindow {
         mapping.get("remove_everything").removeActionListener(removeEverything);
         mapping.get("remove_everything").addActionListener(e -> saveBeforeAction(() -> newRemoveEverything.actionPerformed(e)));
 
-        if (Config.justUpdatedTo0_2_0) {
+        if (config.justUpdatedTo0_2_0) {
             String[] options = {"Old", "New"};
             int result = JOptionPane.showOptionDialog(
                     frame,
@@ -151,14 +150,14 @@ public class OrihimeModWindow {
             );
             // use old behavior
             if (result == JOptionPane.YES_OPTION) {
-                Config.setUseNewSave(false);
+                config.setUseNewSave(false);
             } else { // use new behavior
                 System.out.println("use new behavior");
-                Config.setUseNewSave(true);
+                config.setUseNewSave(true);
             }
         }
         System.out.println("Configuring autosaver");
-        autosaver = new AutosaveHandler(frame, Config.useAutosave(), Config.autoSaveInterval(), Config.autoSaveMaxAge(), filename);
+        autosaver = new AutosaveHandler(frame, config.useAutosave(), config.autoSaveInterval(), config.autoSaveMaxAge(), filename);
     }
 
     private void addContextMenuToLengthsAndAngles() {
@@ -295,7 +294,7 @@ public class OrihimeModWindow {
         exportMenu.add(exportDXF);
         exportMenu.add(exportPng);
         exportMenu.add(exportORH);
-        if (Config.useNewSave() || Config.justUpdatedTo0_2_0) {
+        if (config.useNewSave() || config.justUpdatedTo0_2_0) {
             exportMenu.add(saveAs);
         }
 
@@ -400,14 +399,14 @@ public class OrihimeModWindow {
             if (e.isPopupTrigger()) {
                 currentKeybindID = keybindId;
                 removeKeybind.removeAll();
-                for (Keybind keybind : Config.keybinds()) {
+                for (Keybind keybind : config.keybinds()) {
                     if (keybind.getConfigID().equals(currentKeybindID)) {
                         JMenuItem rk = new JMenuItem(keybind.toString());
                         removeKeybind.add(rk);
                         rk.addActionListener(ev -> {
-                            Config.keybinds().remove(keybind);
-                            Config.updateConfigFile("orihimeKeybinds.cfg");
-                            addTooltips(Config.showNumberTooltips(), Config.showKeybindTooltips(), Config.showHelpTooltips());
+                            config.keybinds().remove(keybind);
+                            config = config.updateAndLoadConfigFile("orihimeKeybinds.cfg");
+                            addTooltips(config.showNumberTooltips(), config.showKeybindTooltips(), config.showHelpTooltips());
                         });
                     }
                 }
@@ -487,9 +486,9 @@ public class OrihimeModWindow {
             if (showKeybindTooltips) {
                 StringBuilder b = new StringBuilder();
                 for (Keybind keybind : getKeybindsFor(i, Keybind.BUTTON)) {
-                    b.append("<br>" + keybind.toString());
+                    b.append("<br>").append(keybind.toString());
                 }
-                btn.setToolTipText(btn.getToolTipText() + b.toString());
+                btn.setToolTipText(btn.getToolTipText() + b);
             }
             btn.setToolTipText("<html>" + btn.getToolTipText() + "</html>");
         }
@@ -508,9 +507,9 @@ public class OrihimeModWindow {
             if (showKeybindTooltips) {
                 StringBuilder b = new StringBuilder();
                 for (Keybind keybind : getKeybindsFor(i, Keybind.CHECKBOX)) {
-                    b.append("<br>" + keybind.toString());
+                    b.append("<br>").append(keybind.toString());
                 }
-                checkBox.setToolTipText(checkBox.getToolTipText() + b.toString());
+                checkBox.setToolTipText(checkBox.getToolTipText() + b);
             }
             checkBox.setToolTipText("<html>" + checkBox.getToolTipText() + "</html>");
         }
@@ -524,7 +523,7 @@ public class OrihimeModWindow {
         } else {
             mappingId = mapping.getKey("button."+buttonId);
         }
-        for (Keybind keybind : Config.keybinds()) {
+        for (Keybind keybind : config.keybinds()) {
             if (keybind.getMappingID().equals(mappingId)) {
                 result.add(keybind);
             }
@@ -533,7 +532,7 @@ public class OrihimeModWindow {
     }
 
     void saveBtnNew(ActionEvent e, boolean saveAs) {
-        if (!Config.useNewSave()) {
+        if (!config.useNewSave()) {
             saveAs = true;
         }
 
@@ -573,11 +572,7 @@ public class OrihimeModWindow {
                 setFilename(filename.substring(0, filename.lastIndexOf(".") - 1));
             }
             changed = false;
-        } else if (!fullFileName.isEmpty() && !saveAs) {
-            changed = false;
-        } else {
-            changed = true;
-        }
+        } else changed = fullFileName.isEmpty() || saveAs;
     }
 
     public void setFilename(String filename) {
@@ -588,10 +583,10 @@ public class OrihimeModWindow {
     void keybindDialogClose(KeyEvent lastKeyEvent) {
         inputKeybind.reset();
         if (lastKeyEvent != null) {
-            Config.keybinds().add(new Keybind(Keybind.BUTTON, currentKeybindID, lastKeyEvent.getExtendedKeyCode(),
+            config.keybinds().add(new Keybind(Keybind.BUTTON, currentKeybindID, lastKeyEvent.getExtendedKeyCode(),
                     lastKeyEvent.isShiftDown(), lastKeyEvent.isControlDown(), lastKeyEvent.isAltDown()));
-            addTooltips(Config.showNumberTooltips(), Config.showKeybindTooltips(), Config.showHelpTooltips());
-            Config.updateConfigFile("orihimeKeybinds.cfg");
+            addTooltips(config.showNumberTooltips(), config.showKeybindTooltips(), config.showHelpTooltips());
+            config = config.updateAndLoadConfigFile("orihimeKeybinds.cfg");
         }
     }
 }

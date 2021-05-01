@@ -12,9 +12,11 @@ import java.util.List;
 public class KeybindListener implements KeyListener {
     static boolean toggle = false;
     ButtonMapping mapping;
+    List<Keybind> keybinds;
 
-    public KeybindListener(ButtonMapping mapping) {
+    public KeybindListener(ButtonMapping mapping, List<Keybind> keybinds) {
         this.mapping = mapping;
+        this.keybinds = keybinds;
     }
 
     @Override
@@ -23,7 +25,7 @@ public class KeybindListener implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        for (Keybind keybind : Config.keybinds()) {
+        for (Keybind keybind : keybinds) {
             if (keybind.matches(e)) {
                 if (keybind.getType() == Keybind.TOGGLE_TYPE) {
                     if (!toggle) {
@@ -44,7 +46,7 @@ public class KeybindListener implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-        for (Keybind keybind : Config.keybinds()) {
+        for (Keybind keybind : keybinds) {
             if (keybind.matches(e) && keybind.getType() == Keybind.TOGGLE_TYPE) {
                 if (toggle) {
                     if (mapping.get("mountain").getBackground().getRed() > 200) {

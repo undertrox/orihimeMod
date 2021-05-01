@@ -25,7 +25,7 @@ public class Config {
     public boolean EXPERT_MODE=false;
     public boolean AUTOSAVE = true;
     public boolean USE_NEW_SAVE_BEHAVIOR = false;
-    public static boolean justUpdatedTo0_2_0 = false;
+    public boolean justUpdatedTo0_2_0 = false;
     public int AUTOSAVE_INTERVAL = 300;
     protected String filename;
     public ButtonMapping mapping;
@@ -37,125 +37,118 @@ public class Config {
     private Config() {
     }
 
-    public static Config getInstance() {
-        if (instance == null) {
-            throw new RuntimeException("Tried to access Config before loading Config file.");
-        }
-        return instance;
+    public boolean showNumberTooltips() {
+        return SHOW_NUMBER_TOOLTIPS;
     }
 
-    public static boolean showNumberTooltips() {
-        return getInstance().SHOW_NUMBER_TOOLTIPS;
+    public boolean showKeybindTooltips() {
+        return SHOW_KEYBIND_TOOLTIPS;
     }
 
-    public static boolean showKeybindTooltips() {
-        return getInstance().SHOW_KEYBIND_TOOLTIPS;
+    public boolean showHelpTooltips() {
+        return SHOW_HELP_TOOLTIPS;
     }
 
-    public static boolean showHelpTooltips() {
-        return getInstance().SHOW_HELP_TOOLTIPS;
+    public String generatedVersion() {
+        return GENERATED_VERSION;
     }
 
-    public static String generatedVersion() {
-        return getInstance().GENERATED_VERSION;
+    public boolean useDarkMode() {
+        return DARK_MODE;
     }
 
-    public static boolean useDarkMode() {
-        return getInstance().DARK_MODE;
+    public boolean useExpertMode() {
+        return EXPERT_MODE;
     }
 
-    public static boolean useExpertMode() {
-        return getInstance().EXPERT_MODE;
+    public boolean useNewSave() {
+        return USE_NEW_SAVE_BEHAVIOR;
     }
 
-    public static boolean useNewSave() {
-        return getInstance().USE_NEW_SAVE_BEHAVIOR;
+    public void setUseNewSave(boolean val) {
+        USE_NEW_SAVE_BEHAVIOR = val;
+        parsedFile.setValue("orihimemod.save.newbehavior", Boolean.toString(val));
+        parsedFile.saveTo(filename);
     }
 
-    public static void setUseNewSave(boolean val) {
-        getInstance().USE_NEW_SAVE_BEHAVIOR = val;
-        getInstance().parsedFile.setValue("orihimemod.save.newbehavior", Boolean.toString(val));
-        getInstance().parsedFile.saveTo(getInstance().filename);
+    public List<Keybind> keybinds() {
+        return keybinds;
     }
 
-    public static List<Keybind> keybinds() {
-        return getInstance().keybinds;
+    public boolean useAutosave() {
+        return AUTOSAVE;
     }
 
-    public static boolean useAutosave() {
-        return getInstance().AUTOSAVE;
+    public int autoSaveInterval() {
+        return AUTOSAVE_INTERVAL;
     }
 
-    public static int autoSaveInterval() {
-        return getInstance().AUTOSAVE_INTERVAL;
+    public int autoSaveMaxAge() {
+        return AUTOSAVE_MAX_AGE;
     }
 
-    public static int autoSaveMaxAge() {
-        return getInstance().AUTOSAVE_MAX_AGE;
-    }
-
-    public static void load(String configFileName) {
+    public static Config load(String configFileName) {
         System.out.println("Loading Config file");
-        instance = new Config();
-        instance.filename = configFileName;
-        instance.mapping = ButtonMapping.load(version, orihimeVersion);
+        Config config = new Config();
+        config.filename = configFileName;
+        config.mapping = ButtonMapping.load(version, orihimeVersion);
         File file = new File(configFileName);
         if (!file.exists()) {
-            createConfigFile(configFileName);
+            config.createConfigFile(configFileName);
         }
-        instance.parsedFile = ParsedConfigFile.fromFile(configFileName);
-        instance.parsed = instance.parsedFile.getAllPairs();
-        List<Pair<String, String>> pairs = instance.parsed;
-        for (int i = 0; i < pairs.size(); i++) {
-            Pair<String, String> pair = pairs.get(i);
-            try{
-                parsePair(pair);
+        config.parsedFile = ParsedConfigFile.fromFile(configFileName);
+        config.parsed = config.parsedFile.getAllPairs();
+        List<Pair<String, String>> pairs = config.parsed;
+        for (Pair<String, String> pair : pairs) {
+            try {
+                config.parsePair(pair);
             } catch (RuntimeException e) {
                 System.err.println("Config Syntax error: " + pair);
                 e.printStackTrace();
             }
         }
 
-        if (!Config.generatedVersion().equals(OrihimeMod.version)) {
-            updateConfigFrom(Config.generatedVersion(), configFileName);
+        if (!config.generatedVersion().equals(OrihimeMod.version)) {
+            config.updateToNewestVersion(configFileName);
             System.out.println("Reloading Config file...");
-            load(configFileName);
+            return load(configFileName);
         }
 
-        if (!instance.parsedFile.contains("orihimemod.save.newbehavior")) {
-            justUpdatedTo0_2_0 = true;
-            instance.parsedFile.addPair("orihimeMod.save.newBehavior", "false");
-            instance.parsedFile.saveTo(configFileName);
+        if (!config.parsedFile.contains("orihimemod.save.newbehavior")) {
+            config.justUpdatedTo0_2_0 = true;
+            config.parsedFile.addPair("orihimeMod.save.newBehavior", "false");
+            config.parsedFile.saveTo(configFileName);
         }
+        return config;
     }
 
-    public static void updateConfigFile(String configFileName) {
-        Config changed = instance;
-        load(configFileName);
+    public Config updateAndLoadConfigFile(String configFileName) {
+        Config oldConfig = load(configFileName);
         List<Keybind> newKeybinds = new ArrayList<>();
         List<Keybind> removedKeybinds = new ArrayList<>();
-        for (Keybind keybind : changed.keybinds) {
-            if (!instance.keybinds.contains(keybind)) {
+        for (Keybind keybind : this.keybinds) {
+            if (!oldConfig.keybinds.contains(keybind)) {
                 newKeybinds.add(keybind);
             }
         }
-        for (Keybind keybind : Config.keybinds()) {
-            if (!changed.keybinds.contains(keybind)) {
+        for (Keybind keybind : instance.keybinds()) {
+            if (!oldConfig.keybinds.contains(keybind)) {
                 removedKeybinds.add(keybind);
             }
         }
         for (Keybind kb : removedKeybinds) {
-            instance.parsedFile.removePair(kb.getConfigID(), kb.getConfigValue());
+            oldConfig.parsedFile.removePair(kb.getConfigID(), kb.getConfigValue());
         }
         for (Keybind newKeybind : newKeybinds) {
-            instance.parsedFile.addPair(newKeybind.getConfigID(), newKeybind.getConfigValue());
+            oldConfig.parsedFile.addPair(newKeybind.getConfigID(), newKeybind.getConfigValue());
         }
-        instance.parsedFile.saveTo(configFileName);
-        load(configFileName);
+        oldConfig.parsedFile.saveTo(configFileName);
+        return load(configFileName);
     }
 
 
-    private static void updateConfigFrom(String version, String configFileName) {
+    private void updateToNewestVersion(String configFileName) {
+        String version = this.generatedVersion();
         System.out.println("Updating Config file from version " + version + " to " + OrihimeMod.version);
         ParsedConfigFile file = ParsedConfigFile.fromFile(configFileName);
         if (Arrays.asList(getVersionsBetween(version, OrihimeMod.version)).contains("0.2.0")) {
@@ -169,7 +162,7 @@ public class Config {
         file.saveTo(configFileName);
     }
 
-    private static void updateKeybindNames(ParsedConfigFile file) {
+    private void updateKeybindNames(ParsedConfigFile file) {
         ButtonMapping oldMapping = ButtonMapping.load("0.3.2", "3.054");
         for (Pair<String, String> configPair : file.getAllPairs()) {
             System.out.println(configPair.getKey().substring(16));
@@ -180,20 +173,21 @@ public class Config {
         }
     }
 
-    private static void createConfigFile(String configFileName) {
+    private void createConfigFile(String configFileName) {
         System.out.println("No config file found, generating default config file.");
-        InputStream reader = instance.getClass().getResourceAsStream("orihimeKeybinds.cfg");
+        InputStream reader = getClass().getResourceAsStream("orihimeKeybinds.cfg");
         OutputStream writer;
         justUpdatedTo0_2_0 = true;
         try {
-            writer = new FileOutputStream(new File(configFileName));
+            writer = new FileOutputStream(configFileName);
+            assert reader != null;
             copy(reader, writer);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    private static void copy(InputStream from, OutputStream to) {
+    private void copy(InputStream from, OutputStream to) {
         byte[] buffer = new byte[1024];
         int length;
         while (true) {
@@ -206,44 +200,44 @@ public class Config {
         }
     }
 
-    private static void parsePair(Pair<String, String> pair) {
+    private void parsePair(Pair<String, String> pair) {
         String key = pair.getKey().toLowerCase();
         String value = pair.getValue().toLowerCase();
         if (key.equals("orihimekeybinds.generatedversion")) {
-            instance.GENERATED_VERSION = value;
+            GENERATED_VERSION = value;
         } else if (key.equals("orihimekeybinds.showkeybindidtooltips")) {
-            instance.SHOW_NUMBER_TOOLTIPS = Boolean.parseBoolean(value);
+            SHOW_NUMBER_TOOLTIPS = Boolean.parseBoolean(value);
         } else if (key.equals("orihimekeybinds.showkeybindtooltips")) {
-            instance.SHOW_KEYBIND_TOOLTIPS = Boolean.parseBoolean(value);
+            SHOW_KEYBIND_TOOLTIPS = Boolean.parseBoolean(value);
         } else if (key.equals("orihimedarkmode.enable")) {
-            instance.DARK_MODE = Boolean.parseBoolean(value);
+            DARK_MODE = Boolean.parseBoolean(value);
         } else if (key.equals("orihimeexpertmode.enable")) {
-            instance.EXPERT_MODE = Boolean.parseBoolean(value);
+            EXPERT_MODE = Boolean.parseBoolean(value);
         } else if ((key.matches("orihimekeybinds.button.[0-9]+"))) {
             Keybind keybind = parseKeybind(pair, Keybind.BUTTON);
             if (keybind != null) {
-                instance.keybinds.add(keybind);
+                keybinds.add(keybind);
             }
         } else if (key.matches("orihimekeybinds.checkbox.[0-9]+")){
             Keybind keybind = parseKeybind(pair, Keybind.CHECKBOX);
             if (keybind != null) {
-                instance.keybinds.add(keybind);
+                keybinds.add(keybind);
             }
         } else if (key.equals("orihimekeybinds.toggletype")) {
             Keybind keybind = parseKeybind(pair, Keybind.TOGGLE_TYPE);
             if (keybind != null) {
-                instance.keybinds.add(keybind);
+                keybinds.add(keybind);
             }
         } else if (key.equals("orihimemod.autosave.enable")) {
-            instance.AUTOSAVE = Boolean.parseBoolean(value);
+            AUTOSAVE = Boolean.parseBoolean(value);
         } else if (key.equals("orihimemod.autosave.interval")) {
-            instance.AUTOSAVE_INTERVAL = Integer.parseInt(value);
+            AUTOSAVE_INTERVAL = Integer.parseInt(value);
         } else if (key.equals("orihimemod.autosave.maxage")) {
-            instance.AUTOSAVE_MAX_AGE = Integer.parseInt(value);
+            AUTOSAVE_MAX_AGE = Integer.parseInt(value);
         } else if (key.equals("orihimemod.showhelptooltips")){
-            instance.SHOW_HELP_TOOLTIPS = Boolean.parseBoolean(value);
+            SHOW_HELP_TOOLTIPS = Boolean.parseBoolean(value);
         } else if (key.equals("orihimemod.save.newbehavior")) {
-            instance.USE_NEW_SAVE_BEHAVIOR = Boolean.parseBoolean(value);
+            USE_NEW_SAVE_BEHAVIOR = Boolean.parseBoolean(value);
         }
         else //noinspection StatementWithEmptyBody
             if (key.equals("orihimeadditionalsavebuttons.enable")) {
@@ -251,12 +245,12 @@ public class Config {
         } else {
             Keybind keybind = parseKeybind(pair, Keybind.ABSTRACT_BUTTON);
             if (keybind != null) {
-                instance.keybinds.add(keybind);
+                keybinds.add(keybind);
             }
         }
     }
 
-    private static Keybind parseKeybind(Pair<String, String> pair, int type) {
+    private Keybind parseKeybind(Pair<String, String> pair, int type) {
         String key = pair.getKey();
         String value = pair.getValue();
         if (value.equals("")) {
