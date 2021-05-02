@@ -4,7 +4,10 @@ import jp.gr.java_conf.mt777.kiroku.memo.Memo;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 
 import java.awt.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 // this class is used to expose Package-private Fields and Methods, mainly from the class ap
@@ -54,7 +57,8 @@ public class Expose {
         Memo memo1 = new Memo();
         try {
 
-                BufferedReader br = new BufferedReader(new FileReader(fname));
+                BufferedReader br = new BufferedReader(new InputStreamReader(
+                    new FileInputStream(fname), StandardCharsets.UTF_8));
 
                 String rdata;
 

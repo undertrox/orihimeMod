@@ -12,8 +12,7 @@ public class SaveHelper {
         es1.kiroku();
         Memo memo1;
         memo1 = es1.getMemo_for_kakidasi();
-        boolean success = false;
-
+        boolean success;
         if (filename.endsWith(".dxf")) {
             success = expose.memoAndName2File(ExportDXF.cpToDxf(expose.orihime2cp(memo1)), filename);
         } else if (filename.endsWith(".cp")) {

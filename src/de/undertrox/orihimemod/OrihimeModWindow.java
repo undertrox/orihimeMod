@@ -269,7 +269,7 @@ public class OrihimeModWindow {
             exposeMethods.getEs1().set_title(exposeMethods.getFrameTitle());
             fullFileName = fname;
             setFilename(fd.getFile());
-            if (filename.contains(".")) {
+            if (filename.lastIndexOf(".") > 0) {
                 setFilename(filename.substring(0, filename.lastIndexOf(".") - 1));
             }
             changed = false;

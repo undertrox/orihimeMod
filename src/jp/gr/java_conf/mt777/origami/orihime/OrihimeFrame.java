@@ -12,8 +12,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,14 +63,12 @@ public class OrihimeFrame extends ap {
         }
 
         // Op button
-        if (img_kaisetu_fname.equals("qqq/yomi_tuika.png")) {
-
-        } else { // Normal Open button
+        if (!img_kaisetu_fname.equals("qqq/yomi_tuika.png")) { // Normal Open button
             frame_title=frame_title_0+"        "+fd.getFile();
             setTitle(frame_title);es1.set_title(frame_title);
             fileName = fd.getFile();
             // Remove extension
-            if (fileName.contains(".")) {
+            if (fileName.lastIndexOf(".") > 0) {
                 fileName = fileName.substring(0, fileName.lastIndexOf(".")-1);
             }
             completeFileName = fname;
@@ -91,9 +89,10 @@ public class OrihimeFrame extends ap {
                 String textFile = fname + "text";
                 String buffer;
                 StringBuilder content = new StringBuilder();
-                BufferedReader tbr = new BufferedReader(new FileReader(textFile));
+                BufferedReader tbr = new BufferedReader(new InputStreamReader(
+                        new FileInputStream(textFile), StandardCharsets.UTF_8));
                 while ((buffer = tbr.readLine()) != null) {
-                    content.append(buffer+"\n");
+                    content.append(buffer).append("\n");
                 }
                 try {
                     textRenderer = TextRenderer.fromString(content.toString(), this);
@@ -102,7 +101,7 @@ public class OrihimeFrame extends ap {
                 }
             }
         } catch(Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
             frame_title=frame_title_0+"        "+"X";
             setTitle(frame_title);es1.set_title(frame_title);
 
@@ -237,6 +236,20 @@ public class OrihimeFrame extends ap {
                                                        mouseWheelEvent.getScrollType(), mouseWheelEvent.getScrollAmount(), wheelMoved);
         for (int i = 0; i < amount; i++) {
             super.mouseWheelMoved(newEvent);
+        }
+    }
+
+    @Override
+    void memoAndName2File(Memo memo1,String fname) {
+        try {
+            BufferedWriter writer = new BufferedWriter
+                    (new OutputStreamWriter(new FileOutputStream(fname), StandardCharsets.UTF_8));
+            for (int i=1;i<=memo1.getGyousuu();i++){
+                writer.write( memo1.getGyou(i) + "\n");
+            }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
