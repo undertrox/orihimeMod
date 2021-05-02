@@ -149,8 +149,19 @@ public class ParsedConfigFile {
         for (Iterator<ParsedConfigLine> iterator = lines.iterator(); iterator.hasNext(); ) {
             ParsedConfigLine line = iterator.next();
             if (line instanceof PairConfigLine) {
-                if (line.getKey().equals(key) && line.getValue().equals(value)) {
+                if (line.getKey().equals(key) && line.getValue().equalsIgnoreCase(value)) {
                     iterator.remove();
+                }
+            }
+        }
+    }
+
+    public void replacePair(Pair<String, String> pair, Pair<String, String> newPair) {
+        for (ParsedConfigLine line : lines) {
+            if (line instanceof PairConfigLine) {
+                if (line.getKey().equalsIgnoreCase(pair.getKey()) && line.getValue().equalsIgnoreCase(pair.getValue())) {
+                    line.setKey(newPair.getKey());
+                    line.setValue(newPair.getValue());
                 }
             }
         }

@@ -41,7 +41,7 @@ public class OrihimeModWindow {
     public JInputKeybindDialog inputKeybind;
     public boolean changed = false;
     public ButtonMapping mapping;
-    public Expose expose;
+    public Expose exposeMethods;
 
     public ActionListener[] oldSaveButton;
 
@@ -59,169 +59,17 @@ public class OrihimeModWindow {
 
     public OrihimeModWindow() {
         System.out.println("OrihimeMod version " + version + " is Starting...");
-        configManager = new ConfigFileManager("orihimeKeybinds.cfg");
-        configManager.load();
-        Config config = configManager.getConfig();
-        System.out.println("Loaded " + config.keybinds().size() + " Keybinds.");
-        System.out.println("Loading Button mapping for Mod version " + version + " and Orihime version " + orihimeVersion);
-        mapping = config.mapping;
-        mapping.setButtons(buttons);
-        mapping.setCheckboxes(checkboxes);
-        System.out.println("Loading Tooltips");
-        tooltips = ResourceBundle.getBundle("tooltips");
+        initConfig();
+        initButtonMapping();
+        loadToolTipFile();
         System.out.println("Starting Orihime...");
-
-        initFrame();
-        expose = new Expose(frame);
-
-        System.out.println("Indexing Buttons and Checkboxes...");
-        indexButtons(frame);
-        indexCheckboxes(frame);
-        System.out.println("Found " + buttons.size() + " Buttons and " + checkboxes.size() + " checkboxes for keybinds");
-
-        System.out.println("Initializing own UI elements");
-        oldSaveButton = mapping.get("save").getActionListeners();
-        initCustomButtons();
-        initRightClickMenu();
-        fixMVButtons();
-        addContextMenuToLengthsAndAngles();
-
-        addMouseListenerToChildren(frame);
-
-        for (ActionListener actionListener : mapping.get("save").getActionListeners()) { // Save button
-            mapping.get("save").removeActionListener(actionListener);
+        initOrihimeFrame();
+        indexOriginalUI();
+        initOwnUI();
+        if (configManager.getConfig().justUpdatedTo0_2_0) {
+            askWhichSavingBehavior();
         }
-        mapping.get("save").addActionListener(e -> saveBtnNew(e, false));
-
-        expose.setFrame(frame);
-        String title = expose.getFrameTitle() + " - OrihimeMod version " + OrihimeMod.version;
-        expose.setFrameTitle0(title);
-        frame.setTitle(title);
-
-        addTooltips(config.showNumberTooltips(), config.showKeybindTooltips(), config.showHelpTooltips());
-        KeyListener listener = new KeybindListener(mapping, config.keybinds());
-        frame.addKeyListener(listener);
-        addKeyListenerToChildren(listener, frame);
-        if (config.useDarkMode()) {
-            enableDarkMode(frame);
-        }
-        if (config.useExpertMode()) {
-            for (Component child : frame.getComponents()) {
-                frame.remove(child);
-            }
-        }
-        // Remove force close on exit
-        frame.removeWindowListener(frame.getWindowListeners()[0]);
-        // Add own window closing listener
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                saveBeforeAction(() -> {
-                    autosaver.stop();
-                    e.getWindow().dispose();
-                });
-            }
-        });
-        ActionListener removeEverything = mapping.get("remove_everything").getActionListeners()[0];
-        ActionListener newRemoveEverything = e -> {
-            removeEverything.actionPerformed(e);
-            frame.textRenderer = new TextRenderer(frame);
-            frame.keijiban = frame.textRenderer;
-        };
-        mapping.get("remove_everything").removeActionListener(removeEverything);
-        mapping.get("remove_everything").addActionListener(e -> saveBeforeAction(() -> newRemoveEverything.actionPerformed(e)));
-
-        if (config.justUpdatedTo0_2_0) {
-            String[] options = {"Old", "New"};
-            int result = JOptionPane.showOptionDialog(
-                    frame,
-                    "Important Change:\n\n This version changes how the save button works.\n " +
-                            "After the initial save/open, it will no longer ask where to save, but automatically \n" +
-                            "save to the last location. If you want to save to a new location, you have to use \n" +
-                            "Export -> Save as. This also means that when you press the Save button after\n" +
-                            "pressing the Save As button, the file will be saved in the location you selected \n" +
-                            "using the Save As button.\n\n" +
-                            "All Other export options will NOT affect where the Save button saves data.\n\n" +
-                            "Do you want to use the new saving behavior, or do you want to keep the old one?\n" +
-                            "This can always be changed by editing the config file (orihimeKeybinds.cfg), but\n" +
-                            "this dialog will not be shown again.",
-                    "Important Change notes",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    null,     //no custom icon
-                    options,  //button titles
-                    options[0] //default button
-            );
-            // use old behavior
-            if (result == JOptionPane.YES_OPTION) {
-                config.setUseNewSave(false);
-            } else { // use new behavior
-                System.out.println("use new behavior");
-                config.setUseNewSave(true);
-            }
-            configManager.saveChangesToFile();
-        }
-        System.out.println("Configuring autosaver");
-        autosaver = new AutosaveHandler(frame, config.useAutosave(), config.autoSaveInterval(), config.autoSaveMaxAge(), filename);
-    }
-
-    private void addContextMenuToLengthsAndAngles() {
-        addContextMenuToMeasureField(mapping.get("measure_l1"));
-        addContextMenuToMeasureField(mapping.get("measure_l2"));
-        addContextMenuToMeasureField(mapping.get("measure_a1"));
-        addContextMenuToMeasureField(mapping.get("measure_a2"));
-        addContextMenuToMeasureField(mapping.get("measure_a3"));
-
-    }
-
-    private void addContextMenuToMeasureField(AbstractButton measuringButton) {
-        Container parent = measuringButton.getParent();
-        boolean found = false;
-        for (Component component : parent.getComponents()) {
-            if (found && component instanceof JLabel) {
-                JLabel measuringLabel = (JLabel) component;
-                JPopupMenu popupMenu = new JPopupMenu();
-                JMenuItem copy = new JMenuItem("Copy");
-                copy.addActionListener(e -> {
-                    Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-                    StringSelection selection;
-
-                    try {
-                        selection = new StringSelection(measuringLabel.getText());
-                        c.setContents(selection, selection);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                });
-                popupMenu.add(copy);
-                measuringLabel.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        if (e.getButton() == MouseEvent.BUTTON3) {
-                            popupMenu.setInvoker(e.getComponent());
-                            popupMenu.setLocation(e.getLocationOnScreen());
-                            popupMenu.setVisible(true);
-                        }
-                    }
-                });
-                return;
-            }
-            if (component == measuringButton) {
-                found = true;
-            }
-        }
-    }
-
-    // Fixes the Colors of M/V/E/A buttons not working on mac
-    private void fixMVButtons() {
-        mapping.get("mountain").setOpaque(true);
-        mapping.get("mountain").setBorderPainted(false);
-        mapping.get("valley").setOpaque(true);
-        mapping.get("valley").setBorderPainted(false);
-        mapping.get("aux").setOpaque(true);
-        mapping.get("aux").setBorderPainted(false);
-        mapping.get("edge").setOpaque(true);
-        mapping.get("edge").setBorderPainted(false);
+        initAutosaver();
     }
 
     public void show() {
@@ -230,114 +78,9 @@ public class OrihimeModWindow {
         autosaver.start();
     }
 
-    private void initRightClickMenu() {
-        addKeybind = new JMenuItem("Add Keybind");
-        removeKeybind = new JMenu("Remove Keybind");
-        addKeybind.addActionListener(e -> {
-            inputKeybind.setTitle("Input Keybind for " + currentKeybindID);
-            inputKeybind.setSize(350, 100);
-            inputKeybind.setModal(true);
-            inputKeybind.reset();
-            inputKeybind.setLocationRelativeTo(frame);
-            inputKeybind.setVisible(true);
-        });
-        rightClickMenu = new JPopupMenu();
-        rightClickMenu.add(addKeybind);
-        rightClickMenu.add(removeKeybind);
-    }
-
-    private void initCustomButtons() {
-        btnSaveAsSVG = new JButtonSaveAsSVG(frame);
-        btnSaveAsSVG.setText("Save as SVG");
-        btnSaveAsCp = new JButtonSaveAsCp(frame);
-        btnSaveAsCp.setText("Save as CP");
-        btnSaveAsDXF = new JButtonSaveAsDXF(frame);
-        btnSaveAsDXF.setText("Save as DXF");
-        inputKeybind = new JInputKeybindDialog(this::keybindDialogClose);
-
-        btnSaveAsCp.setMargin(new Insets(0, 0, 0, 0));
-        buttons.add(btnSaveAsCp);
-        btnSaveAsCp.addActionListener(btnSaveAsCp::saveAsCp);
-
-        btnSaveAsDXF.setMargin(new Insets(0, 0, 0, 0));
-        buttons.add(btnSaveAsDXF);
-        btnSaveAsDXF.addActionListener(btnSaveAsDXF::saveAsDXF);
-
-        btnSaveAsSVG.setMargin(new Insets(0, 0, 0, 0));
-        buttons.add(btnSaveAsSVG);
-        btnSaveAsSVG.addActionListener(btnSaveAsSVG::saveAsSVG);
-
-        frame.tb = new TextButton(frame, "Text Mode");
-        buttons.add(frame.tb);
-        frame.tb.addActionListener(frame::textButtonClick);
-
-
-        exportMenu = new JPopupMenu();
-        JMenuItem exportDXF = new JMenuItem("dxf");
-        exportDXF.addActionListener(e -> btnSaveAsDXF.doClick());
-        JMenuItem exportSVG = new JMenuItem("svg");
-        exportSVG.addActionListener(e -> btnSaveAsSVG.doClick());
-        JMenuItem exportCP = new JMenuItem("cp");
-        exportCP.addActionListener(e -> btnSaveAsCp.doClick());
-        JMenuItem exportPng = new JMenuItem("png");
-        exportPng.addActionListener(e -> mapping.get("export_image").doClick());
-        JMenuItem saveAs = new JMenuItem("Save as");
-        saveAs.addActionListener(e -> saveBtnNew(e, true));
-        JMenuItem exportORH = new JMenuItem("orh");
-        exportORH.addActionListener(e -> {
-            for (ActionListener actionListener : oldSaveButton) {
-                actionListener.actionPerformed(e);
-            }
-        });
-        JButton btnSaveAs = new JButton();
-        btnSaveAs.addActionListener(e -> saveAs.doClick());
-
-        buttons.add(btnSaveAs);
-
-        exportMenu.add(exportCP);
-        exportMenu.add(exportSVG);
-        exportMenu.add(exportDXF);
-        exportMenu.add(exportPng);
-        exportMenu.add(exportORH);
-        if (configManager.getConfig().useNewSave() || configManager.getConfig().justUpdatedTo0_2_0) {
-            exportMenu.add(saveAs);
-        }
-
-        JButton btnExport = new JButton("Export");
-        btnExport.addActionListener(e -> {
-            exportMenu.show(btnExport, 0, btnExport.getHeight());
-            expose.readImageFromFile3();
-            expose.setI_mouseDragged_yuukou(0);
-            expose.setI_mouseReleased_yuukou(0);
-        });
-        btnExport.setMargin(new Insets(0, 0, 0, 0));
-
-        mapping.get("save").getParent().add(btnExport);
-        JPanel p = new JPanel();
-        p.setLayout(new GridLayout(1, 2));
-        p.setBackground(Color.PINK);
-        //p.setBounds(2, 2, 102, 55);
-        p.add(frame.textField);
-        p.add(frame.tb);
-        mapping.get("change_circle_color").getParent().getParent().setLayout(new GridLayout(29, 1));
-        mapping.get("change_circle_color").getParent().getParent().add(p);
-        buttons.add(btnExport);
-    }
-
-    private void initFrame() {
-        frame = new OrihimeFrame();
-        frame.observers.add((newCfs, newFs) -> {
-            this.filename = newFs;
-            this.fullFileName = newCfs;
-        });
-        frame.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                changed = true;
-            }
-        });
-        frame.setSize(1200, 700);
-        frame.setLocationRelativeTo(null);
+    public void setFilename(String filename) {
+        this.filename = filename;
+        this.autosaver.setBaseFileName(filename);
     }
 
     void saveBeforeAction(Runnable action) {
@@ -362,7 +105,6 @@ public class OrihimeModWindow {
         }
     }
 
-
     void addMouseListenerToChildren(Container container) {
         Component[] children = container.getComponents();
         for (Component child : children) {
@@ -372,54 +114,6 @@ public class OrihimeModWindow {
             if (child instanceof AbstractButton) {
                 AbstractButton b = (AbstractButton) child;
                 b.addMouseListener(new RightClickListener(b));
-            }
-        }
-    }
-
-    class RightClickListener extends MouseAdapter {
-
-        AbstractButton b;
-        String keybindId;
-
-        public RightClickListener(AbstractButton button) {
-            b = button;
-            int index = buttons.indexOf(b);
-            String bOrC = "button";
-            if (index < 0) {
-                index = checkboxes.indexOf(b);
-                bOrC = "checkbox";
-            }
-            if (index < 0) keybindId = "";
-            keybindId = mapping.getKey(bOrC + "." + index);
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            super.mousePressed(e);
-            changed = true;
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            if (e.isPopupTrigger()) {
-                currentKeybindID = keybindId;
-                removeKeybind.removeAll();
-                for (Keybind keybind : configManager.getConfig().keybinds()) {
-                    if (keybind.getConfigID().equals(currentKeybindID)) {
-                        JMenuItem rk = new JMenuItem(keybind.toString());
-                        removeKeybind.add(rk);
-                        rk.addActionListener(ev -> {
-                            Config config = configManager.getConfig();
-                            config.keybinds().remove(keybind);
-                            configManager.saveChangesToFile();
-                            config = configManager.getConfig();
-                            addTooltips(config.showNumberTooltips(), config.showKeybindTooltips(), config.showHelpTooltips());
-                        });
-                    }
-                }
-                rightClickMenu.setInvoker(b);
-                rightClickMenu.setLocation(e.getLocationOnScreen());
-                rightClickMenu.setVisible(true);
             }
         }
     }
@@ -543,11 +237,11 @@ public class OrihimeModWindow {
             saveAs = true;
         }
 
-        expose.setExplanationFileName("qqq/kaki.png");
-        expose.readImageFromFile3();
-        expose.Button_kyoutuu_sagyou();
-        expose.setI_mouseDragged_yuukou(0);
-        expose.setI_mouseReleased_yuukou(1);
+        exposeMethods.setExplanationFileName("qqq/kaki.png");
+        exposeMethods.readImageFromFile3();
+        exposeMethods.Button_kyoutuu_sagyou();
+        exposeMethods.setI_mouseDragged_yuukou(0);
+        exposeMethods.setI_mouseReleased_yuukou(1);
         FileDialog fd = new FileDialog(frame);
         String fname = "";
         boolean success;
@@ -570,9 +264,9 @@ public class OrihimeModWindow {
             return;
         }
         if (fd.getFile() != null) {
-            expose.setFrameTitle(expose.getFrameTitle0() + "        " + fd.getFile());
-            frame.setTitle(expose.getFrameTitle());
-            expose.getEs1().set_title(expose.getFrameTitle());
+            exposeMethods.setFrameTitle(exposeMethods.getFrameTitle0() + "        " + fd.getFile());
+            frame.setTitle(exposeMethods.getFrameTitle());
+            exposeMethods.getEs1().set_title(exposeMethods.getFrameTitle());
             fullFileName = fname;
             setFilename(fd.getFile());
             if (filename.contains(".")) {
@@ -580,11 +274,6 @@ public class OrihimeModWindow {
             }
             changed = false;
         } else changed = fullFileName.isEmpty() || saveAs;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
-        this.autosaver.setBaseFileName(filename);
     }
 
     void keybindDialogClose(KeyEvent lastKeyEvent) {
@@ -595,6 +284,336 @@ public class OrihimeModWindow {
                     lastKeyEvent.isShiftDown(), lastKeyEvent.isControlDown(), lastKeyEvent.isAltDown()));
             addTooltips(config.showNumberTooltips(), config.showKeybindTooltips(), config.showHelpTooltips());
             configManager.saveChangesToFile();
+        }
+    }
+
+    private void initAutosaver() {
+        Config config = configManager.getConfig();
+        System.out.println("Configuring autosaver");
+        autosaver = new AutosaveHandler(frame, config.useAutosave(), config.autoSaveInterval(), config.autoSaveMaxAge(), filename);
+    }
+
+    private void askWhichSavingBehavior() {
+        String[] options = {"Old", "New"};
+        int result = JOptionPane.showOptionDialog(
+                frame,
+                "Important Change:\n\n This version changes how the save button works.\n " +
+                        "After the initial save/open, it will no longer ask where to save, but automatically \n" +
+                        "save to the last location. If you want to save to a new location, you have to use \n" +
+                        "Export -> Save as. This also means that when you press the Save button after\n" +
+                        "pressing the Save As button, the file will be saved in the location you selected \n" +
+                        "using the Save As button.\n\n" +
+                        "All Other export options will NOT affect where the Save button saves data.\n\n" +
+                        "Do you want to use the new saving behavior, or do you want to keep the old one?\n" +
+                        "This can always be changed by editing the config file (orihimeKeybinds.cfg), but\n" +
+                        "this dialog will not be shown again.",
+                "Important Change notes",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,     //no custom icon
+                options,  //button titles
+                options[0] //default button
+        );
+        Config config = configManager.getConfig();
+        // use old behavior
+        if (result == JOptionPane.YES_OPTION) {
+            config.setUseNewSave(false);
+        } else { // use new behavior
+            System.out.println("use new behavior");
+            config.setUseNewSave(true);
+        }
+        configManager.saveChangesToFile();
+    }
+
+    private void initOwnUI() {
+        System.out.println("Initializing own UI elements");
+        initCustomButtons();
+        initCustomMenus();
+        initRightClickMenu();
+        fixMVButtons();
+        addContextMenuToLengthsAndAngles();
+
+        addMouseListenerToChildren(frame);
+
+        for (ActionListener actionListener : mapping.get("save").getActionListeners()) { // Save button
+            mapping.get("save").removeActionListener(actionListener);
+        }
+        mapping.get("save").addActionListener(e -> saveBtnNew(e, false));
+
+        exposeMethods.setFrame(frame);
+        String title = exposeMethods.getFrameTitle() + " - OrihimeMod version " + OrihimeMod.version;
+        exposeMethods.setFrameTitle0(title);
+        frame.setTitle(title);
+        Config config = configManager.getConfig();
+        addTooltips(config.showNumberTooltips(), config.showKeybindTooltips(), config.showHelpTooltips());
+        KeyListener listener = new KeybindListener(mapping, config.keybinds());
+        frame.addKeyListener(listener);
+        addKeyListenerToChildren(listener, frame);
+        if (config.useDarkMode()) {
+            enableDarkMode(frame);
+        }
+        if (config.useExpertMode()) {
+            for (Component child : frame.getComponents()) {
+                frame.remove(child);
+            }
+        }
+        // Remove force close on exit
+        frame.removeWindowListener(frame.getWindowListeners()[0]);
+        // Add own window closing listener
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                saveBeforeAction(() -> {
+                    autosaver.stop();
+                    e.getWindow().dispose();
+                });
+            }
+        });
+        ActionListener removeEverything = mapping.get("remove_everything").getActionListeners()[0];
+        ActionListener newRemoveEverything = e -> {
+            removeEverything.actionPerformed(e);
+            frame.textRenderer = new TextRenderer(frame);
+            frame.keijiban = frame.textRenderer;
+        };
+        mapping.get("remove_everything").removeActionListener(removeEverything);
+        mapping.get("remove_everything").addActionListener(e -> saveBeforeAction(() -> newRemoveEverything.actionPerformed(e)));
+    }
+
+    private void initCustomMenus() {
+        exportMenu = new JPopupMenu();
+        JMenuItem exportDXF = new JMenuItem("dxf");
+        exportDXF.addActionListener(e -> btnSaveAsDXF.doClick());
+        JMenuItem exportSVG = new JMenuItem("svg");
+        exportSVG.addActionListener(e -> btnSaveAsSVG.doClick());
+        JMenuItem exportCP = new JMenuItem("cp");
+        exportCP.addActionListener(e -> btnSaveAsCp.doClick());
+        JMenuItem exportPng = new JMenuItem("png");
+        exportPng.addActionListener(e -> mapping.get("export_image").doClick());
+        JMenuItem saveAs = new JMenuItem("Save as");
+        saveAs.addActionListener(e -> saveBtnNew(e, true));
+        JMenuItem exportORH = new JMenuItem("orh");
+        exportORH.addActionListener(e -> {
+            for (ActionListener actionListener : oldSaveButton) {
+                actionListener.actionPerformed(e);
+            }
+        });
+        JButton btnSaveAs = new JButton();
+        btnSaveAs.addActionListener(e -> saveAs.doClick());
+        buttons.add(btnSaveAs);
+
+        exportMenu.add(exportCP);
+        exportMenu.add(exportSVG);
+        exportMenu.add(exportDXF);
+        exportMenu.add(exportPng);
+        exportMenu.add(exportORH);
+        if (configManager.getConfig().useNewSave() || configManager.getConfig().justUpdatedTo0_2_0) {
+            exportMenu.add(saveAs);
+        }
+    }
+
+    private void indexOriginalUI() {
+        System.out.println("Indexing Buttons and Checkboxes...");
+        indexButtons(frame);
+        indexCheckboxes(frame);
+        System.out.println("Found " + buttons.size() + " Buttons and " + checkboxes.size() + " checkboxes for keybinds");
+    }
+
+    private void loadToolTipFile() {
+        System.out.println("Loading Tooltips");
+        tooltips = ResourceBundle.getBundle("tooltips");
+    }
+
+    private void initButtonMapping() {
+        mapping = configManager.getConfig().mapping;
+        mapping.setButtons(buttons);
+        mapping.setCheckboxes(checkboxes);
+    }
+
+    private void initConfig() {
+        configManager = new ConfigFileManager("orihimeKeybinds.cfg");
+        configManager.load();
+        Config config = configManager.getConfig();
+        System.out.println("Loaded " + config.keybinds().size() + " Keybinds.");
+        System.out.println("Loading Button mapping for Mod version " + version + " and Orihime version " + orihimeVersion);
+    }
+
+    private void addContextMenuToLengthsAndAngles() {
+        addContextMenuToMeasureField(mapping.get("measure_l1"));
+        addContextMenuToMeasureField(mapping.get("measure_l2"));
+        addContextMenuToMeasureField(mapping.get("measure_a1"));
+        addContextMenuToMeasureField(mapping.get("measure_a2"));
+        addContextMenuToMeasureField(mapping.get("measure_a3"));
+    }
+
+    private void addContextMenuToMeasureField(AbstractButton measuringButton) {
+        Container parent = measuringButton.getParent();
+        boolean found = false;
+        for (Component component : parent.getComponents()) {
+            if (found && component instanceof JLabel) {
+                JLabel measuringLabel = (JLabel) component;
+                JPopupMenu popupMenu = new JPopupMenu();
+                JMenuItem copy = new JMenuItem("Copy");
+                copy.addActionListener(e -> {
+                    Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    StringSelection selection;
+
+                    try {
+                        selection = new StringSelection(measuringLabel.getText());
+                        c.setContents(selection, selection);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                });
+                popupMenu.add(copy);
+                measuringLabel.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        if (e.getButton() == MouseEvent.BUTTON3) {
+                            popupMenu.setInvoker(e.getComponent());
+                            popupMenu.setLocation(e.getLocationOnScreen());
+                            popupMenu.setVisible(true);
+                        }
+                    }
+                });
+                return;
+            }
+            if (component == measuringButton) {
+                found = true;
+            }
+        }
+    }
+
+    // Fixes the Colors of M/V/E/A buttons not working on mac
+    private void fixMVButtons() {
+        mapping.get("mountain").setOpaque(true);
+        mapping.get("mountain").setBorderPainted(false);
+        mapping.get("valley").setOpaque(true);
+        mapping.get("valley").setBorderPainted(false);
+        mapping.get("aux").setOpaque(true);
+        mapping.get("aux").setBorderPainted(false);
+        mapping.get("edge").setOpaque(true);
+        mapping.get("edge").setBorderPainted(false);
+    }
+
+    private void initRightClickMenu() {
+        addKeybind = new JMenuItem("Add Keybind");
+        removeKeybind = new JMenu("Remove Keybind");
+        addKeybind.addActionListener(e -> {
+            inputKeybind.setTitle("Input Keybind for " + currentKeybindID);
+            inputKeybind.setSize(350, 100);
+            inputKeybind.setModal(true);
+            inputKeybind.reset();
+            inputKeybind.setLocationRelativeTo(frame);
+            inputKeybind.setVisible(true);
+        });
+        rightClickMenu = new JPopupMenu();
+        rightClickMenu.add(addKeybind);
+        rightClickMenu.add(removeKeybind);
+    }
+
+    private void initCustomButtons() {
+        oldSaveButton = mapping.get("save").getActionListeners();
+        btnSaveAsSVG = new JButtonSaveAsSVG(frame);
+        setupButton(btnSaveAsSVG, "Save as SVG", btnSaveAsSVG::saveAsSVG);
+        btnSaveAsCp = new JButtonSaveAsCp(frame);
+        setupButton(btnSaveAsCp, "Save as CP", btnSaveAsCp::saveAsCp);
+        btnSaveAsDXF = new JButtonSaveAsDXF(frame);
+        setupButton(btnSaveAsDXF, "Save as DXF", btnSaveAsDXF::saveAsDXF);
+        inputKeybind = new JInputKeybindDialog(this::keybindDialogClose);
+
+        frame.tb = new TextButton(frame, "Text Mode");
+        buttons.add(frame.tb);
+        frame.tb.addActionListener(frame::textButtonClick);
+
+        JButton btnExport = new JButton("Export");
+        btnExport.addActionListener(e -> {
+            exportMenu.show(btnExport, 0, btnExport.getHeight());
+            exposeMethods.readImageFromFile3();
+            exposeMethods.setI_mouseDragged_yuukou(0);
+            exposeMethods.setI_mouseReleased_yuukou(0);
+        });
+        btnExport.setMargin(new Insets(0, 0, 0, 0));
+
+        mapping.get("save").getParent().add(btnExport);
+        JPanel p = new JPanel();
+        p.setLayout(new GridLayout(1, 2));
+        p.setBackground(Color.PINK);
+        p.add(frame.textField);
+        p.add(frame.tb);
+        mapping.get("change_circle_color").getParent().getParent().setLayout(new GridLayout(29, 1));
+        mapping.get("change_circle_color").getParent().getParent().add(p);
+        buttons.add(btnExport);
+    }
+
+    private void setupButton(JButton button, String text, ActionListener action) {
+        button.setText(text);
+        button.setMargin(new Insets(0, 0, 0, 0));
+        buttons.add(button);
+        button.addActionListener(action);
+    }
+
+    private void initOrihimeFrame() {
+        frame = new OrihimeFrame();
+        frame.observers.add((newCfs, newFs) -> {
+            this.filename = newFs;
+            this.fullFileName = newCfs;
+        });
+        frame.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                changed = true;
+            }
+        });
+        frame.setSize(1200, 700);
+        frame.setLocationRelativeTo(null);
+        exposeMethods = new Expose(frame);
+    }
+
+    class RightClickListener extends MouseAdapter {
+
+        AbstractButton b;
+        String keybindId;
+
+        public RightClickListener(AbstractButton button) {
+            b = button;
+            int index = buttons.indexOf(b);
+            String bOrC = "button";
+            if (index < 0) {
+                index = checkboxes.indexOf(b);
+                bOrC = "checkbox";
+            }
+            if (index < 0) keybindId = "";
+            keybindId = mapping.getKey(bOrC + "." + index);
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            super.mousePressed(e);
+            changed = true;
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                currentKeybindID = keybindId;
+                removeKeybind.removeAll();
+                for (Keybind keybind : configManager.getConfig().keybinds()) {
+                    if (keybind.getConfigID().equals(currentKeybindID)) {
+                        JMenuItem rk = new JMenuItem(keybind.toString());
+                        removeKeybind.add(rk);
+                        rk.addActionListener(ev -> {
+                            Config config = configManager.getConfig();
+                            config.keybinds().remove(keybind);
+                            configManager.saveChangesToFile();
+                            config = configManager.getConfig();
+                            addTooltips(config.showNumberTooltips(), config.showKeybindTooltips(), config.showHelpTooltips());
+                        });
+                    }
+                }
+                rightClickMenu.setInvoker(b);
+                rightClickMenu.setLocation(e.getLocationOnScreen());
+                rightClickMenu.setVisible(true);
+            }
         }
     }
 }

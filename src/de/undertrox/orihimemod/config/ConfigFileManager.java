@@ -60,14 +60,13 @@ public class ConfigFileManager {
         Config oldConfig = loadConfig(fileName);
         ParsedConfigFile oldConfigFile = ParsedConfigFile.fromFile(fileName);
         config.keybinds.stream()
-                .filter(oldConfig.keybinds::contains)
+                .filter(newKeybind -> !oldConfig.keybinds.contains(newKeybind))
                 .forEach(newKeybind ->
-                        oldConfigFile.removePair(newKeybind.getConfigID(), newKeybind.getConfigValue())
+                        oldConfigFile.addPair(newKeybind.getConfigID(), newKeybind.getConfigValue())
                 );
         oldConfig.keybinds.stream()
-                .filter(config.keybinds::contains)
-                .forEach(removedKeybind ->
-                        oldConfigFile.addPair(removedKeybind.getConfigID(), removedKeybind.getConfigValue())
+                .filter(oldKeybind -> !config.keybinds.contains(oldKeybind))
+                .forEach(removedKeybind -> oldConfigFile.removePair(removedKeybind.getConfigID(), removedKeybind.getConfigValue())
                 );
         oldConfigFile.setValue("orihimemod.save.newbehavior", Boolean.toString(config.useNewSave()));
         oldConfigFile.saveTo(fileName);
@@ -75,11 +74,12 @@ public class ConfigFileManager {
     }
 
     private Config loadConfig(String fileName) {
+        Config config = new Config();
         File file = new File(fileName);
         if (!file.exists()) {
             createConfigFile();
+            config.justUpdatedTo0_2_0 = true;
         }
-        Config config = new Config();
         config.filename = fileName;
         config.mapping = ButtonMapping.load(version, orihimeVersion);
         parseConfigFile(fileName, config);
@@ -90,7 +90,8 @@ public class ConfigFileManager {
         ParsedConfigFile parsedFile = ParsedConfigFile.fromFile(fileName);
         for (Pair<String, String> pair : parsedFile.getAllPairs()) {
             try {
-                parsePair(pair, config);
+                Pair<String, String> newPair = parsePair(pair, config);
+                parsedFile.replacePair(pair, newPair);
             } catch (RuntimeException e) {
                 System.err.println("Config Syntax error: " + pair);
                 e.printStackTrace();
@@ -99,6 +100,7 @@ public class ConfigFileManager {
         if (!parsedFile.contains("orihimemod.save.newbehavior")) {
             config.justUpdatedTo0_2_0 = true;
         }
+        parsedFile.saveTo(fileName);
     }
 
     private void updateToNewestVersion() {
@@ -131,7 +133,6 @@ public class ConfigFileManager {
         System.out.println("No config file found, generating default config file.");
         InputStream reader = getClass().getResourceAsStream("orihimeKeybinds.cfg");
         OutputStream writer;
-        config.justUpdatedTo0_2_0 = true;
         try {
             writer = new FileOutputStream(fileName);
             assert reader != null;
@@ -154,7 +155,7 @@ public class ConfigFileManager {
         }
     }
 
-    private void parsePair(Pair<String, String> pair, Config config) {
+    private Pair<String, String> parsePair(Pair<String, String> pair, Config config) {
         String key = pair.getKey().toLowerCase();
         String value = pair.getValue().toLowerCase();
         if (key.equals("orihimekeybinds.generatedversion")) {
@@ -192,15 +193,19 @@ public class ConfigFileManager {
             config.SHOW_HELP_TOOLTIPS = Boolean.parseBoolean(value);
         } else if (key.equals("orihimemod.save.newbehavior")) {
             config.USE_NEW_SAVE_BEHAVIOR = Boolean.parseBoolean(value);
-        } else //noinspection StatementWithEmptyBody
+        }
+        else //noinspection StatementWithEmptyBody
             if (key.equals("orihimeadditionalsavebuttons.enable")) {
                 // for compatibility, but ignored
-            } else {
-                Keybind keybind = parseKeybind(pair, Keybind.ABSTRACT_BUTTON);
-                if (keybind != null) {
-                    config.keybinds.add(keybind);
-                }
+        } else {
+            Keybind keybind = parseKeybind(pair, Keybind.ABSTRACT_BUTTON);
+            if (keybind != null) {
+
+                config.keybinds.add(keybind);
+                return new Pair<>(keybind.getConfigID(), keybind.getConfigValue());
             }
+        }
+        return pair;
     }
 
     private Keybind parseKeybind(Pair<String, String> pair, int type) {
