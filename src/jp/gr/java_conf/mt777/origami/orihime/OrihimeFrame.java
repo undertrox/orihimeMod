@@ -9,9 +9,7 @@ import jp.gr.java_conf.mt777.zukei2d.ten.Ten;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
+import java.awt.event.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -32,6 +30,46 @@ public class OrihimeFrame extends ap {
 
     public int getI_OAZ() {
         return i_OAZ;
+    }
+
+    @Override
+    public void Frame_tuika() {
+        if (add_frame != null) {
+            add_frame.setVisible(true);
+        }
+        if(i_add_frame==1){System.out.println("111 i_add_frame="+i_add_frame);
+            //add_frame.dispose();
+            //add_frame = new OpenFrame("add_frame",this);
+        }
+
+        if(i_add_frame==0){System.out.println("000 i_add_frame="+i_add_frame);
+            add_frame = new OpenFrame("ad_fnc", this);
+            //add_frame.setVisible(false);
+            add_frame.removeWindowListener(add_frame.getWindowListeners()[0]);
+            add_frame.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    e.getWindow().setVisible(false);
+                }
+            });
+            //add_frame = new OpenFrame("add_frame",this);
+        }
+        i_add_frame=1;
+        add_frame.toFront();
+        /*if(i_add_frame==1){System.out.println("111 i_add_frame="+i_add_frame);
+            //add_frame.setVisible(false);
+            //i_add_frame = 0;
+        }
+
+        add_frame.setVisible(true);
+        if(i_add_frame==0){System.out.println("000 i_add_frame="+i_add_frame);
+        }
+        i_add_frame=1;
+        add_frame.toFront();*/
+    }
+
+    public Frame adFncFrame() {
+        return add_frame;
     }
 
     public void setI_OAZ(int i_oaz) {

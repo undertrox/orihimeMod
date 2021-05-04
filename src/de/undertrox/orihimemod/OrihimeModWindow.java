@@ -64,7 +64,6 @@ public class OrihimeModWindow {
 
     public ResourceBundle tooltips;
 
-    // TODO: make keybinds work with ad_fnc
     public OrihimeModWindow() {
         System.out.println("OrihimeMod version " + version + " is Starting...");
         JFrame loadingFrame = initLoadingFrame();
@@ -196,7 +195,7 @@ public class OrihimeModWindow {
                 }
             }
             if (showNumberTooltips) {
-                btn.setToolTipText(btn.getToolTipText() + "<br>Keybind ID: " + mapping.getKey("button." + i));
+                btn.setToolTipText(btn.getToolTipText() + "<br>Keybind ID: " +mapping.getKey("button." + i));
             }
             if (showKeybindTooltips) {
                 StringBuilder b = new StringBuilder();
@@ -212,7 +211,7 @@ public class OrihimeModWindow {
             checkBox.setToolTipText(checkBox.getToolTipText() == null ? "" : checkBox.getToolTipText() + "<br>");
             if (showHelpTooltips) {
                 String key = mapping.getKey("checkbox." + i);
-                if (tooltips.containsKey(key)) {
+                if (key != null && tooltips.containsKey(key)) {
                     checkBox.setToolTipText(checkBox.getToolTipText() + tooltips.getString(key));
                 }
             }
@@ -423,6 +422,7 @@ public class OrihimeModWindow {
         }
         fixDeleteFoldedModelButton();
         addMouseListenerToChildren(frame);
+        addMouseListenerToChildren(frame.adFncFrame());
 
         for (ActionListener actionListener : mapping.get("save").getActionListeners()) { // Save button
             mapping.get("save").removeActionListener(actionListener);
@@ -438,6 +438,8 @@ public class OrihimeModWindow {
         KeyListener listener = new KeybindListener(mapping, config.keybinds());
         frame.addKeyListener(listener);
         addKeyListenerToChildren(listener, frame);
+        frame.adFncFrame().addKeyListener(listener);
+        addKeyListenerToChildren(listener, frame.adFncFrame());
         if (config.useDarkMode()) {
             enableDarkMode(frame);
         }
@@ -454,6 +456,7 @@ public class OrihimeModWindow {
             public void windowClosing(WindowEvent e) {
                 saveBeforeAction(() -> {
                     autosaver.stop();
+                    frame.adFncFrame().dispose();
                     e.getWindow().dispose();
                 });
             }
@@ -583,7 +586,9 @@ public class OrihimeModWindow {
     private void indexOriginalUI() {
         System.out.println("Indexing Buttons and Checkboxes...");
         indexButtons(frame);
+        indexButtons(frame.adFncFrame());
         indexCheckboxes(frame);
+        indexCheckboxes(frame.adFncFrame());
         System.out.println("Found " + buttons.size() + " Buttons and " + checkboxes.size() + " checkboxes for keybinds");
     }
 
@@ -736,6 +741,9 @@ public class OrihimeModWindow {
         frame.setSize(1200, 700);
         frame.setLocationRelativeTo(null);
         exposeMethods = new Expose(frame);
+
+        frame.Frame_tuika();
+        frame.adFncFrame().setVisible(false);
     }
 
     class RightClickListener extends MouseAdapter {
