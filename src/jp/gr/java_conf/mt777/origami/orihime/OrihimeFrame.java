@@ -30,6 +30,18 @@ public class OrihimeFrame extends ap {
         this.keijiban = textRenderer;
     }
 
+    public int getI_OAZ() {
+        return i_OAZ;
+    }
+
+    public void setI_OAZ(int i_oaz) {
+        this.i_OAZ = i_oaz;
+    }
+
+    public void setI_OAZToMax() {
+        this.i_OAZ = this.OAZ.size()-1;
+    }
+
     public void setShowHelp(boolean showHelp) {
         ikaisetuhyouji = showHelp? 1 : 0;
     }

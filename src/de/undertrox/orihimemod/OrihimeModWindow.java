@@ -64,11 +64,10 @@ public class OrihimeModWindow {
 
     public ResourceBundle tooltips;
 
-    // TODO: Automatic selection of the latest folded model on delete
     // TODO: make keybinds work with ad_fnc
     public OrihimeModWindow() {
-        JFrame loadingFrame = initLoadingFrame();
         System.out.println("OrihimeMod version " + version + " is Starting...");
+        JFrame loadingFrame = initLoadingFrame();
         initConfig();
         initButtonMapping();
         loadToolTipFile();
@@ -85,33 +84,6 @@ public class OrihimeModWindow {
         frame.setVisible(true);
         loadingFrame.setVisible(false);
         loadingFrame.dispose();
-    }
-
-    private JFrame initLoadingFrame() {
-        JFrame loadingFrame = new JFrame();
-        URL img = getClass().getResource("/de/undertrox/orihimemod/config/orihimeloadingscreen.png");
-        Image image = null;
-        try {
-            image = ImageIO.read(img);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Image finalImage = image;
-        JPanel panel = new JPanel(){
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                g.drawImage(finalImage, 0, 0, null);
-            }
-        };
-        JLabel l = new JLabel("Orihime is loading...");
-        l.setHorizontalAlignment(SwingConstants.CENTER);
-        loadingFrame.add(panel);
-        loadingFrame.setSize(image.getWidth(null), image.getHeight(null));
-        loadingFrame.setUndecorated(true);
-        loadingFrame.setLocationRelativeTo(null);
-        loadingFrame.setVisible(true);
-        return loadingFrame;
     }
 
     public void show() {
@@ -331,6 +303,33 @@ public class OrihimeModWindow {
         }
     }
 
+    private JFrame initLoadingFrame() {
+        JFrame loadingFrame = new JFrame();
+        URL img = getClass().getResource("/de/undertrox/orihimemod/config/orihimeloadingscreen.png");
+        Image image = null;
+        try {
+            image = ImageIO.read(img);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Image finalImage = image;
+        JPanel panel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(finalImage, 0, 0, null);
+            }
+        };
+        JLabel l = new JLabel("Orihime is loading...");
+        l.setHorizontalAlignment(SwingConstants.CENTER);
+        loadingFrame.add(panel);
+        loadingFrame.setSize(image.getWidth(null), image.getHeight(null));
+        loadingFrame.setUndecorated(true);
+        loadingFrame.setLocationRelativeTo(null);
+        loadingFrame.setVisible(true);
+        return loadingFrame;
+    }
+
     private void applyDefaults() {
         Config config = configManager.getConfig();
         DefaultValues dv = config.defaultVals;
@@ -347,13 +346,13 @@ public class OrihimeModWindow {
         mapping.get("grid_assist").setSelected(dv.gridAssist);
         System.out.println("gm " + dv.gridMode.getId());
         frame.getEs1().set_i_kitei_jyoutai(dv.gridMode.getId());
-        frame.OZ.js.set_i_anti_alias(dv.foldedModelAntiAliasing? 1 : 0);
+        frame.OZ.js.set_i_anti_alias(dv.foldedModelAntiAliasing ? 1 : 0);
         frame.setHelpImage("qqq/a__hajimeni.png");
     }
 
     private void setTextFieldNextToButtonTo(String val, AbstractButton button) {
         List<Component> components = Arrays.asList(button.getParent().getComponents());
-        JTextField textfield = (JTextField) components.get(components.indexOf(button)-1);
+        JTextField textfield = (JTextField) components.get(components.indexOf(button) - 1);
         textfield.setText(val);
         button.doClick();
     }
@@ -363,11 +362,11 @@ public class OrihimeModWindow {
         AbstractButton incBtn = mapping.get(mappingIncBtn);
         AbstractButton decBtn = mapping.get(mappingDecBtn);
         if (value < defaultVal) {
-            for (int i = defaultVal; i>value; i--) {
+            for (int i = defaultVal; i > value; i--) {
                 decBtn.doClick();
             }
         } else if (value > defaultVal) {
-            for (int i = defaultVal; i<value; i++) {
+            for (int i = defaultVal; i < value; i++) {
                 incBtn.doClick();
             }
         }
@@ -422,6 +421,7 @@ public class OrihimeModWindow {
         if (configManager.getConfig().smartFolding) {
             initSmartFolding();
         }
+        fixDeleteFoldedModelButton();
         addMouseListenerToChildren(frame);
 
         for (ActionListener actionListener : mapping.get("save").getActionListeners()) { // Save button
@@ -468,6 +468,19 @@ public class OrihimeModWindow {
         mapping.get("remove_everything").addActionListener(e -> saveBeforeAction(() -> newRemoveEverything.actionPerformed(e)));
     }
 
+    private void fixDeleteFoldedModelButton() {
+        AbstractButton deleteModel = mapping.get("delete_folded_shape");
+        ActionListener oldListener = deleteModel.getActionListeners()[0];
+        deleteModel.removeActionListener(oldListener);
+        deleteModel.addActionListener(e -> {
+            System.out.println(frame.getI_OAZ());
+            if (frame.getI_OAZ() == 0) {
+                frame.setI_OAZToMax();
+            }
+            oldListener.actionPerformed(e);
+        });
+    }
+
     private void initSmartFolding() {
         AbstractButton foldBtn = mapping.get("fold");
         ActionListener oldListener = foldBtn.getActionListeners()[0];
@@ -508,7 +521,7 @@ public class OrihimeModWindow {
                 if (nearest != null) {
                     Deque<Senbun> queue = new ArrayDeque<>(pointLineAdjacency.get(nearest));
                     traversedPoints.add(nearest);
-                    while(!queue.isEmpty()) {
+                    while (!queue.isEmpty()) {
                         Senbun line = queue.pop();
                         if (!selectedLines.contains(line)) {
                             line.set_i_select(2);
@@ -532,8 +545,7 @@ public class OrihimeModWindow {
     }
 
     private double round(double value) {
-        double t = 257*value;
-        return value - t + t;
+        return Math.round(value);
     }
 
     private void initCustomMenus() {
