@@ -90,7 +90,7 @@ public class ParsedConfigFile {
     public boolean contains(String key) {
         key = key.toLowerCase();
         for (ParsedConfigLine line : lines) {
-            if (line.getKey().equals(key)) {
+            if (line.getKey().equalsIgnoreCase(key)) {
                 return true;
             }
         }
@@ -121,7 +121,7 @@ public class ParsedConfigFile {
     public void replaceKey(String oldKey, String newKey) {
         oldKey = oldKey.toLowerCase();
         for (ParsedConfigLine line : lines) {
-            if (line.getKey().equals(oldKey)) {
+            if (line.getKey().equalsIgnoreCase(oldKey)) {
                 line.setKey(newKey);
             }
         }
@@ -131,7 +131,7 @@ public class ParsedConfigFile {
         key = key.toLowerCase();
         boolean found = false;
         for (ParsedConfigLine line : lines) {
-            if (line.getKey().equals(key)) {
+            if (line.getKey().equalsIgnoreCase(key)) {
                 line.setValue(value);
                 found = true;
             }

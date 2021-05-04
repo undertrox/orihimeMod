@@ -71,6 +71,10 @@ public class ButtonMapping {
 
     public AbstractButton get(String key) {
         String mapping = mappings.get(key);
+        if (mapping == null) {
+            System.out.println("Could not find mapping for " + key);
+            return null;
+        }
         if (mapping.toLowerCase().startsWith("checkbox.")) {
             return checkboxes.get(Integer.parseInt(mapping.substring(9)));
         } else if (mapping.toLowerCase().startsWith("button.")) {

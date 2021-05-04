@@ -23,6 +23,11 @@ public class Config {
     protected String filename;
     public ButtonMapping mapping;
     public int AUTOSAVE_MAX_AGE = 86400;
+
+    public boolean smartFolding = true;
+    public DefaultValues defaultVals = new DefaultValues();
+
+
     List<Keybind> keybinds = new ArrayList<>();
 
     Config() {

@@ -30,6 +30,23 @@ public class OrihimeFrame extends ap {
         this.keijiban = textRenderer;
     }
 
+    public void setShowHelp(boolean showHelp) {
+        ikaisetuhyouji = showHelp? 1 : 0;
+    }
+
+    public void setHelpImage(String path) {
+        this.img_kaisetu_fname = path;
+        readImageFromFile3();
+    }
+
+    public boolean getShowHelp() {
+        return ikaisetuhyouji >= 1;
+    }
+
+    public void readImageFromFile3() {
+        super.readImageFromFile3();
+    }
+
     public Egaki_Syokunin getEs1() {
         return this.es1;
     }

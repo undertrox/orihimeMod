@@ -121,7 +121,6 @@ public class ConfigFileManager {
     private void updateKeybindNames(ParsedConfigFile file) {
         ButtonMapping oldMapping = ButtonMapping.load("0.3.2", "3.054");
         for (Pair<String, String> configPair : file.getAllPairs()) {
-            System.out.println(configPair.getKey().substring(16));
             String newName = oldMapping.getKey(configPair.getKey().substring(16));
             if (newName != null) {
                 file.replaceKey(configPair.getKey(), newName);
@@ -158,53 +157,112 @@ public class ConfigFileManager {
     private Pair<String, String> parsePair(Pair<String, String> pair, Config config) {
         String key = pair.getKey().toLowerCase();
         String value = pair.getValue().toLowerCase();
-        if (key.equals("orihimekeybinds.generatedversion")) {
-            config.GENERATED_VERSION = value;
-        } else if (key.equals("orihimekeybinds.showkeybindidtooltips")) {
-            config.SHOW_NUMBER_TOOLTIPS = Boolean.parseBoolean(value);
-        } else if (key.equals("orihimekeybinds.showkeybindtooltips")) {
-            config.SHOW_KEYBIND_TOOLTIPS = Boolean.parseBoolean(value);
-        } else if (key.equals("orihimedarkmode.enable")) {
-            config.DARK_MODE = Boolean.parseBoolean(value);
-        } else if (key.equals("orihimeexpertmode.enable")) {
-            config.EXPERT_MODE = Boolean.parseBoolean(value);
-        } else if ((key.matches("orihimekeybinds.button.[0-9]+"))) {
-            Keybind keybind = parseKeybind(pair, Keybind.BUTTON);
-            if (keybind != null) {
-                config.keybinds.add(keybind);
-            }
-        } else if (key.matches("orihimekeybinds.checkbox.[0-9]+")) {
-            Keybind keybind = parseKeybind(pair, Keybind.CHECKBOX);
-            if (keybind != null) {
-                config.keybinds.add(keybind);
-            }
-        } else if (key.equals("orihimekeybinds.toggletype")) {
-            Keybind keybind = parseKeybind(pair, Keybind.TOGGLE_TYPE);
-            if (keybind != null) {
-                config.keybinds.add(keybind);
-            }
-        } else if (key.equals("orihimemod.autosave.enable")) {
-            config.AUTOSAVE = Boolean.parseBoolean(value);
-        } else if (key.equals("orihimemod.autosave.interval")) {
-            config.AUTOSAVE_INTERVAL = Integer.parseInt(value);
-        } else if (key.equals("orihimemod.autosave.maxage")) {
-            config.AUTOSAVE_MAX_AGE = Integer.parseInt(value);
-        } else if (key.equals("orihimemod.showhelptooltips")) {
-            config.SHOW_HELP_TOOLTIPS = Boolean.parseBoolean(value);
-        } else if (key.equals("orihimemod.save.newbehavior")) {
-            config.USE_NEW_SAVE_BEHAVIOR = Boolean.parseBoolean(value);
-        }
-        else //noinspection StatementWithEmptyBody
-            if (key.equals("orihimeadditionalsavebuttons.enable")) {
-                // for compatibility, but ignored
-        } else {
-            Keybind keybind = parseKeybind(pair, Keybind.ABSTRACT_BUTTON);
-            if (keybind != null) {
+        Keybind keybind;
+        switch (key) {
+            case "orihimekeybinds.generatedversion":
+                config.GENERATED_VERSION = value;
+                break;
+            case "orihimekeybinds.showkeybindidtooltips":
+                config.SHOW_NUMBER_TOOLTIPS = Boolean.parseBoolean(value);
+                break;
+            case "orihimekeybinds.showkeybindtooltips":
+                config.SHOW_NUMBER_TOOLTIPS = Boolean.parseBoolean(value);
+                break;
+            case "orihimedarkmode.enable":
+                config.DARK_MODE = Boolean.parseBoolean(value);
+                break;
+            case "orihimeexpertmode.enable":
+                config.EXPERT_MODE = Boolean.parseBoolean(value);
+                break;
+            case "orihimekeybinds.toggletype":
+                keybind = parseKeybind(pair, Keybind.TOGGLE_TYPE);
+                if (keybind != null) {
+                    config.keybinds.add(keybind);
+                }
+                break;
+            case "orihimemod.autosave.enable":
+                config.AUTOSAVE = Boolean.parseBoolean(value);
+                break;
+            case "orihimemod.autosave.interval":
+                config.AUTOSAVE_INTERVAL = Integer.parseInt(value);
+                break;
+            case "orihimemod.autosave.maxage":
+                config.AUTOSAVE_MAX_AGE = Integer.parseInt(value);
+                break;
+            case "orihimemod.showhelptooltips":
+                config.SHOW_HELP_TOOLTIPS = Boolean.parseBoolean(value);
+                break;
+            case "orihimemod.save.newbehavior":
+                config.USE_NEW_SAVE_BEHAVIOR = Boolean.parseBoolean(value);
+                break;
+            case "orihimeadditionalsavebuttons.enable":
+                break;
+            case "orihimemod.default.undosteps":
+                config.defaultVals.undoSteps = Integer.parseInt(value);
+                break;
+            case "orihimemod.default.foldedmodelundosteps":
+                config.defaultVals.foldedModelUndoSteps = Integer.parseInt(value);
+                break;
+            case "orihimemod.default.auxlineundosteps":
+                config.defaultVals.auxLineUndoSteps = Integer.parseInt(value);
+                break;
+            case "orihimemod.default.linethickness":
+                config.defaultVals.lineThickness = Integer.parseInt(value);
+                break;
+            case "orihimemod.default.auxlinethickness":
+                config.defaultVals.auxLineThickness = Integer.parseInt(value);
+                break;
+            case "orihimemod.default.pointsize":
+                config.defaultVals.pointSize = Integer.parseInt(value);
+                break;
+            case "orihimemod.default.showhelp":
+                config.defaultVals.showHelp = Boolean.parseBoolean(value);
+                break;
+            case "orihimemod.default.gridsize":
+                config.defaultVals.gridSize = Integer.parseInt(value);
+                break;
+            case "orihimemod.default.griddivsize":
+                config.defaultVals.gridDivSize = Integer.parseInt(value);
+                break;
+            case "orihimemod.default.gridmode":
+                config.defaultVals.gridMode = DefaultValues.GridMode.fromId(Integer.parseInt(value));
+                break;
+            case "orihimemod.default.gridassist":
+                config.defaultVals.gridAssist = Boolean.parseBoolean(value);
+                break;
+            case "orihimemod.default.antialiasing":
+                config.defaultVals.antialiasing = Boolean.parseBoolean(value);
+                break;
+            case "orihimemod.default.foldedmodelantialiasing":
+                config.defaultVals.foldedModelAntiAliasing = Boolean.parseBoolean(value);
+                break;
+            case "orihimemod.smartfolding.enable":
+                config.smartFolding = Boolean.parseBoolean(value);
+                break;
+            case "orihimemod.default.gridangle":
+                config.defaultVals.gridAngle = Double.parseDouble(value);
+                break;
+            default:
+                if ((key.matches("orihimekeybinds.button.[0-9]+"))) {
+                    keybind = parseKeybind(pair, Keybind.BUTTON);
+                    if (keybind != null) {
+                        config.keybinds.add(keybind);
+                    }
+                } else if (key.matches("orihimekeybinds.checkbox.[0-9]+")) {
+                    keybind = parseKeybind(pair, Keybind.CHECKBOX);
+                    if (keybind != null) {
+                        config.keybinds.add(keybind);
+                    }
+                }  else {
+                    keybind = parseKeybind(pair, Keybind.ABSTRACT_BUTTON);
+                    if (keybind != null) {
 
-                config.keybinds.add(keybind);
-                return new Pair<>(keybind.getConfigID(), keybind.getConfigValue());
-            }
+                        config.keybinds.add(keybind);
+                        return new Pair<>(keybind.getConfigID(), keybind.getConfigValue());
+                    }
+                }
         }
+
         return pair;
     }
 

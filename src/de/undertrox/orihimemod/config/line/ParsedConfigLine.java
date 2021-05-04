@@ -13,7 +13,7 @@ public abstract class ParsedConfigLine {
     }
 
     public String getKey() {
-        return key.toLowerCase();
+        return key;
     }
 
     public void setValue(String value) {
