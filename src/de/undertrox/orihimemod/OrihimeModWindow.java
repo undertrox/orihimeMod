@@ -64,9 +64,8 @@ public class OrihimeModWindow {
 
     public ResourceBundle tooltips;
 
-    // TODO: implement default values for various fields
-    // TODO: implement smart folding
     // TODO: Automatic selection of the latest folded model on delete
+    // TODO: make keybinds work with ad_fnc
     public OrihimeModWindow() {
         JFrame loadingFrame = initLoadingFrame();
         System.out.println("OrihimeMod version " + version + " is Starting...");
