@@ -21,11 +21,14 @@ import jp.gr.java_conf.mt777.origami.orihime.ap;
 import jp.gr.java_conf.mt777.zukei2d.senbun.Senbun;
 import jp.gr.java_conf.mt777.zukei2d.ten.Ten;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 import java.util.*;
 
@@ -65,12 +68,14 @@ public class OrihimeModWindow {
     // TODO: implement smart folding
     // TODO: Automatic selection of the latest folded model on delete
     public OrihimeModWindow() {
+        JFrame loadingFrame = initLoadingFrame();
         System.out.println("OrihimeMod version " + version + " is Starting...");
         initConfig();
         initButtonMapping();
         loadToolTipFile();
         System.out.println("Starting Orihime...");
         initOrihimeFrame();
+        frame.setVisible(false);
         indexOriginalUI();
         initOwnUI();
         applyDefaults();
@@ -78,46 +83,36 @@ public class OrihimeModWindow {
             askWhichSavingBehavior();
         }
         initAutosaver();
+        frame.setVisible(true);
+        loadingFrame.setVisible(false);
+        loadingFrame.dispose();
     }
 
-    private void applyDefaults() {
-        Config config = configManager.getConfig();
-        DefaultValues dv = config.defaultVals;
-        frame.setShowHelp(dv.showHelp);
-        setTextFieldNextToButtonTo(String.valueOf(dv.undoSteps), mapping.get("set_undo_steps"));
-        setTextFieldNextToButtonTo(String.valueOf(dv.foldedModelUndoSteps), mapping.get("set_undo_steps_folded"));
-        setTextFieldNextToButtonTo(String.valueOf(dv.auxLineUndoSteps), mapping.get("set_undo_steps_sep_aux_line"));
-        setTextFieldNextToButtonTo(String.valueOf(dv.gridSize), mapping.get("set_grid_divisions"));
-        setTextFieldNextToButtonTo(String.valueOf(dv.gridDivSize), mapping.get("set_helper_grid_lines_interval"));
-        setTextFieldNextToButtonTo(String.valueOf(dv.gridAngle), mapping.get("set_grid_additional_params"));
-        setUsingIncDecBtns("inc_line_width", "dec_line_width", 1, dv.lineThickness);
-        setUsingIncDecBtns("inc_point_size", "dec_point_size", 1, dv.pointSize);
-        setUsingIncDecBtns("inc_sep_aux_line_width", "dec_sep_aux_line_width", 1, dv.auxLineThickness);
-        mapping.get("grid_assist").setSelected(dv.gridAssist);
-        frame.OZ.js.set_i_anti_alias(dv.foldedModelAntiAliasing? 1 : 0);
-        frame.setHelpImage("qqq/a__hajimeni.png");
-    }
-
-    private void setTextFieldNextToButtonTo(String val, AbstractButton button) {
-        List<Component> components = Arrays.asList(button.getParent().getComponents());
-        JTextField textfield = (JTextField) components.get(components.indexOf(button)-1);
-        textfield.setText(val);
-        button.doClick();
-    }
-
-    private void setUsingIncDecBtns(String mappingIncBtn, String mappingDecBtn,
-                                    int defaultVal, int value) {
-        AbstractButton incBtn = mapping.get(mappingIncBtn);
-        AbstractButton decBtn = mapping.get(mappingDecBtn);
-        if (value < defaultVal) {
-            for (int i = defaultVal; i>value; i--) {
-                decBtn.doClick();
-            }
-        } else if (value > defaultVal) {
-            for (int i = defaultVal; i<value; i++) {
-                incBtn.doClick();
-            }
+    private JFrame initLoadingFrame() {
+        JFrame loadingFrame = new JFrame();
+        URL img = getClass().getResource("/de/undertrox/orihimemod/config/orihimeloadingscreen.png");
+        Image image = null;
+        try {
+            image = ImageIO.read(img);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        Image finalImage = image;
+        JPanel panel = new JPanel(){
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(finalImage, 0, 0, null);
+            }
+        };
+        JLabel l = new JLabel("Orihime is loading...");
+        l.setHorizontalAlignment(SwingConstants.CENTER);
+        loadingFrame.add(panel);
+        loadingFrame.setSize(image.getWidth(null), image.getHeight(null));
+        loadingFrame.setUndecorated(true);
+        loadingFrame.setLocationRelativeTo(null);
+        loadingFrame.setVisible(true);
+        return loadingFrame;
     }
 
     public void show() {
@@ -337,6 +332,48 @@ public class OrihimeModWindow {
         }
     }
 
+    private void applyDefaults() {
+        Config config = configManager.getConfig();
+        DefaultValues dv = config.defaultVals;
+        frame.setShowHelp(dv.showHelp);
+        setTextFieldNextToButtonTo(String.valueOf(dv.undoSteps), mapping.get("set_undo_steps"));
+        setTextFieldNextToButtonTo(String.valueOf(dv.foldedModelUndoSteps), mapping.get("set_undo_steps_folded"));
+        setTextFieldNextToButtonTo(String.valueOf(dv.auxLineUndoSteps), mapping.get("set_undo_steps_sep_aux_line"));
+        setTextFieldNextToButtonTo(String.valueOf(dv.gridSize), mapping.get("set_grid_divisions"));
+        setTextFieldNextToButtonTo(String.valueOf(dv.gridDivSize), mapping.get("set_helper_grid_lines_interval"));
+        setTextFieldNextToButtonTo(String.valueOf(dv.gridAngle), mapping.get("set_grid_additional_params"));
+        setUsingIncDecBtns("inc_line_width", "dec_line_width", 1, dv.lineThickness);
+        setUsingIncDecBtns("inc_point_size", "dec_point_size", 1, dv.pointSize);
+        setUsingIncDecBtns("inc_sep_aux_line_width", "dec_sep_aux_line_width", 1, dv.auxLineThickness);
+        mapping.get("grid_assist").setSelected(dv.gridAssist);
+        System.out.println("gm " + dv.gridMode.getId());
+        frame.getEs1().set_i_kitei_jyoutai(dv.gridMode.getId());
+        frame.OZ.js.set_i_anti_alias(dv.foldedModelAntiAliasing? 1 : 0);
+        frame.setHelpImage("qqq/a__hajimeni.png");
+    }
+
+    private void setTextFieldNextToButtonTo(String val, AbstractButton button) {
+        List<Component> components = Arrays.asList(button.getParent().getComponents());
+        JTextField textfield = (JTextField) components.get(components.indexOf(button)-1);
+        textfield.setText(val);
+        button.doClick();
+    }
+
+    private void setUsingIncDecBtns(String mappingIncBtn, String mappingDecBtn,
+                                    int defaultVal, int value) {
+        AbstractButton incBtn = mapping.get(mappingIncBtn);
+        AbstractButton decBtn = mapping.get(mappingDecBtn);
+        if (value < defaultVal) {
+            for (int i = defaultVal; i>value; i--) {
+                decBtn.doClick();
+            }
+        } else if (value > defaultVal) {
+            for (int i = defaultVal; i<value; i++) {
+                incBtn.doClick();
+            }
+        }
+    }
+
     private void initAutosaver() {
         Config config = configManager.getConfig();
         System.out.println("Configuring autosaver");
@@ -490,7 +527,6 @@ public class OrihimeModWindow {
                         }
                     }
                 }
-                System.out.println();
             }
             oldListener.actionPerformed(e);
         });

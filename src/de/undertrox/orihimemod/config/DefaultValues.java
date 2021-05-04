@@ -17,7 +17,7 @@ public class DefaultValues {
     public boolean foldedModelAntiAliasing = false;
 
     public enum GridMode {
-        NO_GRID(1), GRID_ON_SQUARE(2), GRID_EVERYWHERE(3);
+        NO_GRID(0), GRID_ON_SQUARE(1), GRID_EVERYWHERE(2);
         int id;
 
         GridMode(int id) {
@@ -30,9 +30,9 @@ public class DefaultValues {
 
         public static GridMode fromId(int id) {
             switch (id) {
-                case 2: return GRID_ON_SQUARE;
-                case 3: return GRID_EVERYWHERE;
-                case 1:
+                case 1: return GRID_ON_SQUARE;
+                case 2: return GRID_EVERYWHERE;
+                case 0:
                 default:
                     return NO_GRID;
             }
