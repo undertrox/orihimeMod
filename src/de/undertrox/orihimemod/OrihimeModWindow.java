@@ -310,7 +310,10 @@ public class OrihimeModWindow {
 
     private JFrame initLoadingFrame() {
         JFrame loadingFrame = new JFrame();
-        URL img = getClass().getResource("/de/undertrox/orihimemod/config/orihimeloadingscreen.png");
+        WeightedRandom<String> loadingScreens = new WeightedRandom<>();
+        loadingScreens.addItem("/de/undertrox/orihimemod/config/orihimeloadingscreen.png", 1);
+        loadingScreens.addItem("/de/undertrox/orihimemod/config/orihimeloadingscreen.png", 100);
+        URL img = getClass().getResource(loadingScreens.generate());
         Image image = null;
         try {
             image = ImageIO.read(img);

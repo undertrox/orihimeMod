@@ -6,6 +6,8 @@ import jp.gr.java_conf.mt777.kiroku.memo.Memo;
 import jp.gr.java_conf.mt777.origami.dougu.keijiban.TextRenderer;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.ExposeES;
+import jp.gr.java_conf.mt777.origami.orihime.jyougehyou_syokunin.Jyougehyou_Syokunin_Mod;
+import jp.gr.java_conf.mt777.origami.orihime.oriagari_zu.Oriagari_Zu;
 import jp.gr.java_conf.mt777.zukei2d.ten.Ten;
 
 import javax.swing.*;
@@ -29,6 +31,7 @@ public class OrihimeFrame extends ap {
         this.config = config;
         this.textRenderer = new TextRenderer(this);
         this.keijiban = textRenderer;
+        this.OZ.js = new Jyougehyou_Syokunin_Mod(this);
     }
 
     public int getI_OAZ() {
@@ -342,6 +345,12 @@ public class OrihimeFrame extends ap {
         for (int i = 0; i < amount; i++) {
             super.mouseWheelMoved(newEvent);
         }
+    }
+
+    @Override
+    public void OAZ_add_new_Oriagari_Zu() {
+        super.OAZ_add_new_Oriagari_Zu();
+        ((Oriagari_Zu) OAZ.get(OAZ.size()-1)).js = new Jyougehyou_Syokunin_Mod(this);
     }
 
     @Override
