@@ -65,6 +65,10 @@ public class OrihimeModWindow {
     public ResourceBundle tooltips;
 
     public OrihimeModWindow() {
+        this(null);
+    }
+
+    public OrihimeModWindow(String path) {
         System.out.println("OrihimeMod version " + version + " is Starting...");
         JFrame loadingFrame = initLoadingFrame();
         initConfig();
@@ -72,17 +76,19 @@ public class OrihimeModWindow {
         loadToolTipFile();
         System.out.println("Starting Orihime...");
         initOrihimeFrame();
-        frame.setVisible(false);
+        if (path != null) {
+            frame.open(path);
+        }
         indexOriginalUI();
         initOwnUI();
         applyDefaults();
-        if (configManager.getConfig().justUpdatedTo0_2_0) {
-            askWhichSavingBehavior();
-        }
         initAutosaver();
         frame.setVisible(true);
         loadingFrame.setVisible(false);
         loadingFrame.dispose();
+        if (configManager.getConfig().justUpdatedTo0_2_0) {
+            askWhichSavingBehavior();
+        }
     }
 
     public void show() {
@@ -346,6 +352,12 @@ public class OrihimeModWindow {
         System.out.println("gm " + dv.gridMode.getId());
         frame.getEs1().set_i_kitei_jyoutai(dv.gridMode.getId());
         frame.OZ.js.set_i_anti_alias(dv.foldedModelAntiAliasing ? 1 : 0);
+        AbstractButton btn = mapping.get(dv.defaultTool);
+        if (btn != null) {
+            btn.doClick();
+        } else {
+            System.out.println("Warning: default tool '"+ dv.defaultTool + "' could not be found");
+        }
         frame.setHelpImage("qqq/a__hajimeni.png");
     }
 
@@ -435,7 +447,7 @@ public class OrihimeModWindow {
         frame.setTitle(title);
         Config config = configManager.getConfig();
         addTooltips(config.showNumberTooltips(), config.showKeybindTooltips(), config.showHelpTooltips());
-        KeyListener listener = new KeybindListener(mapping, config.keybinds());
+        KeyListener listener = new KeybindListener(mapping, configManager);
         frame.addKeyListener(listener);
         addKeyListenerToChildren(listener, frame);
         frame.adFncFrame().addKeyListener(listener);
@@ -457,7 +469,7 @@ public class OrihimeModWindow {
                 saveBeforeAction(() -> {
                     autosaver.stop();
                     frame.adFncFrame().dispose();
-                    e.getWindow().dispose();
+                    System.exit(0);
                 });
             }
         });
@@ -728,6 +740,14 @@ public class OrihimeModWindow {
 
     private void initOrihimeFrame() {
         frame = new OrihimeFrame();
+        frame.setVisible(false);
+        frame.setSize(1200, 700);
+        if (configManager.getConfig().startMaximized) {
+            frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        }
+        frame.setLocationRelativeTo(null);
+        frame.Frame_tuika();
+        frame.adFncFrame().setVisible(false);
         frame.observers.add((newCfs, newFs) -> {
             this.filename = newFs;
             this.fullFileName = newCfs;
@@ -738,12 +758,8 @@ public class OrihimeModWindow {
                 changed = true;
             }
         });
-        frame.setSize(1200, 700);
-        frame.setLocationRelativeTo(null);
         exposeMethods = new Expose(frame);
 
-        frame.Frame_tuika();
-        frame.adFncFrame().setVisible(false);
     }
 
     class RightClickListener extends MouseAdapter {
@@ -775,7 +791,7 @@ public class OrihimeModWindow {
                 currentKeybindID = keybindId;
                 removeKeybind.removeAll();
                 for (Keybind keybind : configManager.getConfig().keybinds()) {
-                    if (keybind.getConfigID().equals(currentKeybindID)) {
+                    if (keybind.getConfigID().equalsIgnoreCase(currentKeybindID)) {
                         JMenuItem rk = new JMenuItem(keybind.toString());
                         removeKeybind.add(rk);
                         rk.addActionListener(ev -> {
@@ -783,6 +799,7 @@ public class OrihimeModWindow {
                             config.keybinds().remove(keybind);
                             configManager.saveChangesToFile();
                             config = configManager.getConfig();
+
                             addTooltips(config.showNumberTooltips(), config.showKeybindTooltips(), config.showHelpTooltips());
                         });
                     }

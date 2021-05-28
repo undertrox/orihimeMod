@@ -15,6 +15,7 @@ public class ConfigFileManager {
 
     private Config config;
     private final String fileName;
+    private boolean justUpdatedTo2_0 = false;
 
     public ConfigFileManager(String fileName) {
         this.fileName = fileName;
@@ -31,7 +32,8 @@ public class ConfigFileManager {
     }
 
     private static ParsedConfigFile getAddedConfig(String version) {
-        return ParsedConfigFile.fromStream(Config.class.getResourceAsStream("../configFiles/" + version + ".cfg"));
+        System.out.println("Loading " + version + ".cfg");
+        return ParsedConfigFile.fromStream(Config.class.getResourceAsStream("configFiles/" + version + ".cfg"));
     }
 
     private static ParsedConfigFile getAddedConfigSince(String version) {
@@ -53,6 +55,7 @@ public class ConfigFileManager {
             updateToNewestVersion();
             System.out.println("Reloading Config file...");
             load();
+            config.justUpdatedTo0_2_0 = this.justUpdatedTo2_0;
         }
     }
 
@@ -109,6 +112,7 @@ public class ConfigFileManager {
         ParsedConfigFile file = ParsedConfigFile.fromFile(fileName);
         if (Arrays.asList(getVersionsBetween(version, OrihimeMod.version)).contains("0.2.0")) {
             config.justUpdatedTo0_2_0 = true;
+            this.justUpdatedTo2_0 = true;
         }
         if (Arrays.asList(getVersionsBetween(version, OrihimeMod.version)).contains("1.0.0")) {
             updateKeybindNames(file);
@@ -161,6 +165,9 @@ public class ConfigFileManager {
         switch (key) {
             case "orihimekeybinds.generatedversion":
                 config.GENERATED_VERSION = value;
+                break;
+            case "orihimemod.useutf8":
+                config.useUtf8 = Boolean.parseBoolean(value);
                 break;
             case "orihimekeybinds.showkeybindidtooltips":
                 config.SHOW_NUMBER_TOOLTIPS = Boolean.parseBoolean(value);
@@ -233,8 +240,14 @@ public class ConfigFileManager {
             case "orihimemod.default.antialiasing":
                 config.defaultVals.antialiasing = Boolean.parseBoolean(value);
                 break;
+            case "orihimemod.startmaximized":
+                config.startMaximized = Boolean.parseBoolean(value);
+                break;
             case "orihimemod.default.foldedmodelantialiasing":
                 config.defaultVals.foldedModelAntiAliasing = Boolean.parseBoolean(value);
+                break;
+            case "orihimemod.default.tool":
+                config.defaultVals.defaultTool = value;
                 break;
             case "orihimemod.smartfolding.enable":
                 config.smartFolding = Boolean.parseBoolean(value);

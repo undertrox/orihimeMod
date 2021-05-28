@@ -15,6 +15,7 @@ public class DefaultValues {
     public boolean gridAssist = false;
     public boolean antialiasing = false;
     public boolean foldedModelAntiAliasing = false;
+    public String defaultTool = "draw_restricted_line";
 
     public enum GridMode {
         NO_GRID(0), GRID_ON_SQUARE(1), GRID_EVERYWHERE(2);

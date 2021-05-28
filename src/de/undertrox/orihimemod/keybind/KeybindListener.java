@@ -1,5 +1,6 @@
 package de.undertrox.orihimemod.keybind;
 
+import de.undertrox.orihimemod.config.ConfigFileManager;
 import de.undertrox.orihimemod.mapping.ButtonMapping;
 
 import java.awt.event.KeyEvent;
@@ -9,11 +10,15 @@ import java.util.List;
 public class KeybindListener implements KeyListener {
     static boolean toggle = false;
     ButtonMapping mapping;
-    List<Keybind> keybinds;
+    ConfigFileManager configFileManager;
 
-    public KeybindListener(ButtonMapping mapping, List<Keybind> keybinds) {
+    public KeybindListener(ButtonMapping mapping, ConfigFileManager configFileManager) {
         this.mapping = mapping;
-        this.keybinds = keybinds;
+        this.configFileManager = configFileManager;
+    }
+
+    private List<Keybind> keybinds() {
+        return configFileManager.getConfig().keybinds();
     }
 
     @Override
@@ -22,7 +27,7 @@ public class KeybindListener implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        for (Keybind keybind : keybinds) {
+        for (Keybind keybind : keybinds()) {
             if (keybind.matches(e)) {
                 if (keybind.getType() == Keybind.TOGGLE_TYPE) {
                     if (!toggle) {
@@ -43,7 +48,7 @@ public class KeybindListener implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-        for (Keybind keybind : keybinds) {
+        for (Keybind keybind : keybinds()) {
             if (keybind.matches(e) && keybind.getType() == Keybind.TOGGLE_TYPE) {
                 if (toggle) {
                     if (mapping.get("mountain").getBackground().getRed() > 200) {

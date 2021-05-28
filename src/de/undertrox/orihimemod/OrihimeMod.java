@@ -15,8 +15,12 @@ public class OrihimeMod {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
-
-        OrihimeModWindow window = new OrihimeModWindow();
+        OrihimeModWindow window;
+        if (args.length > 0) {
+            window = new OrihimeModWindow(String.join(" ", args));
+        } else {
+            window = new OrihimeModWindow();
+        }
         window.show();
         System.out.println("OrihimeMod is now running");
         System.out.println(MouseEvent.BUTTON2);

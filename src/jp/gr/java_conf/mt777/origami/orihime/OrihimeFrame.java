@@ -32,6 +32,46 @@ public class OrihimeFrame extends ap {
         return i_OAZ;
     }
 
+    public void open(String path) {
+        i_mouseDragged_yuukou=0; i_mouseReleased_yuukou=0;
+        Memo memo_temp;
+
+        File file = new File(path);
+        if (!file.exists()) {
+            System.out.println("Could not find " + path);
+            return;
+        }
+
+        memo_temp = getMemoFromFile(file.getParent(), file.getName());
+
+        if(memo_temp.getGyousuu()>0){
+            tenkaizu_syokika();
+            es1.reset();
+            es1.set_i_kitei_jyoutai(0);
+
+            icol=1;	es1.setcolor(icol);
+            ButtonCol_irokesi();ButtonCol_red.setForeground(Color.black);ButtonCol_red.setBackground(Color.red);
+            OZ =temp_OZ;
+            OAZ.clear();OAZ_add_new_Oriagari_Zu(); set_i_OAZ(0);
+            settei_syokika_yosoku();
+
+            Button_F_color.setBackground(OZ.oriagarizu_F_color);
+            Button_B_color.setBackground(OZ.oriagarizu_B_color);
+            Button_L_color.setBackground(OZ.oriagarizu_L_color);
+            es1.setCamera(camera_of_orisen_nyuuryokuzu);
+            es1.setMemo_for_yomikomi(memo_temp);es1.kiroku();
+
+            d_syukusyaku_keisuu=camera_of_orisen_nyuuryokuzu.get_camera_bairitsu_x();
+            text27.setText(String.valueOf(d_syukusyaku_keisuu));
+            text27.setCaretPosition(0);
+
+            d_kaiten_hosei=camera_of_orisen_nyuuryokuzu.get_camera_kakudo();
+            text28.setText(String.valueOf(d_kaiten_hosei));
+            text28.setCaretPosition(0);
+
+        }
+    }
+
     @Override
     public void Frame_tuika() {
         if (add_frame != null) {
@@ -52,20 +92,9 @@ public class OrihimeFrame extends ap {
                     e.getWindow().setVisible(false);
                 }
             });
-            //add_frame = new OpenFrame("add_frame",this);
         }
         i_add_frame=1;
         add_frame.toFront();
-        /*if(i_add_frame==1){System.out.println("111 i_add_frame="+i_add_frame);
-            //add_frame.setVisible(false);
-            //i_add_frame = 0;
-        }
-
-        add_frame.setVisible(true);
-        if(i_add_frame==0){System.out.println("000 i_add_frame="+i_add_frame);
-        }
-        i_add_frame=1;
-        add_frame.toFront();*/
     }
 
     public Frame adFncFrame() {
@@ -111,29 +140,28 @@ public class OrihimeFrame extends ap {
 
     @Override
     public Memo readFile2Memo() {
-        String fname;
-        Memo memo_temp = new Memo();
-
-        boolean file_ok=false;
 
         FileDialog fd = new FileDialog(this,"Open File",FileDialog.LOAD);
         fd.setVisible(true);
-        fname = fd.getDirectory() + fd.getFile();
 
+        return getMemoFromFile(fd.getDirectory(), fd.getFile());
+    }
+
+    private Memo getMemoFromFile(String directory, String file) {
+        boolean file_ok = false;
+        String fname = (directory == null? "" : directory + "/") + file;
         if(fname.endsWith("orh")){ file_ok=true;}
         if(fname.endsWith("obj")){ file_ok=true;}
         if(fname.endsWith("cp")){ file_ok=true;}
-
+        Memo memo_temp = new Memo();
+        if (!file_ok) return memo_temp;
         textRenderer = new TextRenderer(this);
-        if( !file_ok){
-            return memo_temp;
-        }
 
         // Op button
         if (!img_kaisetu_fname.equals("qqq/yomi_tuika.png")) { // Normal Open button
-            frame_title=frame_title_0+"        "+fd.getFile();
+            frame_title=frame_title_0+"        "+ file;
             setTitle(frame_title);es1.set_title(frame_title);
-            fileName = fd.getFile();
+            fileName = file;
             // Remove extension
             if (fileName.lastIndexOf(".") > 0) {
                 fileName = fileName.substring(0, fileName.lastIndexOf(".")-1);
@@ -144,8 +172,11 @@ public class OrihimeFrame extends ap {
 
 
         try {
-            if(fd.getFile()!=null) {  //�L�����Z���ł͂Ȃ��ꍇ�B
-                BufferedReader br = new BufferedReader(new FileReader(fname));
+            if(file!=null) {  //�L�����Z���ł͂Ȃ��ꍇ�B
+
+                BufferedReader br = new BufferedReader(
+                        new InputStreamReader(
+                            new FileInputStream(fname), StandardCharsets.UTF_8));
                 String rdata;
                 memo1.reset();
                 while((rdata = br.readLine()) != null) {
