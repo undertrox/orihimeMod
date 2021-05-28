@@ -1,6 +1,7 @@
 package jp.gr.java_conf.mt777.origami.orihime;
 
 import de.undertrox.orihimemod.button.TextButton;
+import de.undertrox.orihimemod.config.Config;
 import jp.gr.java_conf.mt777.kiroku.memo.Memo;
 import jp.gr.java_conf.mt777.origami.dougu.keijiban.TextRenderer;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
@@ -22,8 +23,10 @@ public class OrihimeFrame extends ap {
     public List<Observer> observers = new ArrayList<>();
     public TextRenderer textRenderer;
     public JTextField textField = new JTextField();
+    public Config config;
 
-    public OrihimeFrame() {
+    public OrihimeFrame(Config config) {
+        this.config = config;
         this.textRenderer = new TextRenderer(this);
         this.keijiban = textRenderer;
     }
@@ -175,8 +178,10 @@ public class OrihimeFrame extends ap {
             if(file!=null) {  //�L�����Z���ł͂Ȃ��ꍇ�B
 
                 BufferedReader br = new BufferedReader(
-                        new InputStreamReader(
-                            new FileInputStream(fname), StandardCharsets.UTF_8));
+                        config.useUtf8?
+                                new InputStreamReader(new FileInputStream(fname), StandardCharsets.UTF_8)
+                                : new FileReader(fname)
+                        );
                 String rdata;
                 memo1.reset();
                 while((rdata = br.readLine()) != null) {
@@ -187,8 +192,10 @@ public class OrihimeFrame extends ap {
                 String textFile = fname + "text";
                 String buffer;
                 StringBuilder content = new StringBuilder();
-                BufferedReader tbr = new BufferedReader(new InputStreamReader(
-                        new FileInputStream(textFile), StandardCharsets.UTF_8));
+                BufferedReader tbr = new BufferedReader(config.useUtf8?
+                        new InputStreamReader(new FileInputStream(textFile), StandardCharsets.UTF_8)
+                        : new FileReader(textFile)
+                );
                 while ((buffer = tbr.readLine()) != null) {
                     content.append(buffer).append("\n");
                 }
@@ -340,8 +347,10 @@ public class OrihimeFrame extends ap {
     @Override
     void memoAndName2File(Memo memo1,String fname) {
         try {
-            BufferedWriter writer = new BufferedWriter
-                    (new OutputStreamWriter(new FileOutputStream(fname), StandardCharsets.UTF_8));
+            BufferedWriter writer = new BufferedWriter(
+                    config.useUtf8?
+                            new OutputStreamWriter(new FileOutputStream(fname), StandardCharsets.UTF_8)
+                            : new FileWriter(fname));
             for (int i=1;i<=memo1.getGyousuu();i++){
                 writer.write( memo1.getGyou(i) + "\n");
             }

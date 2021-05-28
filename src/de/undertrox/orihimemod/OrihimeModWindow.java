@@ -739,7 +739,7 @@ public class OrihimeModWindow {
     }
 
     private void initOrihimeFrame() {
-        frame = new OrihimeFrame();
+        frame = new OrihimeFrame(configManager.getConfig());
         frame.setVisible(false);
         frame.setSize(1200, 700);
         if (configManager.getConfig().startMaximized) {

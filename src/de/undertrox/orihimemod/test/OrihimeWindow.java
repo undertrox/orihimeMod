@@ -1,16 +1,16 @@
 package de.undertrox.orihimemod.test;
 
 import jp.gr.java_conf.mt777.origami.orihime.Expose;
-import jp.gr.java_conf.mt777.origami.orihime.ap;
+import jp.gr.java_conf.mt777.origami.orihime.OrihimeFrame;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class OrihimeWindow extends JFrame {
     public static JPanel canvas;
-    ap frame;
+    OrihimeFrame frame;
 
-    public OrihimeWindow(ap parentFrame) {
+    public OrihimeWindow(OrihimeFrame parentFrame) {
         super();
         frame = parentFrame;
         canvas = new JPanel();

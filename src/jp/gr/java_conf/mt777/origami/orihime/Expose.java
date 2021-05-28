@@ -1,11 +1,13 @@
 package jp.gr.java_conf.mt777.origami.orihime;
 
+import de.undertrox.orihimemod.config.Config;
 import jp.gr.java_conf.mt777.kiroku.memo.Memo;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -14,8 +16,10 @@ import java.util.List;
 public class Expose {
 
     private ap frame;
+    private Config config;
 
-    public Expose(ap frame) {
+    public Expose(OrihimeFrame frame) {
+        this.config = frame.config;
         this.frame = frame;
     }
 
@@ -57,8 +61,10 @@ public class Expose {
         Memo memo1 = new Memo();
         try {
 
-                BufferedReader br = new BufferedReader(new InputStreamReader(
-                    new FileInputStream(fname), StandardCharsets.UTF_8));
+                BufferedReader br = new BufferedReader(
+                    config.useUtf8?
+                        new InputStreamReader(new FileInputStream(fname), StandardCharsets.UTF_8)
+                        : new FileReader(fname));
 
                 String rdata;
 
