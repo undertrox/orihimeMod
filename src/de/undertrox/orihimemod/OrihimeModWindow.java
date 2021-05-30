@@ -325,7 +325,7 @@ public class OrihimeModWindow {
         WeightedRandom<String> loadingScreens = new WeightedRandom<>();
         loadingScreens.addItem("/de/undertrox/orihimemod/config/orihimeloadingscreen.png", 1);
         loadingScreens.addItem("/de/undertrox/orihimemod/config/Orihime_logo.png", 100);
-        URL img = getClass().getResource(loadingScreens.generate());
+        URL img = getClass().getResource(loadingScreens.getRandomItem());
         Image image = null;
         try {
             image = ImageIO.read(img);
@@ -349,8 +349,9 @@ public class OrihimeModWindow {
         progressBar.setString("Loading Config file");
         progressBar.setSize(image.getWidth(null), 3);
         progressBar.setBorderPainted(false);
-        progressBar.setForeground(Color.lightGray);
-        progressBar.setBackground(Color.white);
+        progressBar.setForeground(Color.getHSBColor(0,0,(255-45)/255f));
+        progressBar.setFont(Font.getFont("Arial"));
+        //progressBar.setBackground(Color.white);
         loadingFrame.add(progressBar);
         loadingFrame.setUndecorated(true);
         loadingFrame.setLocationRelativeTo(null);

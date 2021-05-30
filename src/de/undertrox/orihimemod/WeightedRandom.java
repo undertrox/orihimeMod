@@ -21,7 +21,7 @@ public class WeightedRandom<T> {
         sum += weight;
     }
 
-    public T generate() {
+    public T getRandomItem() {
         if (sum == 0) return null;
         int rnd = random.nextInt(sum);
         int index = -1;
