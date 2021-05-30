@@ -55,6 +55,8 @@ public class OrihimeModWindow {
     public JPopupMenu exportMenu;
     public OrihimeFrame frame;
 
+    public JProgressBar progressBar;
+
     public String filename = "";
     public String fullFileName = "";
 
@@ -74,15 +76,24 @@ public class OrihimeModWindow {
         initConfig();
         initButtonMapping();
         loadToolTipFile();
+        progressBar.setValue(1);
+        progressBar.setString("Initializing original Orihime");
         System.out.println("Starting Orihime...");
         initOrihimeFrame();
         if (path != null) {
             frame.open(path);
         }
+        progressBar.setValue(2);
+        progressBar.setString("adding own UI elements");
         indexOriginalUI();
         initOwnUI();
+        progressBar.setValue(3);
+        progressBar.setString("applying defaults");
         applyDefaults();
+        progressBar.setValue(4);
+        progressBar.setString("Starting autosaver");
         initAutosaver();
+        progressBar.setValue(5);
         frame.setVisible(true);
         loadingFrame.setVisible(false);
         loadingFrame.dispose();
@@ -310,9 +321,10 @@ public class OrihimeModWindow {
 
     private JFrame initLoadingFrame() {
         JFrame loadingFrame = new JFrame();
+        loadingFrame.getContentPane().setLayout(new BoxLayout(loadingFrame.getContentPane(), BoxLayout.Y_AXIS));
         WeightedRandom<String> loadingScreens = new WeightedRandom<>();
         loadingScreens.addItem("/de/undertrox/orihimemod/config/orihimeloadingscreen.png", 1);
-        loadingScreens.addItem("/de/undertrox/orihimemod/config/orihimeloadingscreen.png", 100);
+        loadingScreens.addItem("/de/undertrox/orihimemod/config/Orihime_logo.png", 100);
         URL img = getClass().getResource(loadingScreens.generate());
         Image image = null;
         try {
@@ -328,10 +340,18 @@ public class OrihimeModWindow {
                 g.drawImage(finalImage, 0, 0, null);
             }
         };
-        JLabel l = new JLabel("Orihime is loading...");
-        l.setHorizontalAlignment(SwingConstants.CENTER);
         loadingFrame.add(panel);
-        loadingFrame.setSize(image.getWidth(null), image.getHeight(null));
+        loadingFrame.setSize(image.getWidth(null), image.getHeight(null) + 30);
+        UIManager.put("ProgressBar.selectionForeground", Color.black);
+        UIManager.put("ProgressBar.selectionBackground", Color.black);
+        progressBar = new JProgressBar(SwingConstants.HORIZONTAL, 0, 5);
+        progressBar.setStringPainted(true);
+        progressBar.setString("Loading Config file");
+        progressBar.setSize(image.getWidth(null), 3);
+        progressBar.setBorderPainted(false);
+        progressBar.setForeground(Color.lightGray);
+        progressBar.setBackground(Color.white);
+        loadingFrame.add(progressBar);
         loadingFrame.setUndecorated(true);
         loadingFrame.setLocationRelativeTo(null);
         loadingFrame.setVisible(true);
