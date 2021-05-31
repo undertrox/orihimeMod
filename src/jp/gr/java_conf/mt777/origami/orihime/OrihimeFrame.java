@@ -4,6 +4,7 @@ import de.undertrox.orihimemod.button.TextButton;
 import de.undertrox.orihimemod.config.Config;
 import jp.gr.java_conf.mt777.kiroku.memo.Memo;
 import jp.gr.java_conf.mt777.origami.dougu.keijiban.TextRenderer;
+import jp.gr.java_conf.mt777.origami.dougu.orisensyuugou.OrisensyuugouMod;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.Egaki_Syokunin;
 import jp.gr.java_conf.mt777.origami.orihime.egaki_syokunin.ExposeES;
 import jp.gr.java_conf.mt777.origami.orihime.jyougehyou_syokunin.Jyougehyou_Syokunin_Mod;
@@ -32,6 +33,8 @@ public class OrihimeFrame extends ap {
         this.textRenderer = new TextRenderer(this);
         this.keijiban = textRenderer;
         this.OZ.js = new Jyougehyou_Syokunin_Mod(this);
+        this.es1.ori_s=new OrisensyuugouMod();
+        this.es1.reset_2();
     }
 
     public int getI_OAZ() {
