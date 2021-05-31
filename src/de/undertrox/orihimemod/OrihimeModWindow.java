@@ -337,6 +337,8 @@ public class OrihimeModWindow {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
+                g.setColor(Color.white);
+                g.fillRect(0,0,getWidth(),getHeight());
                 g.drawImage(finalImage, 0, 0, null);
             }
         };
@@ -351,7 +353,7 @@ public class OrihimeModWindow {
         progressBar.setBorderPainted(false);
         progressBar.setForeground(Color.getHSBColor(0,0,(255-45)/255f));
         progressBar.setFont(Font.getFont("Arial"));
-        //progressBar.setBackground(Color.white);
+        progressBar.setBackground(Color.white);
         loadingFrame.add(progressBar);
         loadingFrame.setUndecorated(true);
         loadingFrame.setLocationRelativeTo(null);

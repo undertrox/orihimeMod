@@ -23,7 +23,7 @@ public class WeightedRandom<T> {
 
     public T getRandomItem() {
         if (sum == 0) return null;
-        int rnd = random.nextInt(sum);
+        int rnd = random.nextInt(sum)+1;
         int index = -1;
         while (rnd > 0) {
             index++;
