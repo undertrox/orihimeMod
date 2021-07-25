@@ -27,7 +27,7 @@ public class SaveHelper {
         }
         Memo m = new Memo();
         m.addGyou(frame.textRenderer.serialize());
-        if (m.getGyousuu() != 0) {
+        if (!frame.textRenderer.empty()) {
             expose.memoAndName2File(m, filename + "text");
         }
         return success;

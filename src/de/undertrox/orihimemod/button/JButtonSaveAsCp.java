@@ -42,13 +42,15 @@ public class JButtonSaveAsCp extends JButton {
             expose.memoAndName2File(expose.orihime2cp(memo1), fname);
         }
 
-        Memo m = new Memo();
-        m.addGyou(frame.textRenderer.serialize());
-        expose.memoAndName2File(m, fname + "text");
-        if (fd.getFile() != null) {
-            expose.setFrameTitle(expose.getFrameTitle0() + "        " + fd.getFile());
-            frame.setTitle(expose.getFrameTitle());
-            es1.set_title(expose.getFrameTitle());
+        if (!frame.textRenderer.empty()) {
+            Memo m = new Memo();
+            m.addGyou(frame.textRenderer.serialize());
+            expose.memoAndName2File(m, fname + "text");
+            if (fd.getFile() != null) {
+                expose.setFrameTitle(expose.getFrameTitle0() + "        " + fd.getFile());
+                frame.setTitle(expose.getFrameTitle());
+                es1.set_title(expose.getFrameTitle());
+            }
         }
     }
 }

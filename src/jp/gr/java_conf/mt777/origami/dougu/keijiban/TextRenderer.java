@@ -89,4 +89,8 @@ public class TextRenderer extends Keijiban {
         }
         return r;
     }
+
+    public boolean empty() {
+        return this.textList.size() == 0;
+    }
 }

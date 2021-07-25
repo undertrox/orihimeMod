@@ -324,8 +324,8 @@ public class OrihimeModWindow {
         JFrame loadingFrame = new JFrame();
         loadingFrame.getContentPane().setLayout(new BoxLayout(loadingFrame.getContentPane(), BoxLayout.Y_AXIS));
         WeightedRandom<String> loadingScreens = new WeightedRandom<>();
-        loadingScreens.addItem("/de/undertrox/orihimemod/config/orihimeloadingscreen.png", 400);
-        loadingScreens.addItem("/de/undertrox/orihimemod/config/Orihime_logo.png", 1);
+        loadingScreens.addItem("/de/undertrox/orihimemod/config/orihimeloadingscreen.png", 1);
+        loadingScreens.addItem("/de/undertrox/orihimemod/config/Orihime_logo.png", 400);
         URL img = getClass().getResource(loadingScreens.getRandomItem());
         Image image = null;
         try {
