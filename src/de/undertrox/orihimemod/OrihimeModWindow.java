@@ -458,7 +458,7 @@ public class OrihimeModWindow {
         if (configManager.getConfig().smartFolding) {
             initSmartFolding();
         }
-        fixDeleteFoldedModelButton();
+        fixFoldedModelButtons();
         addMouseListenerToChildren(frame);
         addMouseListenerToChildren(frame.adFncFrame());
 
@@ -509,12 +509,32 @@ public class OrihimeModWindow {
         mapping.get("remove_everything").addActionListener(e -> saveBeforeAction(() -> newRemoveEverything.actionPerformed(e)));
     }
 
-    private void fixDeleteFoldedModelButton() {
-        AbstractButton deleteModel = mapping.get("delete_folded_shape");
-        ActionListener oldListener = deleteModel.getActionListeners()[0];
-        deleteModel.removeActionListener(oldListener);
-        deleteModel.addActionListener(e -> {
-            System.out.println(frame.getI_OAZ());
+    private void fixFoldedModelButtons() {
+        fixFoldedModelButton("delete_folded_shape");
+        fixFoldedModelButton("flip_folded");
+        fixFoldedModelButton("calculate_100_folded");
+        fixFoldedModelButton("go_to_folded_shape");
+        fixFoldedModelButton("modify_wireframe_folded");
+        fixFoldedModelButton("modify_folded");
+        fixFoldedModelButton("move_folded");
+        fixFoldedModelButton("zoom_out_folded");
+        fixFoldedModelButton("set_zoom_folded");
+        fixFoldedModelButton("zoom_in_folded");
+        fixFoldedModelButton("rotate_counterclockwise_folded");
+        fixFoldedModelButton("set_rotation_folded");
+        fixFoldedModelButton("rotate_clockwise_folded");
+        fixFoldedModelButton("antialiasing_folded");
+        fixFoldedModelButton("shadow_folded");
+        fixFoldedModelButton("set_folded_front_color");
+        fixFoldedModelButton("set_folded_back_color");
+        fixFoldedModelButton("set_folded_line_color");
+    }
+
+    private void fixFoldedModelButton(String mappingName) {
+        AbstractButton foldedModelButton = mapping.get(mappingName);
+        ActionListener oldListener = foldedModelButton.getActionListeners()[0];
+        foldedModelButton.removeActionListener(oldListener);
+        foldedModelButton.addActionListener(e -> {
             if (frame.getI_OAZ() == 0) {
                 frame.setI_OAZToMax();
             }
