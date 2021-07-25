@@ -116,6 +116,7 @@ public class OrihimeFrame extends ap {
 
     public void setI_OAZToMax() {
         this.i_OAZ = this.OAZ.size()-1;
+        this.OZ = (Oriagari_Zu) this.OAZ.get(i_OAZ);
     }
 
     public void setShowHelp(boolean showHelp) {

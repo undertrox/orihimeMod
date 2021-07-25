@@ -324,8 +324,8 @@ public class OrihimeModWindow {
         JFrame loadingFrame = new JFrame();
         loadingFrame.getContentPane().setLayout(new BoxLayout(loadingFrame.getContentPane(), BoxLayout.Y_AXIS));
         WeightedRandom<String> loadingScreens = new WeightedRandom<>();
-        loadingScreens.addItem("/de/undertrox/orihimemod/config/orihimeloadingscreen.png", 1);
-        loadingScreens.addItem("/de/undertrox/orihimemod/config/Orihime_logo.png", 100);
+        loadingScreens.addItem("/de/undertrox/orihimemod/config/orihimeloadingscreen.png", 400);
+        loadingScreens.addItem("/de/undertrox/orihimemod/config/Orihime_logo.png", 1);
         URL img = getClass().getResource(loadingScreens.getRandomItem());
         Image image = null;
         try {
@@ -512,6 +512,7 @@ public class OrihimeModWindow {
 
     private void fixFoldedModelButtons() {
         fixFoldedModelButton("delete_folded_shape");
+        fixFoldedModelButton("search_next_fold");
         fixFoldedModelButton("flip_folded");
         fixFoldedModelButton("calculate_100_folded");
         fixFoldedModelButton("go_to_folded_shape");
@@ -519,6 +520,8 @@ public class OrihimeModWindow {
         fixFoldedModelButton("modify_folded");
         fixFoldedModelButton("move_folded");
         fixFoldedModelButton("zoom_out_folded");
+        fixFoldedModelButton("undo_folded");
+        fixFoldedModelButton("redo_folded");
         fixFoldedModelButton("set_zoom_folded");
         fixFoldedModelButton("zoom_in_folded");
         fixFoldedModelButton("rotate_counterclockwise_folded");
