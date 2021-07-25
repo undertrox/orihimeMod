@@ -108,6 +108,9 @@ public class ConfigFileManager {
 
     private void updateToNewestVersion() {
         String version = config.version();
+        if (!Arrays.asList(Config.versions).contains(version)) {
+            return;
+        }
         System.out.println("Updating Config file from version " + version + " to " + OrihimeMod.version);
         ParsedConfigFile file = ParsedConfigFile.fromFile(fileName);
         if (Arrays.asList(getVersionsBetween(version, OrihimeMod.version)).contains("0.2.0")) {
