@@ -11,7 +11,7 @@ import java.awt.*;
 
 public class Jyougehyou_Syokunin_Mod extends Jyougehyou_Syokunin {
     Touka_jyouken errorPos = null;
-
+    public static boolean showIntersection = true;
     public Jyougehyou_Syokunin_Mod(ap ap0) {
         super(ap0);
     }
@@ -605,17 +605,19 @@ public class Jyougehyou_Syokunin_Mod extends Jyougehyou_Syokunin {
         super.oekaki_toukazu_with_camera(g, orite, otta_Men_zu, Smen_zu, i_toukazu_color, toukazu_toukado);
         Graphics2D g2 = (Graphics2D) g;
         if (errorPos != null) {
-            g2.setColor(new Color(255, 0, 0, 75));
-            fillPolygon(g2, errorPos.geta(), otta_Men_zu, camera);
-            fillPolygon(g2, errorPos.getb(), otta_Men_zu, camera);
-            fillPolygon(g2, errorPos.getc(), otta_Men_zu, camera);
-            fillPolygon(g2, errorPos.getd(), otta_Men_zu, camera);
+            if (showIntersection) {
+                g2.setColor(new Color(255, 0, 0, 75));
+                fillPolygon(g2, errorPos.geta(), otta_Men_zu, camera);
+                fillPolygon(g2, errorPos.getb(), otta_Men_zu, camera);
+                fillPolygon(g2, errorPos.getc(), otta_Men_zu, camera);
+                fillPolygon(g2, errorPos.getd(), otta_Men_zu, camera);
 
 
-            fillPolygon(g2, errorPos.geta(), orite.get(), orihime_ap.camera_of_orisen_nyuuryokuzu);
-            fillPolygon(g2, errorPos.getb(), orite.get(), orihime_ap.camera_of_orisen_nyuuryokuzu);
-            fillPolygon(g2, errorPos.getc(), orite.get(), orihime_ap.camera_of_orisen_nyuuryokuzu);
-            fillPolygon(g2, errorPos.getd(), orite.get(), orihime_ap.camera_of_orisen_nyuuryokuzu);
+                fillPolygon(g2, errorPos.geta(), orite.get(), orihime_ap.camera_of_orisen_nyuuryokuzu);
+                fillPolygon(g2, errorPos.getb(), orite.get(), orihime_ap.camera_of_orisen_nyuuryokuzu);
+                fillPolygon(g2, errorPos.getc(), orite.get(), orihime_ap.camera_of_orisen_nyuuryokuzu);
+                fillPolygon(g2, errorPos.getd(), orite.get(), orihime_ap.camera_of_orisen_nyuuryokuzu);
+            }
         }
     }
 

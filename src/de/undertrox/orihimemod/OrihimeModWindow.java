@@ -18,6 +18,7 @@ import jp.gr.java_conf.mt777.origami.dougu.keijiban.TextRenderer;
 import jp.gr.java_conf.mt777.origami.orihime.Expose;
 import jp.gr.java_conf.mt777.origami.orihime.OrihimeFrame;
 import jp.gr.java_conf.mt777.origami.orihime.ap;
+import jp.gr.java_conf.mt777.origami.orihime.jyougehyou_syokunin.Jyougehyou_Syokunin_Mod;
 import jp.gr.java_conf.mt777.zukei2d.senbun.Senbun;
 import jp.gr.java_conf.mt777.zukei2d.ten.Ten;
 
@@ -768,10 +769,18 @@ public class OrihimeModWindow {
 
         mapping.get("save").getParent().add(btnExport);
         JPanel p = new JPanel();
-        p.setLayout(new GridLayout(1, 2));
+        p.setLayout(new GridLayout(2, 2));
         p.setBackground(Color.PINK);
         p.add(frame.textField);
         p.add(frame.tb);
+        JCheckBox showIntersection = new JCheckBox("ssi");
+        checkboxes.add(showIntersection);
+        showIntersection.setSelected(true);
+        showIntersection.addActionListener(e -> {
+            Jyougehyou_Syokunin_Mod.showIntersection = showIntersection.isSelected();
+            frame.repaint();
+        });
+        mapping.get("check_overlapping_creases").getParent().add(showIntersection);
         mapping.get("change_circle_color").getParent().getParent().setLayout(new GridLayout(29, 1));
         mapping.get("change_circle_color").getParent().getParent().add(p);
         buttons.add(btnExport);
