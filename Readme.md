@@ -3,7 +3,9 @@ Orihime-Mod
 
 This is a little mod/addon for the software Orihime by @MT777. It adds the possibility 
 to use keyboard shortcuts and a lot of other features. Download the jar file [here](https://github.com/undertrox/orihimeMod/releases/download/v1.0.0/orihimeMod-1.0.0.jar)
-(version 1.0.0)
+(version 1.0.0).
+
+Also check out [qurbens origami editor](https://github.com/qurben/origami-editor), it has most of the features from this mod, plus an insanely fast folding algorithm.
 
 Features
 ---
